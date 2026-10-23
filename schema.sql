@@ -320,3 +320,42 @@ ON CONFLICT ("Key") DO NOTHING;
 INSERT INTO "Announcements" ("ID", "Judul", "Konten", "Kategori", "Prioritas", "ID Pembuat", "Nama Pembuat", "Role Pembuat", "Tanggal Buat", "Tanggal Update", "Status", "Gambar URL")
 VALUES ('ANN001', 'Selamat Datang di Portal Sekolah', 'Portal Sekolah resmi diluncurkan. Guru dan siswa dapat mengakses portal ini untuk kegiatan pembelajaran, absensi, dan ujian CBT.', 'Umum', 'Tinggi', 'USR001', 'Administrator', 'admin', NOW()::text, NOW()::text, 'active', '')
 ON CONFLICT ("ID") DO NOTHING;
+
+-- 14. TABEL LEARNINGS (Ruang Pembelajaran Mandiri & Modul Siswa)
+CREATE TABLE IF NOT EXISTS "Learnings" (
+    "ID" TEXT PRIMARY KEY,
+    "Judul" TEXT NOT NULL,
+    "ID Mapel" TEXT,
+    "Nama Mapel" TEXT,
+    "ID Kelas" TEXT,
+    "Nama Kelas" TEXT,
+    "ID Guru" TEXT,
+    "Nama Guru" TEXT,
+    "Token" TEXT UNIQUE NOT NULL,
+    "Ringkasan" TEXT,
+    "Konten" TEXT,
+    "Media URL" TEXT,
+    "Status" TEXT DEFAULT 'active',
+    "Tanggal Buat" TEXT,
+    "Tanggal Update" TEXT
+);
+
+-- 15. TABEL LEARNING SESSIONS (Daftar Siswa Mengakses Ruang Belajar)
+CREATE TABLE IF NOT EXISTS "LearningSessions" (
+    "ID" TEXT PRIMARY KEY,
+    "ID Pembelajaran" TEXT,
+    "Judul Pembelajaran" TEXT,
+    "Nama Siswa" TEXT NOT NULL,
+    "Waktu Masuk" TEXT,
+    "Catatan" TEXT
+);
+
+ALTER TABLE "Learnings" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "LearningSessions" ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public Access Learnings" ON "Learnings";
+CREATE POLICY "Public Access Learnings" ON "Learnings" FOR ALL USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public Access LearningSessions" ON "LearningSessions";
+CREATE POLICY "Public Access LearningSessions" ON "LearningSessions" FOR ALL USING (true) WITH CHECK (true);
+

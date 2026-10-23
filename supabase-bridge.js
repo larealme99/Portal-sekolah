@@ -133,20 +133,31 @@
     },
 
     async getPendingUsers() {
-      return await this.getAllData('PendingUsers');
+      try {
+        const sb = getClient();
+        if (!sb) return { success: false, message: 'Supabase client belum siap.', data: [] };
+        const { data, error } = await sb.from('PendingUsers').select('*').order('Tanggal Daftar', { ascending: false });
+        if (error) throw error;
+        return { success: true, data: data || [] };
+      } catch (e) {
+        console.error('[getPendingUsers error]:', e);
+        return { success: false, message: e.message || 'Gagal memuat data pendaftaran.', data: [] };
+      }
     },
 
     async approveUser(pendingId) {
       try {
         const sb = getClient();
-        const { data: pList } = await sb.from('PendingUsers').select('*').eq('ID', pendingId);
+        if (!sb) return { success: false, message: 'Supabase client belum siap.' };
+        const { data: pList, error: pErr } = await sb.from('PendingUsers').select('*').eq('ID', pendingId);
+        if (pErr) throw pErr;
         if (!pList || pList.length === 0) return { success: false, message: 'Data pendaftaran tidak ditemukan.' };
         const p = pList[0];
 
         const newUserId = generateId('USR');
         const now = new Date().toISOString();
 
-        await sb.from('Users').insert([{
+        const { error: insErr } = await sb.from('Users').insert([{
           'ID': newUserId,
           'Username': p['Username'],
           'Password': p['Password'],
@@ -161,10 +172,12 @@
           'Telepon': p['Telepon'] || '',
           'Alamat': p['Alamat'] || ''
         }]);
+        if (insErr) throw insErr;
 
         await sb.from('PendingUsers').delete().eq('ID', pendingId);
         return { success: true, message: 'Guru berhasil disetujui.' };
       } catch (e) {
+        console.error('[approveUser error]:', e);
         return { success: false, message: e.message };
       }
     },
@@ -172,7 +185,9 @@
     async rejectUser(pendingId) {
       try {
         const sb = getClient();
-        await sb.from('PendingUsers').delete().eq('ID', pendingId);
+        if (!sb) return { success: false, message: 'Supabase client belum siap.' };
+        const { error } = await sb.from('PendingUsers').delete().eq('ID', pendingId);
+        if (error) throw error;
         return { success: true, message: 'Pendaftaran ditolak.' };
       } catch (e) {
         return { success: false, message: e.message };
@@ -184,18 +199,39 @@
     },
 
     async getUsers() {
-      return await this.getAllData('Users');
+      try {
+        const sb = getClient();
+        if (!sb) return { success: false, message: 'Supabase client belum siap.', data: [] };
+        const { data, error } = await sb.from('Users').select('*').order('Nama Lengkap', { ascending: true });
+        if (error) throw error;
+        const filtered = (data || []).filter(u => u.Role !== 'admin');
+        return { success: true, data: filtered };
+      } catch (e) {
+        console.error('[getUsers error]:', e);
+        return { success: false, message: e.message || 'Gagal memuat daftar guru.', data: [] };
+      }
     },
 
     async getAllUsers() {
-      return await this.getAllData('Users');
+      try {
+        const sb = getClient();
+        if (!sb) return { success: false, message: 'Supabase client belum siap.', data: [] };
+        const { data, error } = await sb.from('Users').select('*');
+        if (error) throw error;
+        return { success: true, data: data || [] };
+      } catch (e) {
+        console.error('[getAllUsers error]:', e);
+        return { success: false, message: e.message || 'Gagal memuat data pengguna.', data: [] };
+      }
     },
 
     async getUserById(userId) {
       try {
         const sb = getClient();
-        const { data } = await sb.from('Users').select('*').eq('ID', userId);
-        if (data && data.length > 0) return { success: true, user: data[0] };
+        if (!sb) return { success: false, message: 'Supabase client belum siap.' };
+        const { data, error } = await sb.from('Users').select('*').eq('ID', userId);
+        if (error) throw error;
+        if (data && data.length > 0) return { success: true, data: data[0], user: data[0] };
         return { success: false, message: 'User tidak ditemukan.' };
       } catch (e) {
         return { success: false, message: e.message };
@@ -205,6 +241,13 @@
     async adminCreateUser(data) {
       try {
         const sb = getClient();
+        if (!sb) return { success: false, message: 'Supabase client belum siap.' };
+
+        const { data: existing } = await sb.from('Users').select('ID').eq('Username', data.username);
+        if (existing && existing.length > 0) {
+          return { success: false, message: 'Username sudah digunakan oleh akun lain.' };
+        }
+
         const newId = generateId('USR');
         const now = new Date().toISOString();
         const { error } = await sb.from('Users').insert([{
@@ -223,8 +266,9 @@
           'Alamat': data.alamat || ''
         }]);
         if (error) throw error;
-        return { success: true, message: 'User berhasil dibuat.' };
+        return { success: true, message: 'Guru berhasil ditambahkan.' };
       } catch (e) {
+        console.error('[adminCreateUser error]:', e);
         return { success: false, message: e.message };
       }
     },
@@ -1282,6 +1326,217 @@
       if (examId) query = query.eq('ID Ujian', examId);
       const { data, error } = await query;
       return { success: !error, data: data || [] };
+    },
+
+    // --- RUANG PEMBELAJARAN (LEARNING ROOM) ---
+    async _loadLearningsStore() {
+      const sb = getClient();
+      if (sb) {
+        try {
+          const { data, error } = await sb.from('Learnings').select('*').order('Tanggal Buat', { ascending: false });
+          if (!error && Array.isArray(data)) return data;
+        } catch (e) {}
+        try {
+          const { data, error } = await sb.from('Settings').select('Value').eq('Key', 'app_learnings_data').maybeSingle();
+          if (!error && data && data.Value) {
+            const parsed = JSON.parse(data.Value);
+            if (Array.isArray(parsed)) return parsed;
+          }
+        } catch (e) {}
+      }
+      try {
+        const local = localStorage.getItem('portal_learnings_data');
+        if (local) return JSON.parse(local);
+      } catch (e) {}
+      return [];
+    },
+
+    async _saveLearningsStore(list) {
+      const sb = getClient();
+      if (sb) {
+        try {
+          await sb.from('Settings').upsert([{
+            'Key': 'app_learnings_data',
+            'Value': JSON.stringify(list),
+            'Label': 'Data Ruang Pembelajaran',
+            'Keterangan': 'Sync modul ruang pembelajaran mandiri',
+            'Diupdate': new Date().toISOString()
+          }]);
+        } catch (e) {}
+      }
+      try {
+        localStorage.setItem('portal_learnings_data', JSON.stringify(list));
+      } catch (e) {}
+    },
+
+    async getLearnings(filterGuruId) {
+      try {
+        const list = await this._loadLearningsStore();
+        let result = list;
+        if (filterGuruId) {
+          result = list.filter(item => !item.idGuru || item.idGuru === filterGuruId || item.idGuru === '');
+        }
+        return { success: true, data: result };
+      } catch (e) {
+        return { success: false, message: e.message, data: [] };
+      }
+    },
+
+    async createLearning(data) {
+      try {
+        const list = await this._loadLearningsStore();
+        const newId = generateId('LRN');
+        const token = (data.token || ('LRN' + Math.random().toString(36).substr(2, 4)).toUpperCase()).trim().toUpperCase();
+
+        const newItem = {
+          id: newId,
+          judul: data.judul || 'Materi Pembelajaran Baru',
+          idMapel: data.idMapel || '',
+          namaMapel: data.namaMapel || '',
+          idKelas: data.idKelas || '',
+          namaKelas: data.namaKelas || 'Semua Kelas',
+          idGuru: data.idGuru || '',
+          namaGuru: data.namaGuru || 'Guru Pengampu',
+          token: token,
+          ringkasan: data.ringkasan || '',
+          konten: data.konten || '',
+          mediaUrl: data.mediaUrl || '',
+          status: data.status || 'active',
+          tanggalBuat: new Date().toISOString()
+        };
+
+        list.unshift(newItem);
+        await this._saveLearningsStore(list);
+        return { success: true, message: 'Pembelajaran berhasil dipublikasikan!', data: newItem };
+      } catch (e) {
+        return { success: false, message: e.message };
+      }
+    },
+
+    async updateLearning(id, data) {
+      try {
+        const list = await this._loadLearningsStore();
+        const idx = list.findIndex(item => item.id === id);
+        if (idx === -1) return { success: false, message: 'Data pembelajaran tidak ditemukan.' };
+
+        list[idx] = {
+          ...list[idx],
+          judul: data.judul !== undefined ? data.judul : list[idx].judul,
+          idMapel: data.idMapel !== undefined ? data.idMapel : list[idx].idMapel,
+          namaMapel: data.namaMapel !== undefined ? data.namaMapel : list[idx].namaMapel,
+          idKelas: data.idKelas !== undefined ? data.idKelas : list[idx].idKelas,
+          namaKelas: data.namaKelas !== undefined ? data.namaKelas : list[idx].namaKelas,
+          token: data.token ? data.token.trim().toUpperCase() : list[idx].token,
+          ringkasan: data.ringkasan !== undefined ? data.ringkasan : list[idx].ringkasan,
+          konten: data.konten !== undefined ? data.konten : list[idx].konten,
+          mediaUrl: data.mediaUrl !== undefined ? data.mediaUrl : list[idx].mediaUrl,
+          status: data.status !== undefined ? data.status : list[idx].status,
+          tanggalUpdate: new Date().toISOString()
+        };
+
+        await this._saveLearningsStore(list);
+        return { success: true, message: 'Pembelajaran berhasil diperbarui!' };
+      } catch (e) {
+        return { success: false, message: e.message };
+      }
+    },
+
+    async deleteLearning(id) {
+      try {
+        let list = await this._loadLearningsStore();
+        list = list.filter(item => item.id !== id);
+        await this._saveLearningsStore(list);
+        return { success: true, message: 'Pembelajaran berhasil dihapus.' };
+      } catch (e) {
+        return { success: false, message: e.message };
+      }
+    },
+
+    async validateAndJoinLearning(namaSiswa, tokenInput) {
+      try {
+        if (!namaSiswa || !tokenInput) {
+          return { success: false, message: 'Nama lengkap siswa dan token wajib diisi!' };
+        }
+        const cleanTok = tokenInput.trim().toUpperCase();
+        const list = await this._loadLearningsStore();
+        const match = list.find(item => {
+          const itemTok = (item.token || '').trim().toUpperCase();
+          const itemId = (item.id || '').trim().toUpperCase();
+          return (itemTok === cleanTok || itemId === cleanTok) && item.status !== 'inactive';
+        });
+
+        if (!match) {
+          return { success: false, message: 'Token Pembelajaran tidak valid atau materi sudah tidak aktif!' };
+        }
+
+        // Catat kehadiran siswa
+        const attendees = await this._loadLearningAttendeesStore();
+        const now = new Date().toISOString();
+        attendees.unshift({
+          id: generateId('ATT'),
+          idPembelajaran: match.id,
+          judulPembelajaran: match.judul,
+          namaSiswa: namaSiswa.trim(),
+          waktuAkses: now
+        });
+        await this._saveLearningAttendeesStore(attendees);
+
+        return {
+          success: true,
+          message: 'Berhasil bergabung!',
+          learning: match,
+          namaSiswa: namaSiswa.trim(),
+          waktuMasuk: now
+        };
+      } catch (e) {
+        return { success: false, message: e.message };
+      }
+    },
+
+    async getLearningAttendees(learningId) {
+      try {
+        const attendees = await this._loadLearningAttendeesStore();
+        const filtered = attendees.filter(a => a.idPembelajaran === learningId);
+        return { success: true, data: filtered };
+      } catch (e) {
+        return { success: false, message: e.message, data: [] };
+      }
+    },
+
+    async _loadLearningAttendeesStore() {
+      const sb = getClient();
+      if (sb) {
+        try {
+          const { data, error } = await sb.from('Settings').select('Value').eq('Key', 'app_learning_attendees_data').maybeSingle();
+          if (!error && data && data.Value) {
+            const parsed = JSON.parse(data.Value);
+            if (Array.isArray(parsed)) return parsed;
+          }
+        } catch (e) {}
+      }
+      try {
+        const local = localStorage.getItem('portal_learning_attendees_data');
+        if (local) return JSON.parse(local);
+      } catch (e) {}
+      return [];
+    },
+
+    async _saveLearningAttendeesStore(list) {
+      const sb = getClient();
+      if (sb) {
+        try {
+          await sb.from('Settings').upsert([{
+            'Key': 'app_learning_attendees_data',
+            'Value': JSON.stringify(list),
+            'Label': 'Data Hadir Ruang Belajar',
+            'Keterangan': 'Sync riwayat siswa masuk ruang pembelajaran',
+            'Diupdate': new Date().toISOString()
+          }]);
+        } catch (e) {}
+      }
+      try {
+        localStorage.setItem('portal_learning_attendees_data', JSON.stringify(list));
+      } catch (e) {}
     }
   };
 

@@ -855,6 +855,30 @@
             transform: translateY(-2px);
         }
 
+        .lp-btn-learn {
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 15px;
+            padding: 13px 26px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 18px rgba(124, 58, 237, 0.4);
+            transition: all 0.25s ease;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .lp-btn-learn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 26px rgba(168, 85, 247, 0.6);
+            background: linear-gradient(135deg, #6d28d9, #9333ea);
+        }
+
         .lp-hero-actions {
             display: flex;
             gap: 16px;
@@ -3171,8 +3195,11 @@
                 Portal resmi layanan akademik, absensi cerdas, dan sistem ujian berbasis komputer (CBT) terpadu.
             </p>
 
-            <!-- HANYA DUA TOMBOL DI LANDING PAGE: UJIAN SISWA & LOGIN (ADMIN & GURU) -->
+            <!-- TOMBOL DI LANDING PAGE: RUANG BELAJAR, UJIAN SISWA, LOGIN ADMIN & GURU -->
             <div class="lp-hero-actions">
+                <button type="button" class="lp-btn-learn" onclick="openStudentLearningModal()">
+                    <i class="fas fa-chalkboard-teacher"></i> Ruang Pembelajaran
+                </button>
                 <button type="button" class="lp-btn-exam" onclick="openStudentExamModal()">
                     <i class="fas fa-pencil-alt"></i> Ujian Siswa
                 </button>
@@ -3302,6 +3329,48 @@
                 <button type="button" class="btn-confirm-start" onclick="proceedStartExam()">
                     <i class="fas fa-play"></i> Mulai Mengerjakan Ujian
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════ MODAL RUANG PEMBELAJARAN SISWA ═══════════════════ -->
+    <div class="modal-glass-overlay hidden" id="studentLearningModal">
+        <div class="modal-glass-card" style="max-width:440px">
+            <button class="btn-glass-close" onclick="closeModal('studentLearningModal')"><i class="fas fa-times"></i></button>
+            <div style="text-align:center;margin-bottom:20px">
+                <div style="width:64px;height:64px;background:rgba(124,58,237,0.2);border:1px solid rgba(168,85,247,0.4);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:26px;color:#a855f7">
+                    <i class="fas fa-laptop-code"></i>
+                </div>
+                <div class="glass-auth-title" style="font-size:24px">Ruang Pembelajaran</div>
+                <div class="glass-auth-subtitle">Masukkan Nama Lengkap dan Token Materi dari Guru</div>
+            </div>
+
+            <div class="glass-input-box">
+                <input type="text" id="modalNamaSiswaBelajar" placeholder="Nama Lengkap Siswa"
+                    onkeydown="if(event.key==='Enter')doStudentLearningFromModal()" />
+                <div class="glass-input-icon"><i class="far fa-user"></i></div>
+            </div>
+
+            <div class="glass-input-box">
+                <input type="text" id="modalTokenBelajar" placeholder="Token Pembelajaran (Contoh: LRN1234)"
+                    style="text-transform:uppercase;letter-spacing:2px;font-weight:700"
+                    onkeydown="if(event.key==='Enter')doStudentLearningFromModal()" />
+                <div class="glass-input-icon"><i class="fas fa-key"></i></div>
+            </div>
+
+            <button type="button" class="btn-glass-submit" style="background:linear-gradient(135deg,#7c3aed,#a855f7)"
+                onclick="doStudentLearningFromModal()">
+                <span><i class="fas fa-sign-in-alt" style="margin-right:8px"></i> Masuk Pembelajaran</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ── MODAL VIEWER MATERI SISWA (INTERAKTIF & ELEGAN) ── -->
+    <div class="modal-glass-overlay hidden" id="learningViewModal" style="z-index:9999">
+        <div class="modal-glass-card" style="max-width:850px;width:95%;max-height:92vh;overflow-y:auto;padding:28px 24px;border:1px solid rgba(168,85,247,0.3)">
+            <button class="btn-glass-close" onclick="closeModal('learningViewModal')"><i class="fas fa-times"></i></button>
+            <div id="learningViewContent">
+                <!-- Dynamically populated by renderStudentLearningView() -->
             </div>
         </div>
     </div>
@@ -3458,8 +3527,6 @@
                     <div class="sidebar-item" onclick="loadPage('approveUser')" id="menu-approveUser"><i
                             class="fas fa-user-check"></i><span>Approve User <span id="pendingBadge"
                                 class="badge badge-danger" style="margin-left:4px;display:none">0</span></span></div>
-                    <div class="sidebar-item" onclick="loadPage('absenAdmin')" id="menu-absenAdmin"><i
-                            class="fas fa-calendar-check"></i><span>Absen Siswa</span></div>
                 </div>
                 <div class="sidebar-section">
                     <div class="sidebar-section-label">Akademik</div>
@@ -3467,6 +3534,10 @@
                             class="fas fa-school"></i><span>Daftar Kelas</span></div>
                     <div class="sidebar-item" onclick="loadPage('daftarMapelAdmin')" id="menu-daftarMapelAdmin"><i
                             class="fas fa-book"></i><span>Daftar Mapel</span></div>
+                    <div class="sidebar-item" onclick="loadPage('absenAdmin')" id="menu-absenAdmin"><i
+                            class="fas fa-calendar-check"></i><span>Absen Siswa</span></div>
+                    <div class="sidebar-item" onclick="loadPage('pembelajaranAdmin')" id="menu-pembelajaranAdmin"><i
+                            class="fas fa-chalkboard"></i><span>Ruang Pembelajaran</span></div>
                     <div class="sidebar-item" onclick="loadPage('ujianAdmin')" id="menu-ujianAdmin"><i
                             class="fas fa-file-alt"></i><span>Ujian</span></div>
                     <div class="sidebar-item" onclick="loadPage('rekapNilaiAdmin')" id="menu-rekapNilaiAdmin"><i
@@ -3495,12 +3566,14 @@
                             class="fas fa-school"></i><span>Daftar Kelas</span></div>
                     <div class="sidebar-item" onclick="loadPage('daftarMapelGuru')" id="menu-daftarMapelGuru"><i
                             class="fas fa-book"></i><span>Daftar Mapel</span></div>
+                    <div class="sidebar-item" onclick="loadPage('absenGuru')" id="menu-absenGuru"><i
+                            class="fas fa-calendar-check"></i><span>Absen Siswa</span></div>
+                    <div class="sidebar-item" onclick="loadPage('pembelajaranGuru')" id="menu-pembelajaranGuru"><i
+                            class="fas fa-chalkboard"></i><span>Ruang Pembelajaran</span></div>
                     <div class="sidebar-item" onclick="loadPage('ujianGuru')" id="menu-ujianGuru"><i
                             class="fas fa-file-alt"></i><span>Ujian</span></div>
                     <div class="sidebar-item" onclick="loadPage('rekapNilaiGuru')" id="menu-rekapNilaiGuru"><i
                             class="fas fa-chart-bar"></i><span>Rekap Nilai</span></div>
-                    <div class="sidebar-item" onclick="loadPage('absenGuru')" id="menu-absenGuru"><i
-                            class="fas fa-calendar-check"></i><span>Absen Siswa</span></div>
                     <div class="sidebar-item" onclick="loadPage('pengumumanGuru')" id="menu-pengumumanGuru"><i
                             class="fas fa-bullhorn"></i><span>Pengumuman</span></div>
                     <div class="sidebar-item" onclick="loadPage('profileGuru')" id="menu-profileGuru"><i
@@ -4200,6 +4273,448 @@
         // ═══════════════════════════════════════════════════
         // MODAL UJIAN SISWA DARI LANDING PAGE
         // ═══════════════════════════════════════════════════
+        // ═══════════════════════════════════════════════════
+        // RUANG PEMBELAJARAN (SISWA FLOW)
+        // ═══════════════════════════════════════════════════
+        function openStudentLearningModal() {
+            var n = document.getElementById('modalNamaSiswaBelajar');
+            var t = document.getElementById('modalTokenBelajar');
+            if (n) n.value = '';
+            if (t) t.value = '';
+            openModal('studentLearningModal');
+            setTimeout(function () {
+                if (n) n.focus();
+            }, 150);
+        }
+
+        function doStudentLearningFromModal() {
+            var nama = v('modalNamaSiswaBelajar');
+            var token = v('modalTokenBelajar');
+            if (!nama || !token) {
+                showToast('Nama Lengkap Siswa dan Token Pembelajaran wajib diisi!', 'warning');
+                return;
+            }
+            showWaiting('Memvalidasi Token...', 'Mengecek ketersediaan ruang pembelajaran');
+            google.script.run.withSuccessHandler(function (res) {
+                hideWaiting();
+                if (res && res.success) {
+                    closeModal('studentLearningModal');
+                    renderStudentLearningView(res.learning, nama, res.waktuMasuk);
+                } else {
+                    showToast((res && res.message) ? res.message : 'Token tidak valid.', 'error');
+                }
+            }).withFailureHandler(function (e) {
+                hideWaiting();
+                err(e);
+            }).validateAndJoinLearning(nama, token);
+        }
+
+        function renderStudentLearningView(learning, studentName, joinTime) {
+            var dateStr = joinTime ? formatCleanDateTime(joinTime) : formatCleanDateTime(new Date().toISOString());
+            
+            // Format media URL embed (YouTube support)
+            var mediaHtml = '';
+            if (learning.mediaUrl) {
+                var url = learning.mediaUrl.trim();
+                var ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+                if (ytMatch && ytMatch[1]) {
+                    mediaHtml = '<div style="margin:20px 0;border-radius:12px;overflow:hidden;border:1px solid var(--border);box-shadow:0 6px 20px rgba(0,0,0,0.3)">' +
+                        '<iframe width="100%" height="380" src="https://www.youtube.com/embed/' + ytMatch[1] + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="display:block"></iframe>' +
+                        '</div>';
+                } else {
+                    mediaHtml = '<div style="margin:18px 0;padding:14px 18px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">' +
+                        '<div style="display:flex;align-items:center;gap:12px"><i class="fas fa-link fa-2x" style="color:var(--primary)"></i><div><strong style="display:block;font-size:14px">Materi / Tautan Referensi Eksternal</strong><span style="font-size:12px;color:var(--text2);word-break:break-all">' + esc(url) + '</span></div></div>' +
+                        '<a href="' + esc(url) + '" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm"><i class="fas fa-external-link-alt"></i> Buka Tautan</a>' +
+                        '</div>';
+                }
+            }
+
+            var html = '<div style="border-bottom:1px solid var(--border);padding-bottom:16px;margin-bottom:18px">' +
+                '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px">' +
+                '<span class="badge badge-purple" style="font-size:12px;padding:5px 10px"><i class="fas fa-laptop-code"></i> Ruang Pembelajaran</span>' +
+                '<span style="font-size:12px;color:#10b981;background:rgba(16,185,129,0.15);padding:4px 10px;border-radius:20px;border:1px solid rgba(16,185,129,0.3);font-weight:600"><i class="fas fa-check-circle"></i> Kehadiran Siswa Tercatat</span>' +
+                '</div>' +
+                '<h2 style="font-size:22px;font-weight:800;color:var(--text);margin-bottom:8px">' + esc(learning.judul) + '</h2>' +
+                '<div style="display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--text2)">' +
+                '<span><i class="fas fa-book" style="color:var(--primary);margin-right:5px"></i>' + esc(learning.namaMapel || 'Mata Pelajaran') + '</span>' +
+                '<span><i class="fas fa-school" style="color:var(--accent);margin-right:5px"></i>' + esc(learning.namaKelas || 'Semua Kelas') + '</span>' +
+                '<span><i class="fas fa-chalkboard-teacher" style="color:#a855f7;margin-right:5px"></i>' + esc(learning.namaGuru || 'Guru Pengampu') + '</span>' +
+                '<span><i class="fas fa-user-graduate" style="color:#38bdf8;margin-right:5px"></i>Siswa: <strong>' + esc(studentName) + '</strong></span>' +
+                '</div>' +
+                '</div>';
+
+            if (learning.ringkasan) {
+                html += '<div style="background:rgba(124,58,237,0.08);border-left:4px solid #a855f7;padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:20px;font-size:14px;color:var(--text3)">' +
+                    '<strong><i class="fas fa-info-circle" style="color:#a855f7;margin-right:6px"></i>Ringkasan / Petunjuk Belajar:</strong><br/>' +
+                    esc(learning.ringkasan) +
+                    '</div>';
+            }
+
+            html += mediaHtml;
+
+            html += '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:22px">' +
+                '<h4 style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px">' +
+                '<i class="fas fa-file-alt" style="color:var(--primary)"></i> Modul & Isi Materi Pembelajaran' +
+                '</h4>' +
+                '<div style="font-size:15px;line-height:1.75;color:var(--text);white-space:pre-wrap;font-family:inherit">' +
+                (learning.konten ? esc(learning.konten) : '<span style="color:var(--text2)">Tidak ada catatan teks tambahan. Silakan pelajari materi melalui media / tautan di atas.</span>') +
+                '</div>' +
+                '</div>';
+
+            html += '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;padding-top:14px;border-top:1px solid var(--border)">' +
+                '<span style="font-size:12px;color:var(--text2)"><i class="far fa-clock"></i> Masuk pada: ' + dateStr + '</span>' +
+                '<button class="btn btn-primary" onclick="closeModal(\'learningViewModal\');showToast(\'Selamat, Anda telah menyelesaikan pembelajaran ini!\', \'success\')"><i class="fas fa-check"></i> Selesai Mempelajari</button>' +
+                '</div>';
+
+            document.getElementById('learningViewContent').innerHTML = html;
+            openModal('learningViewModal');
+        }
+
+        // ═══════════════════════════════════════════════════
+        // RUANG PEMBELAJARAN (ADMIN & GURU MANAGEMENT)
+        // ═══════════════════════════════════════════════════
+        var APP_LEARNINGS_CACHE = [];
+
+        function renderRuangPembelajaran(role) {
+            showWaiting('Memuat Data...', 'Mengambil data ruang pembelajaran');
+            var filterGuru = (role === 'guru' && APP.currentUser) ? APP.currentUser.id : '';
+
+            google.script.run.withSuccessHandler(function (res) {
+                hideWaiting();
+                var main = document.getElementById('dashMain');
+                if (!res || !res.success) {
+                    main.innerHTML = errHtml((res && res.message) ? res.message : 'Gagal memuat pembelajaran');
+                    return;
+                }
+
+                APP_LEARNINGS_CACHE = res.data || [];
+                var items = APP_LEARNINGS_CACHE;
+                var activeCount = items.filter(function (it) { return it.status === 'active'; }).length;
+
+                var html = '<div class="page-header">' +
+                    '<h1><i class="fas fa-chalkboard" style="color:#a855f7"></i> Ruang Pembelajaran</h1>' +
+                    '<p>Kelola modul belajar, video referensi, dan token akses siswa untuk belajar mandiri</p>' +
+                    '</div>' +
+                    '<div class="stats-grid" style="margin-bottom:20px">' +
+                    '<div class="stat-card"><div class="stat-icon" style="background:rgba(124,58,237,0.15);color:#a855f7"><i class="fas fa-laptop-code"></i></div><div><div class="stat-value">' + items.length + '</div><div class="stat-label">Total Pembelajaran</div></div></div>' +
+                    '<div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,0.15);color:#10b981"><i class="fas fa-check-circle"></i></div><div><div class="stat-value">' + activeCount + '</div><div class="stat-label">Materi Aktif</div></div></div>' +
+                    '<div class="stat-card"><div class="stat-icon" style="background:rgba(56,189,248,0.15);color:#38bdf8"><i class="fas fa-key"></i></div><div><div class="stat-value">' + (items.length ? 'Aktif' : '-') + '</div><div class="stat-label">Sistem Token CBT Belajar</div></div></div>' +
+                    '</div>' +
+                    '<div class="card">' +
+                    '<div class="card-header">' +
+                    '<div class="filter-bar"><div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchLearn" placeholder="Cari materi / mapel / token..." oninput="filterTable(\'learnTable\',this.value)"/></div></div>' +
+                    '<button class="btn btn-primary btn-sm" onclick="openAddLearningModal(\'' + role + '\')"><i class="fas fa-plus"></i> Buat Pembelajaran Baru</button>' +
+                    '</div>' +
+                    '<div class="table-wrap"><table id="learnTable"><thead><tr><th>#</th><th>Judul Pembelajaran</th><th>Mapel</th><th>Kelas</th><th>Guru</th><th>Token Belajar</th><th>Status</th><th>Aksi</th></tr></thead><tbody>';
+
+                if (items.length === 0) {
+                    html += '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text2)">Belum ada materi pembelajaran. Klik "Buat Pembelajaran Baru" untuk memulai!</td></tr>';
+                } else {
+                    items.forEach(function (it, idx) {
+                        var statusBadge = it.status === 'active'
+                            ? '<span class="badge badge-success">Aktif</span>'
+                            : '<span class="badge badge-danger">Nonaktif</span>';
+
+                        html += '<tr>' +
+                            '<td>' + (idx + 1) + '</td>' +
+                            '<td><strong>' + esc(it.judul) + '</strong>' + (it.mediaUrl ? ' <i class="fas fa-paperclip" title="Memiliki media/tautan" style="color:var(--primary);font-size:12px"></i>' : '') + '</td>' +
+                            '<td>' + esc(it.namaMapel || '-') + '</td>' +
+                            '<td><span class="badge badge-outline">' + esc(it.namaKelas || 'Semua') + '</span></td>' +
+                            '<td>' + esc(it.namaGuru || '-') + '</td>' +
+                            '<td>' +
+                            '<div style="display:inline-flex;align-items:center;gap:6px">' +
+                            '<code style="background:rgba(124,58,237,0.15);color:#a855f7;border:1px solid rgba(168,85,247,0.3);padding:3px 8px;border-radius:6px;font-weight:700;letter-spacing:1px;font-size:12px">' + esc(it.token) + '</code>' +
+                            '<button class="btn btn-outline btn-xs" title="Salin Token" onclick="copyTextToClipboard(\'' + esc(it.token) + '\')"><i class="fas fa-copy"></i></button>' +
+                            '</div>' +
+                            '</td>' +
+                            '<td>' + statusBadge + '</td>' +
+                            '<td>' +
+                            '<div class="action-btns">' +
+                            '<button class="btn btn-primary btn-sm btn-icon" title="Pratinjau Materi" onclick="previewLearningModal(\'' + it.id + '\')"><i class="fas fa-eye"></i></button>' +
+                            '<button class="btn btn-outline btn-sm btn-icon" title="Daftar Siswa Masuk" onclick="viewLearningAttendees(\'' + it.id + '\', \'' + esc(it.judul) + '\')"><i class="fas fa-user-check"></i></button>' +
+                            '<button class="btn btn-warning btn-sm btn-icon" title="Edit" onclick="editLearningModal(\'' + it.id + '\', \'' + role + '\')"><i class="fas fa-edit"></i></button>' +
+                            '<button class="btn btn-danger btn-sm btn-icon" title="Hapus" onclick="deleteLearningConfirm(\'' + it.id + '\', \'' + esc(it.judul) + '\', \'' + role + '\')"><i class="fas fa-trash"></i></button>' +
+                            '</div>' +
+                            '</td>' +
+                            '</tr>';
+                    });
+                }
+
+                html += '</tbody></table></div></div>';
+                main.innerHTML = html;
+            }).withFailureHandler(function (e) {
+                hideWaiting();
+                errPage(e);
+            }).getLearnings(filterGuru);
+        }
+
+        function openAddLearningModal(role) {
+            document.getElementById('generalModalTitle').textContent = 'Buat Ruang Pembelajaran Baru';
+            document.getElementById('generalModalBox').style.maxWidth = '680px';
+
+            var defaultToken = 'LRN' + Math.random().toString(36).substr(2, 4).toUpperCase();
+            var guruId = (role === 'guru' && APP.currentUser) ? APP.currentUser.id : '';
+            var guruNama = (role === 'guru' && APP.currentUser) ? APP.currentUser.namaLengkap : (APP.currentUser ? APP.currentUser.namaLengkap : 'Guru Pengampu');
+
+            // Load Mapel & Kelas options
+            showWaiting('Menyiapkan Form...', 'Memuat daftar kelas & mata pelajaran');
+            google.script.run.withSuccessHandler(function (classRes) {
+                google.script.run.withSuccessHandler(function (subjRes) {
+                    hideWaiting();
+                    var classes = (classRes && classRes.success && classRes.data) ? classRes.data : [];
+                    var subjects = (subjRes && subjRes.success && subjRes.data) ? subjRes.data : [];
+
+                    var classOpts = '<option value="">Semua Kelas</option>' + classes.map(function (c) {
+                        return '<option value="' + c['ID Kelas'] + '" data-nama="' + esc(c['Nama Kelas']) + '">' + esc(c['Nama Kelas']) + '</option>';
+                    }).join('');
+
+                    var subjOpts = '<option value="">Pilih Mata Pelajaran</option>' + subjects.map(function (s) {
+                        return '<option value="' + s['ID Mapel'] + '" data-nama="' + esc(s['Nama Mapel']) + '">' + esc(s['Nama Mapel']) + '</option>';
+                    }).join('');
+
+                    document.getElementById('generalModalBody').innerHTML =
+                        '<div class="form-group"><label>Judul Pembelajaran / Topik Bahasan *</label><input class="form-control" id="mlJudul" placeholder="Contoh: Konsep Turunan & Diferensial Fungsi Aljabar"/></div>' +
+                        '<div class="form-row">' +
+                        '<div class="form-group"><label>Mata Pelajaran *</label><select class="form-control" id="mlMapel">' + subjOpts + '</select></div>' +
+                        '<div class="form-group"><label>Kelas Target</label><select class="form-control" id="mlKelas">' + classOpts + '</select></div>' +
+                        '</div>' +
+                        '<div class="form-row">' +
+                        '<div class="form-group"><label>Token Akses Siswa * (Otomatis dibuat)</label><div style="display:flex;gap:8px"><input class="form-control" id="mlToken" value="' + defaultToken + '" style="font-family:monospace;letter-spacing:1.5px;font-weight:700;text-transform:uppercase"/><button type="button" class="btn btn-outline" onclick="document.getElementById(\'mlToken\').value=\'LRN\'+Math.random().toString(36).substr(2,4).toUpperCase()"><i class="fas fa-random"></i> Acak</button></div></div>' +
+                        '<div class="form-group"><label>Status Pembelajaran</label><select class="form-control" id="mlStatus"><option value="active">Aktif (Dapat diakses siswa)</option><option value="inactive">Nonaktif</option></select></div>' +
+                        '</div>' +
+                        '<div class="form-group"><label>Tautan Video / Materi Eksternal (Opsional - YouTube / Google Drive / Dokumen)</label><input class="form-control" id="mlMediaUrl" placeholder="Contoh: https://www.youtube.com/watch?v=... atau link materi"/></div>' +
+                        '<div class="form-group"><label>Ringkasan / Petunjuk Belajar</label><textarea class="form-control" id="mlRingkasan" rows="2" placeholder="Petunjuk singkat sebelum membaca modul..."></textarea></div>' +
+                        '<div class="form-group"><label>Isi Catatan & Modul Pembelajaran *</label><textarea class="form-control" id="mlKonten" rows="6" placeholder="Tuliskan rangkuman materi lengkap, teori, rumus, atau tugas belajar di sini..."></textarea></div>' +
+                        '<div style="display:flex;gap:10px;margin-top:16px">' +
+                        '<button class="btn btn-primary" onclick="submitCreateLearning(\'' + role + '\', \'' + guruId + '\', \'' + esc(guruNama) + '\')"><i class="fas fa-save"></i> Publikasikan Pembelajaran</button>' +
+                        '<button class="btn btn-outline" onclick="closeModal(\'generalModal\')">Batal</button>' +
+                        '</div>';
+
+                    openModal('generalModal');
+                }).withFailureHandler(function (e) { hideWaiting(); err(e); }).getSubjects();
+            }).withFailureHandler(function (e) { hideWaiting(); err(e); }).getClasses();
+        }
+
+        function submitCreateLearning(role, guruId, guruNama) {
+            var judul = v('mlJudul');
+            var mapelSelect = document.getElementById('mlMapel');
+            var kelasSelect = document.getElementById('mlKelas');
+            var idMapel = mapelSelect ? mapelSelect.value : '';
+            var namaMapel = mapelSelect && mapelSelect.selectedIndex >= 0 ? mapelSelect.options[mapelSelect.selectedIndex].text : '';
+            var idKelas = kelasSelect ? kelasSelect.value : '';
+            var namaKelas = kelasSelect && kelasSelect.selectedIndex >= 0 ? kelasSelect.options[kelasSelect.selectedIndex].text : '';
+            var token = v('mlToken');
+            var status = v('mlStatus');
+            var mediaUrl = v('mlMediaUrl');
+            var ringkasan = v('mlRingkasan');
+            var konten = v('mlKonten');
+
+            if (!judul || !token || !konten) {
+                showToast('Lengkapi Judul, Token, dan Isi Materi Pembelajaran!', 'warning');
+                return;
+            }
+
+            var payload = {
+                judul: judul,
+                idMapel: idMapel,
+                namaMapel: idMapel ? namaMapel : 'Umum',
+                idKelas: idKelas,
+                namaKelas: idKelas ? namaKelas : 'Semua Kelas',
+                idGuru: guruId,
+                namaGuru: guruNama,
+                token: token,
+                status: status || 'active',
+                mediaUrl: mediaUrl,
+                ringkasan: ringkasan,
+                konten: konten
+            };
+
+            showWaiting('Menyimpan Data...', 'Menerbitkan pembelajaran baru');
+            google.script.run.withSuccessHandler(function (res) {
+                hideWaiting();
+                if (res && res.success) {
+                    showToast(res.message, 'success');
+                    closeModal('generalModal');
+                    renderRuangPembelajaran(role);
+                } else {
+                    showToast((res && res.message) ? res.message : 'Gagal menyimpan.', 'error');
+                }
+            }).withFailureHandler(function (e) {
+                hideWaiting();
+                err(e);
+            }).createLearning(payload);
+        }
+
+        function previewLearningModal(learningId) {
+            var item = APP_LEARNINGS_CACHE.find(function (it) { return it.id === learningId; });
+            if (!item) { showToast('Data materi tidak ditemukan.', 'error'); return; }
+            renderStudentLearningView(item, 'Pratinjau Guru', new Date().toISOString());
+        }
+
+        function editLearningModal(learningId, role) {
+            var item = APP_LEARNINGS_CACHE.find(function (it) { return it.id === learningId; });
+            if (!item) { showToast('Data materi tidak ditemukan.', 'error'); return; }
+
+            document.getElementById('generalModalTitle').textContent = 'Edit Ruang Pembelajaran';
+            document.getElementById('generalModalBox').style.maxWidth = '680px';
+
+            showWaiting('Menyiapkan Form...', 'Memuat data');
+            google.script.run.withSuccessHandler(function (classRes) {
+                google.script.run.withSuccessHandler(function (subjRes) {
+                    hideWaiting();
+                    var classes = (classRes && classRes.success && classRes.data) ? classRes.data : [];
+                    var subjects = (subjRes && subjRes.success && subjRes.data) ? subjRes.data : [];
+
+                    var classOpts = '<option value="">Semua Kelas</option>' + classes.map(function (c) {
+                        return '<option value="' + c['ID Kelas'] + '"' + (item.idKelas === c['ID Kelas'] ? ' selected' : '') + '>' + esc(c['Nama Kelas']) + '</option>';
+                    }).join('');
+
+                    var subjOpts = '<option value="">Pilih Mata Pelajaran</option>' + subjects.map(function (s) {
+                        return '<option value="' + s['ID Mapel'] + '"' + (item.idMapel === s['ID Mapel'] ? ' selected' : '') + '>' + esc(s['Nama Mapel']) + '</option>';
+                    }).join('');
+
+                    document.getElementById('generalModalBody').innerHTML =
+                        '<div class="form-group"><label>Judul Pembelajaran / Topik Bahasan *</label><input class="form-control" id="mlJudul" value="' + esc(item.judul) + '"/></div>' +
+                        '<div class="form-row">' +
+                        '<div class="form-group"><label>Mata Pelajaran *</label><select class="form-control" id="mlMapel">' + subjOpts + '</select></div>' +
+                        '<div class="form-group"><label>Kelas Target</label><select class="form-control" id="mlKelas">' + classOpts + '</select></div>' +
+                        '</div>' +
+                        '<div class="form-row">' +
+                        '<div class="form-group"><label>Token Akses Siswa *</label><input class="form-control" id="mlToken" value="' + esc(item.token) + '" style="font-family:monospace;letter-spacing:1.5px;font-weight:700;text-transform:uppercase"/></div>' +
+                        '<div class="form-group"><label>Status Pembelajaran</label><select class="form-control" id="mlStatus"><option value="active"' + (item.status === 'active' ? ' selected' : '') + '>Aktif</option><option value="inactive"' + (item.status === 'inactive' ? ' selected' : '') + '>Nonaktif</option></select></div>' +
+                        '</div>' +
+                        '<div class="form-group"><label>Tautan Video / Materi Eksternal</label><input class="form-control" id="mlMediaUrl" value="' + esc(item.mediaUrl || '') + '"/></div>' +
+                        '<div class="form-group"><label>Ringkasan / Petunjuk Belajar</label><textarea class="form-control" id="mlRingkasan" rows="2">' + esc(item.ringkasan || '') + '</textarea></div>' +
+                        '<div class="form-group"><label>Isi Catatan & Modul Pembelajaran *</label><textarea class="form-control" id="mlKonten" rows="6">' + esc(item.konten || '') + '</textarea></div>' +
+                        '<div style="display:flex;gap:10px;margin-top:16px">' +
+                        '<button class="btn btn-primary" onclick="submitUpdateLearning(\'' + item.id + '\', \'' + role + '\')"><i class="fas fa-save"></i> Simpan Perubahan</button>' +
+                        '<button class="btn btn-outline" onclick="closeModal(\'generalModal\')">Batal</button>' +
+                        '</div>';
+
+                    openModal('generalModal');
+                }).withFailureHandler(function (e) { hideWaiting(); err(e); }).getSubjects();
+            }).withFailureHandler(function (e) { hideWaiting(); err(e); }).getClasses();
+        }
+
+        function submitUpdateLearning(learningId, role) {
+            var judul = v('mlJudul');
+            var mapelSelect = document.getElementById('mlMapel');
+            var kelasSelect = document.getElementById('mlKelas');
+            var idMapel = mapelSelect ? mapelSelect.value : '';
+            var namaMapel = mapelSelect && mapelSelect.selectedIndex >= 0 ? mapelSelect.options[mapelSelect.selectedIndex].text : '';
+            var idKelas = kelasSelect ? kelasSelect.value : '';
+            var namaKelas = kelasSelect && kelasSelect.selectedIndex >= 0 ? kelasSelect.options[kelasSelect.selectedIndex].text : '';
+            var token = v('mlToken');
+            var status = v('mlStatus');
+            var mediaUrl = v('mlMediaUrl');
+            var ringkasan = v('mlRingkasan');
+            var konten = v('mlKonten');
+
+            if (!judul || !token || !konten) {
+                showToast('Lengkapi Judul, Token, dan Isi Materi Pembelajaran!', 'warning');
+                return;
+            }
+
+            var payload = {
+                judul: judul,
+                idMapel: idMapel,
+                namaMapel: idMapel ? namaMapel : 'Umum',
+                idKelas: idKelas,
+                namaKelas: idKelas ? namaKelas : 'Semua Kelas',
+                token: token,
+                status: status,
+                mediaUrl: mediaUrl,
+                ringkasan: ringkasan,
+                konten: konten
+            };
+
+            showWaiting('Menyimpan Perubahan...', 'Memperbarui materi');
+            google.script.run.withSuccessHandler(function (res) {
+                hideWaiting();
+                if (res && res.success) {
+                    showToast(res.message, 'success');
+                    closeModal('generalModal');
+                    renderRuangPembelajaran(role);
+                } else {
+                    showToast((res && res.message) ? res.message : 'Gagal memperbarui.', 'error');
+                }
+            }).withFailureHandler(function (e) {
+                hideWaiting();
+                err(e);
+            }).updateLearning(learningId, payload);
+        }
+
+        function deleteLearningConfirm(learningId, judul, role) {
+            showConfirmDialog(
+                'Hapus Pembelajaran',
+                'Apakah Anda yakin ingin menghapus materi pembelajaran "' + judul + '"? Token akses ini tidak akan dapat digunakan lagi.',
+                function () {
+                    showWaiting('Menghapus...', 'Menghapus materi pembelajaran');
+                    google.script.run.withSuccessHandler(function (res) {
+                        hideWaiting();
+                        showToast(res.message, res.success ? 'success' : 'error');
+                        if (res.success) renderRuangPembelajaran(role);
+                    }).withFailureHandler(function (e) { hideWaiting(); err(e); }).deleteLearning(learningId);
+                }
+            );
+        }
+
+        function viewLearningAttendees(learningId, judul) {
+            document.getElementById('generalModalTitle').textContent = 'Daftar Siswa Mengakses Pembelajaran';
+            document.getElementById('generalModalBox').style.maxWidth = '600px';
+
+            showWaiting('Memuat Data...', 'Mengambil riwayat akses siswa');
+            google.script.run.withSuccessHandler(function (res) {
+                hideWaiting();
+                var attendees = (res && res.success && res.data) ? res.data : [];
+                var html = '<div style="margin-bottom:14px"><strong style="color:var(--text);font-size:15px">' + esc(judul) + '</strong><p style="color:var(--text2);font-size:13px">Siswa yang memasukkan token untuk bergabung ke materi ini</p></div>';
+
+                if (attendees.length === 0) {
+                    html += '<div style="text-align:center;padding:30px;color:var(--text2);background:var(--bg3);border-radius:12px">Belum ada siswa yang bergabung pada sesi ini.</div>';
+                } else {
+                    html += '<div class="table-wrap"><table><thead><tr><th>#</th><th>Nama Lengkap Siswa</th><th>Waktu Masuk</th><th>Status Kehadiran</th></tr></thead><tbody>';
+                    attendees.forEach(function (att, i) {
+                        html += '<tr>' +
+                            '<td>' + (i + 1) + '</td>' +
+                            '<td><strong>' + esc(att.namaSiswa) + '</strong></td>' +
+                            '<td>' + formatCleanDateTime(att.waktuAkses) + '</td>' +
+                            '<td><span class="badge badge-success"><i class="fas fa-check"></i> Hadir</span></td>' +
+                            '</tr>';
+                    });
+                    html += '</tbody></table></div>';
+                }
+
+                html += '<div style="margin-top:16px;text-align:right"><button class="btn btn-outline" onclick="closeModal(\'generalModal\')">Tutup</button></div>';
+                document.getElementById('generalModalBody').innerHTML = html;
+                openModal('generalModal');
+            }).withFailureHandler(function (e) {
+                hideWaiting();
+                err(e);
+            }).getLearningAttendees(learningId);
+        }
+
+        function copyTextToClipboard(text) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(function () {
+                    showToast('Token ' + text + ' berhasil disalin!', 'success');
+                }).catch(function () {
+                    fallbackCopyText(text);
+                });
+            } else {
+                fallbackCopyText(text);
+            }
+        }
+
+        function fallbackCopyText(text) {
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showToast('Token ' + text + ' berhasil disalin!', 'success');
+        }
+
         function openStudentExamModal() {
             var m = document.getElementById('studentExamModal');
             if (m) {
@@ -4463,6 +4978,8 @@
                 case 'daftarSiswaAdmin': renderDaftarSiswaAdmin(); break;
                 case 'approveUser': renderApproveUser(); break;
                 case 'absenAdmin': renderAbsenAdmin(); break;
+                case 'pembelajaranAdmin': renderRuangPembelajaran('admin'); break;
+                case 'pembelajaranGuru': renderRuangPembelajaran('guru'); break;
                 case 'daftarKelasAdmin': renderDaftarKelas('admin'); break;
                 case 'daftarMapelAdmin': renderDaftarMapel('admin'); break;
                 case 'ujianAdmin': renderUjian('admin'); break;
