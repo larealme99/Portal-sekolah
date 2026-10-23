@@ -8,8 +8,8 @@
 
 window.PORTAL_CONFIG = {
   // Ganti dengan Project URL Anda (contoh: 'https://xyzabcdefghijkl.supabase.co')
-  SUPABASE_URL: 'https://GANTI_DENGAN_PROJECT_URL_ANDA.supabase.co',
+  SUPABASE_URL: 'https://jpaaidqdyarboowjusom.supabase.co',
 
   // Ganti dengan anon public key Anda
-  SUPABASE_ANON_KEY: 'GANTI_DENGAN_ANON_KEY_ANDA'
+  SUPABASE_ANON_KEY: 'sb_publishable_GjKXAsbZi1HP2kkBGMvMzg_cmyIFcu'
 };
