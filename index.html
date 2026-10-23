@@ -4299,29 +4299,39 @@
             var password = document.getElementById('loginPassword').value;
             if (!username || !password) { showToast('Isi username dan password!', 'warning'); return; }
             var btn = document.getElementById('loginBtn');
+            var originalBtnHtml = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
             btn.disabled = true;
-            google.script.run.withSuccessHandler(function (res) {
-                btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Masuk';
+
+            function resetButton() {
+                btn.innerHTML = originalBtnHtml || '<span>Login</span>';
                 btn.disabled = false;
-                if (res.success) {
-                    APP.currentUser = res.user;
-                    if (loginTarget === 'admin' && res.user.role !== 'admin') {
-                        showToast('Akses ditolak. Anda bukan admin.', 'error'); return;
+            }
+
+            try {
+                google.script.run.withSuccessHandler(function (res) {
+                    resetButton();
+                    if (res && res.success) {
+                        APP.currentUser = res.user;
+                        if (loginTarget === 'admin' && res.user.role !== 'admin') {
+                            showToast('Akses ditolak. Anda bukan admin.', 'error'); return;
+                        }
+                        if (loginTarget === 'guru' && res.user.role === 'admin') {
+                            showToast('Gunakan tombol Login Admin.', 'warning'); return;
+                        }
+                        closeModal('loginModal');
+                        initDashboard();
+                    } else {
+                        showToast((res && res.message) ? res.message : 'Login gagal.', 'error');
                     }
-                    if (loginTarget === 'guru' && res.user.role === 'admin') {
-                        showToast('Gunakan tombol Login Admin.', 'warning'); return;
-                    }
-                    closeModal('loginModal');
-                    initDashboard();
-                } else {
-                    showToast(res.message, 'error');
-                }
-            }).withFailureHandler(function (e) {
-                btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Masuk';
-                btn.disabled = false;
-                showToast('Terjadi kesalahan: ' + e.message, 'error');
-            }).loginUser(username, password);
+                }).withFailureHandler(function (e) {
+                    resetButton();
+                    showToast('Terjadi kesalahan: ' + (e && e.message ? e.message : e), 'error');
+                }).loginUser(username, password);
+            } catch (err) {
+                resetButton();
+                showToast('Terjadi kesalahan: ' + err.message, 'error');
+            }
         }
 
         function doRegister() {

@@ -11,5 +11,5 @@ window.PORTAL_CONFIG = {
   SUPABASE_URL: 'https://jpaaidqdyarboowjusom.supabase.co',
 
   // Ganti dengan anon public key Anda
-  SUPABASE_ANON_KEY: 'sb_publishable_GjKXAsbZi1HP2kkBGMvMzg_cmyIFcu'
+  SUPABASE_ANON_KEY: 'sb_publishable_GjKXAsbZi1HP2kkBGMvMzg_cmyIFcu6'
 };

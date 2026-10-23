@@ -94,7 +94,10 @@
         }
         return { success: false, message: 'Password salah!' };
       } catch (e) {
-        return { success: false, message: e.message };
+        console.error('[loginUser Error]:', e);
+        const msg = e.message || (typeof e === 'string' ? e : 'Terjadi kesalahan sistem.');
+        const hint = e.hint ? ` (${e.hint})` : '';
+        return { success: false, message: msg + hint };
       }
     },
 
@@ -1288,33 +1291,36 @@
   window.google = window.google || {};
   window.google.script = window.google.script || {};
 
-  window.google.script.run = (function createRunner() {
+  function createRunner() {
     let onSuccess = null;
     let onFailure = null;
+    let userObj = null;
 
-    const runner = {
-      withSuccessHandler(fn) {
-        onSuccess = fn;
-        return runner;
-      },
-      withFailureHandler(fn) {
-        onFailure = fn;
-        return runner;
-      },
-      withUserObject() {
-        return runner;
-      }
-    };
-
-    return new Proxy(runner, {
+    const proxy = new Proxy({}, {
       get(target, prop) {
-        if (prop in target) return target[prop];
+        if (prop === 'withSuccessHandler') {
+          return function (fn) {
+            onSuccess = fn;
+            return proxy;
+          };
+        }
+        if (prop === 'withFailureHandler') {
+          return function (fn) {
+            onFailure = fn;
+            return proxy;
+          };
+        }
+        if (prop === 'withUserObject') {
+          return function (obj) {
+            userObj = obj;
+            return proxy;
+          };
+        }
 
         return async function (...args) {
           const successCb = onSuccess;
           const failureCb = onFailure;
-          onSuccess = null;
-          onFailure = null;
+          const uObj = userObj;
 
           try {
             let result;
@@ -1325,16 +1331,38 @@
               result = await Handlers.getAllData(prop);
             }
 
-            if (successCb) successCb(result);
+            if (successCb) {
+              try {
+                successCb(result, uObj);
+              } catch (cbErr) {
+                console.error(`[Supabase Bridge] Error inside success handler of ${prop}:`, cbErr);
+              }
+            }
             return result;
           } catch (err) {
             console.error(`[Supabase Bridge Error] pada ${prop}:`, err);
-            if (failureCb) failureCb(err);
+            if (failureCb) {
+              try {
+                failureCb(err, uObj);
+              } catch (cbErr) {
+                console.error(`[Supabase Bridge] Error inside failure handler of ${prop}:`, cbErr);
+              }
+            }
           }
         };
       }
     });
-  })();
+
+    return proxy;
+  }
+
+  Object.defineProperty(window.google.script, 'run', {
+    get() {
+      return createRunner();
+    },
+    configurable: true,
+    enumerable: true
+  });
 
   console.log('✅ [Portal Sekolah] Supabase Bridge aktif dan siap melayani permintaan.');
 })();
