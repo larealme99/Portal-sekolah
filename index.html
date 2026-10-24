@@ -2011,6 +2011,7 @@
         .student-space-card {
             transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
         }
+
         .student-space-card:hover {
             transform: translateY(-4px);
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
@@ -2024,6 +2025,7 @@
             padding: 20px;
             transition: border-color .2s;
         }
+
         .guru-bento-card:hover {
             border-color: rgba(56, 189, 248, 0.4);
         }
@@ -2038,10 +2040,22 @@
             animation: pulse-live 1.8s infinite;
             margin-right: 5px;
         }
+
         @keyframes pulse-live {
-            0% { transform: scale(0.95); opacity: 0.8; }
-            50% { transform: scale(1.3); opacity: 1; }
-            100% { transform: scale(0.95); opacity: 0.8; }
+            0% {
+                transform: scale(0.95);
+                opacity: 0.8;
+            }
+
+            50% {
+                transform: scale(1.3);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(0.95);
+                opacity: 0.8;
+            }
         }
 
         .discussion-reply-item {
@@ -3215,9 +3229,105 @@
                 grid-template-columns: 1fr;
             }
 
-            .hero h1 {
-                font-size: 26px;
-            }
+        /* ═══════════════════════════════════════════════════
+           SPMB (SISTEM PENERIMAAN MURID BARU) STYLES
+           ═══════════════════════════════════════════════════ */
+        .spmb-modal-box {
+            max-width: 840px !important;
+            width: 95vw !important;
+            max-height: 92vh !important;
+            display: flex;
+            flex-direction: column;
+        }
+        .spmb-stepper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 8px 12px;
+            margin-bottom: 20px;
+            gap: 6px;
+            overflow-x: auto;
+        }
+        .spmb-step-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text2);
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .spmb-step-item.active {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+        .spmb-step-item.completed {
+            color: #10b981;
+        }
+        .spmb-step-badge {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .spmb-step-item.active .spmb-step-badge {
+            background: #fff;
+            color: #059669;
+        }
+        .spmb-doc-card {
+            background: var(--bg3);
+            border: 1px dashed var(--border);
+            border-radius: 10px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            transition: all 0.2s ease;
+        }
+        .spmb-doc-card:hover {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.03);
+        }
+        .spmb-doc-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            background: rgba(16, 185, 129, 0.12);
+            color: #10b981;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .spmb-grade-table th, .spmb-grade-table td {
+            padding: 8px 10px;
+            text-align: center;
+            font-size: 12px;
+        }
+        .spmb-grade-input {
+            width: 58px;
+            text-align: center;
+            padding: 6px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            font-weight: 600;
         }
 
         @media print {
@@ -3256,23 +3366,37 @@
 
             <h1 class="lp-hero-title" id="lpHeroSchoolTitle">SMAN 12 Muna Barat</h1>
             <!-- ALAMAT & NPSN SEKOLAH (TULISAN MIRING TEPAT DIBAWAH NAMA SEKOLAH) -->
-            <p class="lp-hero-school-meta" id="lpHeroSchoolMeta" style="font-style: italic; font-size: 14.5px; color: #cbd5e1; margin-top: -6px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;">
-                <span><i class="fas fa-map-marker-alt" style="color:#38bdf8;margin-right:5px"></i><span id="lpHeroAddress">Jl. Poros Lagadi-Tondasi, Muna Barat</span></span>
+            <p class="lp-hero-school-meta" id="lpHeroSchoolMeta"
+                style="font-style: italic; font-size: 14.5px; color: #cbd5e1; margin-top: -6px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;">
+                <span><i class="fas fa-map-marker-alt" style="color:#38bdf8;margin-right:5px"></i><span
+                        id="lpHeroAddress">Jl. Poros Lagadi-Tondasi, Muna Barat</span></span>
                 <span style="opacity:0.5">•</span>
-                <span><i class="fas fa-id-card" style="color:#38bdf8;margin-right:5px"></i>NPSN: <span id="lpHeroNpsn">69989028</span></span>
+                <span><i class="fas fa-id-card" style="color:#38bdf8;margin-right:5px"></i>NPSN: <span
+                        id="lpHeroNpsn">69989028</span></span>
             </p>
             <p class="lp-hero-subtitle">
                 Portal resmi layanan akademik, absensi cerdas, dan sistem ujian berbasis komputer (CBT) terpadu.
             </p>
 
-            <!-- TOMBOL DI LANDING PAGE: RUANG SISWA & LOGIN (ADMIN & GURU) -->
+            <!-- TOMBOL DI LANDING PAGE: RUANG SISWA, PENDAFTARAN SPMB & LOGIN (ADMIN & GURU) -->
             <div class="lp-hero-actions">
-                <button type="button" class="lp-btn-student" onclick="openStudentSpaceModal()" style="background:linear-gradient(135deg, #0284c7, #2563eb);color:#fff;border:none;box-shadow:0 8px 25px rgba(37,99,235,0.4);border-radius:12px;padding:12px 24px;font-size:14px;font-weight:700;display:inline-flex;align-items:center;gap:8px;cursor:pointer;transition:all .2s ease">
+                <button type="button" class="lp-btn-student" onclick="openStudentSpaceModal()"
+                    style="background:linear-gradient(135deg, #0284c7, #2563eb);color:#fff;border:none;box-shadow:0 8px 25px rgba(37,99,235,0.4);border-radius:12px;padding:12px 24px;font-size:14px;font-weight:700;display:inline-flex;align-items:center;gap:8px;cursor:pointer;transition:all .2s ease">
                     <i class="fas fa-user-graduate"></i> Ruang Siswa
+                </button>
+                <button type="button" class="lp-btn-spmb" onclick="openSpmbRegistrationModal()"
+                    style="background:linear-gradient(135deg, #10b981, #059669);color:#fff;border:none;box-shadow:0 8px 25px rgba(16,185,129,0.35);border-radius:12px;padding:12px 24px;font-size:14px;font-weight:700;display:inline-flex;align-items:center;gap:8px;cursor:pointer;transition:all .2s ease">
+                    <i class="fas fa-id-card-alt"></i> Pendaftaran SPMB
                 </button>
                 <button type="button" class="lp-btn-login" onclick="showLogin('guru')">
                     <i class="fas fa-sign-in-alt"></i> Login (Admin & Guru)
                 </button>
+            </div>
+            <div style="margin-top:12px;display:flex;justify-content:center;gap:12px;align-items:center;flex-wrap:wrap">
+                <a href="javascript:void(0)" onclick="openSpmbCheckStatusModal()"
+                    style="font-size:12.5px;color:#38bdf8;text-decoration:none;display:inline-flex;align-items:center;gap:6px;background:rgba(56,189,248,0.1);padding:5px 14px;border-radius:20px;border:1px solid rgba(56,189,248,0.25);transition:all 0.2s ease">
+                    <i class="fas fa-search"></i> Cek Status Seleksi SPMB Siswa Baru
+                </a>
             </div>
             <!-- Tombol riwayat ujian HANYA muncul setelah siswa menyelesaikan ujian (bukan di landing page awal) -->
             <div id="lpBtnRecentExamWrap" style="margin-top:14px;display:none;justify-content:center">
@@ -3322,40 +3446,54 @@
     <!-- ═══════════════════ MODAL MENU RUANG SISWA (BOX KONTAINER TERPADU) ═══════════════════ -->
     <div class="modal-glass-overlay hidden" id="studentSpaceModal">
         <div class="modal-glass-card" style="max-width:580px;width:95%;padding:28px 24px">
-            <button class="btn-glass-close" onclick="closeModal('studentSpaceModal')"><i class="fas fa-times"></i></button>
+            <button class="btn-glass-close" onclick="closeModal('studentSpaceModal')"><i
+                    class="fas fa-times"></i></button>
             <div style="text-align:center;margin-bottom:24px">
-                <div style="width:64px;height:64px;background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:26px;color:#38bdf8">
+                <div
+                    style="width:64px;height:64px;background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:26px;color:#38bdf8">
                     <i class="fas fa-user-graduate"></i>
                 </div>
                 <div class="glass-auth-title" style="font-size:22px">Ruang Siswa Terpadu</div>
-                <div class="glass-auth-subtitle" style="font-size:13px">Pilih layanan pembelajaran mandiri atau ruang ujian komputer:</div>
+                <div class="glass-auth-subtitle" style="font-size:13px">Pilih layanan pembelajaran mandiri atau ruang
+                    ujian komputer:</div>
             </div>
 
-            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(230px, 1fr));gap:16px;margin-bottom:8px">
+            <div
+                style="display:grid;grid-template-columns:repeat(auto-fit, minmax(230px, 1fr));gap:16px;margin-bottom:8px">
                 <!-- BOX 1: RUANG PEMBELAJARAN -->
-                <div class="student-space-card" onclick="closeModal('studentSpaceModal');openStudentLearningModal()" style="background:rgba(124,58,237,0.12);border:1px solid rgba(168,85,247,0.35);border-radius:14px;padding:20px;cursor:pointer;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:space-between">
+                <div class="student-space-card" onclick="closeModal('studentSpaceModal');openStudentLearningModal()"
+                    style="background:rgba(124,58,237,0.12);border:1px solid rgba(168,85,247,0.35);border-radius:14px;padding:20px;cursor:pointer;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:space-between">
                     <div>
-                        <div style="width:52px;height:52px;background:rgba(168,85,247,0.25);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#c084fc;margin:0 auto 12px">
+                        <div
+                            style="width:52px;height:52px;background:rgba(168,85,247,0.25);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#c084fc;margin:0 auto 12px">
                             <i class="fas fa-chalkboard-teacher"></i>
                         </div>
                         <h3 style="font-size:16px;font-weight:700;color:#fff;margin-bottom:6px">Ruang Pembelajaran</h3>
-                        <p style="font-size:12px;color:#cbd5e1;line-height:1.55;margin-bottom:16px">Pelajari modul digital, video referensi, unduh berkas materi (PDF, PPT, Foto), dan tanya jawab di forum diskusi.</p>
+                        <p style="font-size:12px;color:#cbd5e1;line-height:1.55;margin-bottom:16px">Pelajari modul
+                            digital, video referensi, unduh berkas materi (PDF, PPT, Foto), dan tanya jawab di forum
+                            diskusi.</p>
                     </div>
-                    <button type="button" class="btn btn-primary btn-sm" style="width:100%;background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;border-radius:10px;padding:10px;font-weight:700">
+                    <button type="button" class="btn btn-primary btn-sm"
+                        style="width:100%;background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;border-radius:10px;padding:10px;font-weight:700">
                         <i class="fas fa-door-open"></i> Masuk Pembelajaran
                     </button>
                 </div>
 
                 <!-- BOX 2: UJIAN / ULANGAN SISWA -->
-                <div class="student-space-card" onclick="closeModal('studentSpaceModal');openStudentExamModal()" style="background:rgba(14,165,233,0.12);border:1px solid rgba(56,189,248,0.35);border-radius:14px;padding:20px;cursor:pointer;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:space-between">
+                <div class="student-space-card" onclick="closeModal('studentSpaceModal');openStudentExamModal()"
+                    style="background:rgba(14,165,233,0.12);border:1px solid rgba(56,189,248,0.35);border-radius:14px;padding:20px;cursor:pointer;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:space-between">
                     <div>
-                        <div style="width:52px;height:52px;background:rgba(56,189,248,0.25);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#38bdf8;margin:0 auto 12px">
+                        <div
+                            style="width:52px;height:52px;background:rgba(56,189,248,0.25);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#38bdf8;margin:0 auto 12px">
                             <i class="fas fa-pencil-alt"></i>
                         </div>
-                        <h3 style="font-size:16px;font-weight:700;color:#fff;margin-bottom:6px">Ujian / Ulangan Siswa</h3>
-                        <p style="font-size:12px;color:#cbd5e1;line-height:1.55;margin-bottom:16px">Ikuti tes CBT, ulangan harian, PTS, dan PAS dengan memasukkan token ujian resmi dari guru.</p>
+                        <h3 style="font-size:16px;font-weight:700;color:#fff;margin-bottom:6px">Ujian / Ulangan Siswa
+                        </h3>
+                        <p style="font-size:12px;color:#cbd5e1;line-height:1.55;margin-bottom:16px">Ikuti tes CBT,
+                            ulangan harian, PTS, dan PAS dengan memasukkan token ujian resmi dari guru.</p>
                     </div>
-                    <button type="button" class="btn btn-primary btn-sm" style="width:100%;background:linear-gradient(135deg,#0284c7,#2563eb);border:none;border-radius:10px;padding:10px;font-weight:700">
+                    <button type="button" class="btn btn-primary btn-sm"
+                        style="width:100%;background:linear-gradient(135deg,#0284c7,#2563eb);border:none;border-radius:10px;padding:10px;font-weight:700">
                         <i class="fas fa-pen-nib"></i> Masuk Ruang Ujian
                     </button>
                 </div>
@@ -3447,9 +3585,11 @@
     <!-- ═══════════════════ MODAL RUANG PEMBELAJARAN SISWA ═══════════════════ -->
     <div class="modal-glass-overlay hidden" id="studentLearningModal">
         <div class="modal-glass-card" style="max-width:520px;width:95%">
-            <button class="btn-glass-close" onclick="closeModal('studentLearningModal')"><i class="fas fa-times"></i></button>
+            <button class="btn-glass-close" onclick="closeModal('studentLearningModal')"><i
+                    class="fas fa-times"></i></button>
             <div style="text-align:center;margin-bottom:20px">
-                <div style="width:64px;height:64px;background:rgba(124,58,237,0.2);border:1px solid rgba(168,85,247,0.4);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:26px;color:#a855f7">
+                <div
+                    style="width:64px;height:64px;background:rgba(124,58,237,0.2);border:1px solid rgba(168,85,247,0.4);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:26px;color:#a855f7">
                     <i class="fas fa-laptop-code"></i>
                 </div>
                 <div class="glass-auth-title" style="font-size:24px">Ruang Pembelajaran</div>
@@ -3476,12 +3616,17 @@
 
             <!-- DAFTAR MATERI AKTIF (1-KLIK PILIH TOKEN) -->
             <div style="margin-top:20px;border-top:1px solid rgba(255,255,255,0.1);padding-top:14px">
-                <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;justify-content:space-between">
-                    <span><i class="fas fa-book-open" style="color:#a855f7;margin-right:4px"></i> Materi Aktif yang Tersedia:</span>
-                    <span style="font-size:10px;color:#38bdf8;cursor:pointer" onclick="openStudentLearningModal()"><i class="fas fa-sync-alt"></i> Muat Ulang</span>
+                <div
+                    style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;justify-content:space-between">
+                    <span><i class="fas fa-book-open" style="color:#a855f7;margin-right:4px"></i> Materi Aktif yang
+                        Tersedia:</span>
+                    <span style="font-size:10px;color:#38bdf8;cursor:pointer" onclick="openStudentLearningModal()"><i
+                            class="fas fa-sync-alt"></i> Muat Ulang</span>
                 </div>
-                <div id="modalActiveLearningsList" style="max-height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:6px">
-                    <div style="font-size:12px;color:var(--text2);text-align:center;padding:10px"><i class="fas fa-spinner fa-spin"></i> Memeriksa materi...</div>
+                <div id="modalActiveLearningsList"
+                    style="max-height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:6px">
+                    <div style="font-size:12px;color:var(--text2);text-align:center;padding:10px"><i
+                            class="fas fa-spinner fa-spin"></i> Memeriksa materi...</div>
                 </div>
             </div>
         </div>
@@ -3489,7 +3634,8 @@
 
     <!-- ── MODAL VIEWER MATERI SISWA (INTERAKTIF & ELEGAN) ── -->
     <div class="modal-glass-overlay hidden" id="learningViewModal" style="z-index:9999">
-        <div class="modal-glass-card" style="max-width:920px;width:95%;max-height:92vh;overflow-y:auto;padding:28px 24px;border:1px solid rgba(168,85,247,0.3)">
+        <div class="modal-glass-card"
+            style="max-width:920px;width:95%;max-height:92vh;overflow-y:auto;padding:28px 24px;border:1px solid rgba(168,85,247,0.3)">
             <button class="btn-glass-close" onclick="exitStudentLearningRoom()"><i class="fas fa-times"></i></button>
             <div id="learningViewContent">
                 <!-- Dynamically populated by renderStudentLearningView() -->
@@ -3499,34 +3645,55 @@
 
     <!-- ── MODAL MONITOR KEHADIRAN SISWA DI RUANG PEMBELAJARAN (GURU & ADMIN) ── -->
     <div class="modal-glass-overlay hidden" id="learningMonitorModal" style="z-index:99999">
-        <div class="modal-glass-card" style="max-width:880px;width:95%;max-height:90vh;overflow-y:auto;padding:26px 22px;border:1px solid rgba(56,189,248,0.35)">
-            <button class="btn-glass-close" onclick="closeModal('learningMonitorModal')"><i class="fas fa-times"></i></button>
-            <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:18px;flex-wrap:wrap;gap:10px">
+        <div class="modal-glass-card"
+            style="max-width:880px;width:95%;max-height:90vh;overflow-y:auto;padding:26px 22px;border:1px solid rgba(56,189,248,0.35)">
+            <button class="btn-glass-close" onclick="closeModal('learningMonitorModal')"><i
+                    class="fas fa-times"></i></button>
+            <div
+                style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:18px;flex-wrap:wrap;gap:10px">
                 <div>
-                    <h3 style="font-size:18px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:8px">
+                    <h3
+                        style="font-size:18px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:8px">
                         <i class="fas fa-users-cog" style="color:#38bdf8"></i> Monitor Kehadiran Siswa
                     </h3>
-                    <p style="font-size:12px;color:var(--text2)" id="learningMonitorSubtitle">Memantau aktivitas siswa masuk dan keluar ruangan</p>
+                    <p style="font-size:12px;color:var(--text2)" id="learningMonitorSubtitle">Memantau aktivitas siswa
+                        masuk dan keluar ruangan</p>
                 </div>
                 <div style="display:flex;align-items:center;gap:8px">
-                    <button class="btn btn-outline btn-sm" id="btnRefreshMonitor" onclick="refreshLearningMonitor()"><i class="fas fa-sync-alt"></i> Segarkan Data</button>
-                    <span id="monitorLiveBadge" style="font-size:11px;padding:4px 10px;border-radius:12px;background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);font-weight:600"><span class="live-dot"></span>Live Tracker</span>
+                    <button class="btn btn-outline btn-sm" id="btnRefreshMonitor" onclick="refreshLearningMonitor()"><i
+                            class="fas fa-sync-alt"></i> Segarkan Data</button>
+                    <span id="monitorLiveBadge"
+                        style="font-size:11px;padding:4px 10px;border-radius:12px;background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);font-weight:600"><span
+                            class="live-dot"></span>Live Tracker</span>
                 </div>
             </div>
 
             <!-- Stats Monitor -->
-            <div class="stats-grid" style="margin-bottom:18px;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr))">
+            <div class="stats-grid"
+                style="margin-bottom:18px;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr))">
                 <div class="stat-card" style="padding:14px">
-                    <div class="stat-icon" style="background:rgba(56,189,248,0.15);color:#38bdf8"><i class="fas fa-users"></i></div>
-                    <div><div class="stat-value" id="monTotalCount">0</div><div class="stat-label">Total Akses Siswa</div></div>
+                    <div class="stat-icon" style="background:rgba(56,189,248,0.15);color:#38bdf8"><i
+                            class="fas fa-users"></i></div>
+                    <div>
+                        <div class="stat-value" id="monTotalCount">0</div>
+                        <div class="stat-label">Total Akses Siswa</div>
+                    </div>
                 </div>
                 <div class="stat-card" style="padding:14px">
-                    <div class="stat-icon" style="background:rgba(16,185,129,0.15);color:#10b981"><i class="fas fa-user-check"></i></div>
-                    <div><div class="stat-value" id="monActiveCount" style="color:#10b981">0</div><div class="stat-label">Sedang Aktif di Ruang</div></div>
+                    <div class="stat-icon" style="background:rgba(16,185,129,0.15);color:#10b981"><i
+                            class="fas fa-user-check"></i></div>
+                    <div>
+                        <div class="stat-value" id="monActiveCount" style="color:#10b981">0</div>
+                        <div class="stat-label">Sedang Aktif di Ruang</div>
+                    </div>
                 </div>
                 <div class="stat-card" style="padding:14px">
-                    <div class="stat-icon" style="background:rgba(148,163,184,0.15);color:#94a3b8"><i class="fas fa-user-clock"></i></div>
-                    <div><div class="stat-value" id="monFinishedCount">0</div><div class="stat-label">Selesai / Sudah Keluar</div></div>
+                    <div class="stat-icon" style="background:rgba(148,163,184,0.15);color:#94a3b8"><i
+                            class="fas fa-user-clock"></i></div>
+                    <div>
+                        <div class="stat-value" id="monFinishedCount">0</div>
+                        <div class="stat-label">Selesai / Sudah Keluar</div>
+                    </div>
                 </div>
             </div>
 
@@ -3720,6 +3887,12 @@
                     <div class="sidebar-item" onclick="loadPage('pengumumanAdmin')" id="menu-pengumumanAdmin"><i
                             class="fas fa-bullhorn"></i><span>Pengumuman</span></div>
                 </div>
+                <div class="sidebar-section">
+                    <div class="sidebar-section-label">Layanan SPMB</div>
+                    <div class="sidebar-item" onclick="loadPage('spmbAdmin')" id="menu-spmbAdmin"><i
+                            class="fas fa-id-card-alt" style="color:#10b981"></i><span>Penerimaan Siswa (SPMB) <span id="spmbBadge"
+                                class="badge badge-success" style="margin-left:4px;display:none">0</span></span></div>
+                </div>
                 <div class="sidebar-section"
                     style="margin-top:auto;border-top:1px solid var(--border);padding-top:12px">
                     <div class="sidebar-item" onclick="loadPage('settingsAdmin')" id="menu-settingsAdmin"><i
@@ -3886,6 +4059,564 @@
                 </div>
                 <button class="btn btn-primary" style="width:100%;justify-content:center;padding:13px"
                     onclick="doExamToken()" id="examTokenBtn"><i class="fas fa-play-circle"></i> Mulai Ujian</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════ MODAL PENDAFTARAN SPMB (CALON SISWA BARU) ═══════════════════ -->
+    <div class="modal-overlay hidden" id="spmbModal">
+        <div class="modal spmb-modal-box" id="spmbModalBox">
+            <div class="modal-header" style="background:linear-gradient(135deg, rgba(16,185,129,0.1), rgba(6,182,212,0.05));border-bottom:1px solid var(--border)">
+                <div>
+                    <h3 style="font-size:18px;font-weight:700;display:flex;align-items:center;gap:10px;color:var(--text);margin:0">
+                        <i class="fas fa-id-card-alt" style="color:#10b981"></i> Penerimaan Murid Baru (SPMB)
+                    </h3>
+                    <span style="font-size:12px;color:var(--text2)">SMAN 12 Muna Barat — Formulir Pendaftaran Siswa Baru</span>
+                </div>
+                <button class="btn-close" onclick="closeModal('spmbModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" style="padding:18px 22px;overflow-y:auto;max-height:calc(92vh - 140px)">
+                <!-- Stepper Progress Bar -->
+                <div class="spmb-stepper" id="spmbStepper">
+                    <div class="spmb-step-item active" id="spmbStepTab1" onclick="goToSpmbStep(1)">
+                        <span class="spmb-step-badge">1</span> Registrasi Awal
+                    </div>
+                    <div class="spmb-step-item" id="spmbStepTab2" onclick="goToSpmbStep(2)">
+                        <span class="spmb-step-badge">2</span> Biodata & Ortu
+                    </div>
+                    <div class="spmb-step-item" id="spmbStepTab3" onclick="goToSpmbStep(3)">
+                        <span class="spmb-step-badge">3</span> Alamat & Domisili
+                    </div>
+                    <div class="spmb-step-item" id="spmbStepTab4" onclick="goToSpmbStep(4)">
+                        <span class="spmb-step-badge">4</span> Nilai Rapor
+                    </div>
+                    <div class="spmb-step-item" id="spmbStepTab5" onclick="goToSpmbStep(5)">
+                        <span class="spmb-step-badge">5</span> Dokumen
+                    </div>
+                    <div class="spmb-step-item" id="spmbStepTab6" onclick="goToSpmbStep(6)">
+                        <span class="spmb-step-badge">6</span> Konfirmasi
+                    </div>
+                </div>
+
+                <!-- ── LANGKAH 1: DATA AKUN & REGISTRASI AWAL ── -->
+                <div id="spmbStepContent1" class="spmb-step-content">
+                    <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12.5px;color:var(--text)">
+                        <i class="fas fa-info-circle" style="color:#10b981;margin-right:6px"></i>
+                        Silakan pilih jalur pendaftaran dan isi data akun awal sesuai dengan dokumen resmi (Akta Kelahiran / Ijazah).
+                    </div>
+                    <div class="form-group">
+                        <label>Jalur Pendaftaran *</label>
+                        <select class="form-control" id="spmbJalur">
+                            <option value="Zonasi/Domisili">Jalur Zonasi / Domisili Tempat Tinggal</option>
+                            <option value="Prestasi/Rapor">Jalur Prestasi Nilai Rapor / Akademik</option>
+                            <option value="Afirmasi/KIP">Jalur Afirmasi (KIP / KKS / PKH / SKTM)</option>
+                            <option value="Mutasi/Pindahan">Jalur Perpindahan Tugas Orang Tua / Wali (Mutasi)</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>NISN (Nomor Induk Siswa Nasional) *</label>
+                            <input type="text" class="form-control" id="spmbNisn" maxlength="10" placeholder="10 digit NISN" oninput="this.value=this.value.replace(/[^0-9]/g,'')"/>
+                        </div>
+                        <div class="form-group">
+                            <label>NIK (Nomor Induk Kependudukan) / No. Peserta *</label>
+                            <input type="text" class="form-control" id="spmbNik" maxlength="16" placeholder="16 digit NIK calon siswa" oninput="this.value=this.value.replace(/[^0-9]/g,'')"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Nama Lengkap (Sesuai Ijazah / Akta) *</label>
+                        <input type="text" class="form-control" id="spmbNamaLengkap" placeholder="Nama lengkap calon siswa"/>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Tempat Lahir *</label>
+                            <input type="text" class="form-control" id="spmbTempatLahir" placeholder="Kota / Kabupaten Lahir"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Tanggal Lahir *</label>
+                            <input type="date" class="form-control" id="spmbTanggalLahir"/>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" style="flex:1.5">
+                            <label>Nama Asal Sekolah *</label>
+                            <input type="text" class="form-control" id="spmbAsalSekolah" placeholder="Contoh: SMP Negeri 1 Barangka"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Jenjang Asal</label>
+                            <select class="form-control" id="spmbJenjangAsal">
+                                <option value="SMP">SMP</option>
+                                <option value="MTs">MTs</option>
+                                <option value="Paket B">Paket B</option>
+                                <option value="Lainnya">Lainnya</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Tahun Lulus</label>
+                            <select class="form-control" id="spmbTahunLulus">
+                                <option value="2026">2026</option>
+                                <option value="2025">2025</option>
+                                <option value="2024">2024</option>
+                                <option value="2023">2023</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display:flex;justify-content:flex-end;margin-top:20px">
+                        <button type="button" class="btn btn-primary" onclick="goToSpmbStep(2)">Lanjut ke Biodata & Ortu <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- ── LANGKAH 2: BIODATA CALON SISWA & ORANG TUA ── -->
+                <div id="spmbStepContent2" class="spmb-step-content" style="display:none">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Jenis Kelamin *</label>
+                            <select class="form-control" id="spmbJenisKelamin">
+                                <option value="Laki-laki">Laki-laki</option>
+                                <option value="Perempuan">Perempuan</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Agama *</label>
+                            <select class="form-control" id="spmbAgama">
+                                <option value="Islam">Islam</option>
+                                <option value="Kristen Protestan">Kristen Protestan</option>
+                                <option value="Katolik">Katolik</option>
+                                <option value="Hindu">Hindu</option>
+                                <option value="Buddha">Buddha</option>
+                                <option value="Khonghucu">Khonghucu</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nama Ibu Kandung *</label>
+                            <input type="text" class="form-control" id="spmbNamaIbu" placeholder="Nama lengkap ibu kandung"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Nomor Kartu Keluarga (KK) *</label>
+                            <input type="text" class="form-control" id="spmbNoKk" maxlength="16" placeholder="16 digit Nomor KK" oninput="this.value=this.value.replace(/[^0-9]/g,'')"/>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nama Lengkap Ayah / Wali *</label>
+                            <input type="text" class="form-control" id="spmbNamaAyah" placeholder="Nama ayah / wali siswa"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Nomor HP / WhatsApp Aktif (Ortu / Siswa) *</label>
+                            <input type="text" class="form-control" id="spmbTeleponOrtu" placeholder="08xxxxxxxxxx" oninput="this.value=this.value.replace(/[^0-9]/g,'')"/>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Pekerjaan Orang Tua / Wali *</label>
+                            <select class="form-control" id="spmbPekerjaanOrtu">
+                                <option value="Petani/Nelayan">Petani / Nelayan</option>
+                                <option value="Wiraswasta/Pedagang">Wiraswasta / Pedagang</option>
+                                <option value="PNS/TNI/Polri">PNS / TNI / Polri</option>
+                                <option value="Karyawan Swasta">Karyawan Swasta</option>
+                                <option value="Buruh">Buruh Harian Lepas</option>
+                                <option value="Pensiunan">Pensiunan</option>
+                                <option value="Lainnya">Lainnya</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Jenis Kebutuhan Khusus (Jika ada)</label>
+                            <select class="form-control" id="spmbKebutuhanKhusus">
+                                <option value="Tidak Ada">Tidak Ada</option>
+                                <option value="Tuna Netra">Tuna Netra</option>
+                                <option value="Tuna Rungu">Tuna Rungu</option>
+                                <option value="Tuna Daksa">Tuna Daksa</option>
+                                <option value="Tuna Grahita">Tuna Grahita</option>
+                                <option value="Lainnya">Lainnya</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;margin-top:20px">
+                        <button type="button" class="btn btn-outline" onclick="goToSpmbStep(1)"><i class="fas fa-arrow-left"></i> Kembali</button>
+                        <button type="button" class="btn btn-primary" onclick="goToSpmbStep(3)">Lanjut ke Alamat & Domisili <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- ── LANGKAH 3: DATA ALAMAT & TITIK DOMISILI ── -->
+                <div id="spmbStepContent3" class="spmb-step-content" style="display:none">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Provinsi *</label>
+                            <input type="text" class="form-control" id="spmbProvinsi" value="Sulawesi Tenggara"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Kabupaten / Kota *</label>
+                            <input type="text" class="form-control" id="spmbKabupaten" value="Muna Barat"/>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Kecamatan *</label>
+                            <input type="text" class="form-control" id="spmbKecamatan" placeholder="Contoh: Barangka, Lawa, Kusambi"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Kelurahan / Desa *</label>
+                            <input type="text" class="form-control" id="spmbDesa" placeholder="Nama desa / kelurahan"/>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>RT / RW</label>
+                            <input type="text" class="form-control" id="spmbRtRw" placeholder="002/001"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Kode Pos</label>
+                            <input type="text" class="form-control" id="spmbKodePos" placeholder="93653"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Alamat Lengkap (Jalan / Dusun / No. Rumah) *</label>
+                        <textarea class="form-control" id="spmbAlamatLengkap" rows="2" placeholder="Nama jalan, lorong, nomor rumah, atau patokan tempat tinggal..."></textarea>
+                    </div>
+
+                    <!-- Pemetan Titik Koordinat Digital & GPS -->
+                    <div class="card" style="margin-bottom:16px;background:var(--bg3);border:1px solid var(--border)">
+                        <div style="font-weight:700;font-size:13.5px;margin-bottom:8px;display:flex;align-items:center;gap:8px">
+                            <i class="fas fa-map-marker-alt" style="color:#0284c7"></i> Titik Koordinat Lokasi Rumah (Untuk Perhitungan Jarak Zonasi)
+                        </div>
+                        <div style="font-size:12px;color:var(--text2);margin-bottom:12px">
+                            Tekan tombol <strong>"Deteksi Koordinat GPS Saya"</strong> saat berada di rumah, atau masukkan koordinat (Latitude, Longitude) secara manual.
+                        </div>
+                        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                            <div style="flex:1;min-width:220px">
+                                <input type="text" class="form-control" id="spmbKoordinat" placeholder="Contoh: -4.842105, 122.458912" onchange="updateSpmbDistance()"/>
+                            </div>
+                            <button type="button" class="btn btn-outline btn-sm" onclick="getSpmbGeolocation()">
+                                <i class="fas fa-crosshairs"></i> Deteksi Koordinat GPS Saya
+                            </button>
+                            <a id="spmbGmapsLink" target="_blank" href="https://maps.google.com" class="btn btn-outline btn-sm">
+                                <i class="fas fa-external-link-alt"></i> Cek di Google Maps
+                            </a>
+                        </div>
+                        <div id="spmbDistanceInfo" style="margin-top:10px;font-size:12px;color:#38bdf8;display:none">
+                            <i class="fas fa-route"></i> Perkiraan Jarak ke SMAN 12 Muna Barat: <strong id="spmbDistanceValue">-</strong>
+                        </div>
+                    </div>
+
+                    <!-- Unggah Foto Tampak Depan Rumah -->
+                    <div class="form-group" style="background:var(--bg3);padding:14px;border-radius:10px;border:1px dashed var(--border)">
+                        <label style="font-weight:700;display:flex;align-items:center;gap:6px">
+                            <i class="fas fa-home" style="color:#10b981"></i> Foto Tampak Depan Rumah (Maks. 2MB)
+                        </label>
+                        <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Unggah foto fasad atau tampak depan rumah tempat tinggal calon peserta didik.</div>
+                        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+                            <label for="spmbFotoRumahInput" class="btn btn-outline btn-sm" style="cursor:pointer">
+                                <i class="fas fa-camera"></i> Pilih Foto Rumah
+                            </label>
+                            <input type="file" id="spmbFotoRumahInput" accept="image/*" style="display:none" onchange="handleSpmbFotoRumah(this)"/>
+                            <span id="spmbFotoRumahStatus" style="font-size:12px;color:var(--text2)">Belum ada foto</span>
+                        </div>
+                        <div id="spmbFotoRumahPreviewWrap" style="margin-top:12px;display:none">
+                            <img id="spmbFotoRumahPreview" src="" style="max-height:160px;border-radius:8px;border:1px solid var(--border);object-fit:cover"/>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;justify-content:space-between;margin-top:20px">
+                        <button type="button" class="btn btn-outline" onclick="goToSpmbStep(2)"><i class="fas fa-arrow-left"></i> Kembali</button>
+                        <button type="button" class="btn btn-primary" onclick="goToSpmbStep(4)">Lanjut ke Data Nilai Rapor <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- ── LANGKAH 4: DATA AKADEMIK & NILAI (JALUR PRESTASI / RAPOR) ── -->
+                <div id="spmbStepContent4" class="spmb-step-content" style="display:none">
+                    <div style="background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.25);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12.5px;color:var(--text)">
+                        <i class="fas fa-calculator" style="color:#38bdf8;margin-right:6px"></i>
+                        Isi nilai rapor Semester 1 sampai 5 untuk mata pelajaran utama di bawah ini. Sistem akan menghitung rata-rata secara otomatis.
+                    </div>
+
+                    <div class="table-wrap" style="margin-bottom:16px">
+                        <table class="spmb-grade-table">
+                            <thead>
+                                <tr>
+                                    <th style="text-align:left">Mata Pelajaran</th>
+                                    <th>Sem 1</th>
+                                    <th>Sem 2</th>
+                                    <th>Sem 3</th>
+                                    <th>Sem 4</th>
+                                    <th>Sem 5</th>
+                                    <th>Rata-rata</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="text-align:left;font-weight:600">Matematika</td>
+                                    <td><input class="spmb-grade-input" id="g_mtk_1" type="number" min="0" max="100" value="85" oninput="calculateSpmbGrades()"/></td>
+                                    <td><input class="spmb-grade-input" id="g_mtk_2" type="number" min="0" max="100" value="86" oninput="calculateSpmbGrades()"/></td>
+                                    <td><input class="spmb-grade-input" id="g_mtk_3" type="number" min="0" max="100" value="85" oninput="calculateSpmbGrades()"/></td>
+                                    <td><input class="spmb-grade-input" id="g_mtk_4" type="number" min="0" max="100" value="88" oninput="calculateSpmbGrades()"/></td>
+                                    <td><input class="spmb-grade-input" id="g_mtk_5" type="number" min="0" max="100" value="87" oninput="calculateSpmbGrades()"/></td>
+                                    <td><strong id="avg_mtk" style="color:#10b981">86.20</strong></td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align:left;font-weight:600">Bahasa Indonesia</td>
+                                    <td><input class="spmb-grade-input" id="g_ind_1" type="number" min="0" max="100" value="88" oninput="calculateSpmbGrades()"/></td>
+                                    <td><input class="spmb-grade-input" id="g_ind_2" type="number" min="0" max="100" value="87" oninput="calculateSpmbGrades()"/></td>
+                                    <td><input class="spmb-grade-input" id="g_ind_3" type="number" min="0" max="100" value="89" oninput="calculateSpmbGrades()"/></td>
+                                    <td><input class="spmb-grade-input" id="g_ind_4" type="number" min="0" max="100" value="88" oninput="calculateSpmbGrades()"/></td>
+                                    <td><input class="spmb-grade-input" id="g_ind_5" type="number" min="0" max="100" value="90" oninput="calculateSpmbGrades()"/></td>
+                                    <td><strong id="avg_ind" style="color:#10b981">88.40</strong></td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align:left;font-weight:600">Bahasa Inggris</td>
+                                    <td><input class="spmb-grade-input" id="g_ing_1" type="number" min="0" max="100" value="84" oninput="calculateSpmbGrades()"/></td>
+                                    <td><input class="spmb-grade-input" id="g_ing_2" type="number" min="0" max="100" value="85" oninput="calculateSpmbGrades()"/></td>
+                                    <td><input class="spmb-grade-input" id="g_ing_3" type="number" min="0" max="100" value="86" oninput="calculateSpmbGrades()"/></td>
+                                    <td><input class="spmb-grade-input" id="g_ing_4" type="number" min="0" max="100" value="86" oninput="calculateSpmbGrades()"/></td>
+                                    <td><input class="spmb-grade-input" id="g_ing_5" type="number" min="0" max="100" value="88" oninput="calculateSpmbGrades()"/></td>
+                                    <td><strong id="avg_ing" style="color:#10b981">85.80</strong></td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align:left;font-weight:600">Ilmu Pengetahuan Alam (IPA)</td>
+                                    <td><input class="spmb-grade-input" id="g_ipa_1" type="number" min="0" max="100" value="85" oninput="calculateSpmbGrades()"/></td>
+                                    <td><input class="spmb-grade-input" id="g_ipa_2" type="number" min="0" max="100" value="86" oninput="calculateSpmbGrades()"/></td>
+                                    <td><input class="spmb-grade-input" id="g_ipa_3" type="number" min="0" max="100" value="87" oninput="calculateSpmbGrades()"/></td>
+                                    <td><input class="spmb-grade-input" id="g_ipa_4" type="number" min="0" max="100" value="88" oninput="calculateSpmbGrades()"/></td>
+                                    <td><input class="spmb-grade-input" id="g_ipa_5" type="number" min="0" max="100" value="89" oninput="calculateSpmbGrades()"/></td>
+                                    <td><strong id="avg_ipa" style="color:#10b981">87.00</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+                        <div>
+                            <div style="font-size:12px;color:var(--text2)">Total Nilai Rata-rata Gabungan (Semester 1–5):</div>
+                            <div style="font-size:24px;font-weight:800;color:#10b981" id="spmbTotalAvgScore">86.85</div>
+                        </div>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="calculateSpmbGrades()"><i class="fas fa-sync-alt"></i> Hitung Ulang</button>
+                    </div>
+
+                    <div style="display:flex;justify-content:space-between;margin-top:20px">
+                        <button type="button" class="btn btn-outline" onclick="goToSpmbStep(3)"><i class="fas fa-arrow-left"></i> Kembali</button>
+                        <button type="button" class="btn btn-primary" onclick="goToSpmbStep(5)">Lanjut ke Dokumen Persyaratan <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- ── LANGKAH 5: DOKUMEN PERSYARATAN YANG DIUNGGAH ── -->
+                <div id="spmbStepContent5" class="spmb-step-content" style="display:none">
+                    <div style="background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.25);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12.5px;color:var(--text)">
+                        <i class="fas fa-file-upload" style="color:#a855f7;margin-right:6px"></i>
+                        Unggah scan / foto berkas asli dalam format <strong>PDF, JPG, atau PNG (maksimal 2MB per file)</strong>.
+                    </div>
+
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(340px, 1fr));gap:12px">
+                        <!-- 1. Pas Foto -->
+                        <div class="spmb-doc-card">
+                            <div class="spmb-doc-icon"><i class="fas fa-user-circle"></i></div>
+                            <div style="flex:1;overflow:hidden">
+                                <div style="font-weight:700;font-size:13px">1. Pas Foto Calon Siswa *</div>
+                                <div style="font-size:11px;color:var(--text2)">Latar merah / biru resmi</div>
+                                <div id="status_dok_pasFoto" style="font-size:11px;color:#10b981;display:none;margin-top:2px"><i class="fas fa-check"></i> Terunggah</div>
+                            </div>
+                            <div style="display:flex;gap:6px">
+                                <label for="up_pasFoto" class="btn btn-outline btn-xs" style="cursor:pointer"><i class="fas fa-upload"></i> Unggah</label>
+                                <input type="file" id="up_pasFoto" accept=".jpg,.jpeg,.png" style="display:none" onchange="handleSpmbDocFile('pasFoto', this)"/>
+                                <button type="button" class="btn btn-outline btn-xs" id="prev_pasFoto" style="display:none" onclick="previewSpmbDoc('pasFoto')"><i class="fas fa-eye"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- 2. Kartu Keluarga -->
+                        <div class="spmb-doc-card">
+                            <div class="spmb-doc-icon"><i class="fas fa-id-card"></i></div>
+                            <div style="flex:1;overflow:hidden">
+                                <div style="font-weight:700;font-size:13px">2. Kartu Keluarga (KK) *</div>
+                                <div style="font-size:11px;color:var(--text2)">Pindai/scan jelas kartu keluarga</div>
+                                <div id="status_dok_kk" style="font-size:11px;color:#10b981;display:none;margin-top:2px"><i class="fas fa-check"></i> Terunggah</div>
+                            </div>
+                            <div style="display:flex;gap:6px">
+                                <label for="up_kk" class="btn btn-outline btn-xs" style="cursor:pointer"><i class="fas fa-upload"></i> Unggah</label>
+                                <input type="file" id="up_kk" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleSpmbDocFile('kk', this)"/>
+                                <button type="button" class="btn btn-outline btn-xs" id="prev_kk" style="display:none" onclick="previewSpmbDoc('kk')"><i class="fas fa-eye"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- 3. Akta Kelahiran -->
+                        <div class="spmb-doc-card">
+                            <div class="spmb-doc-icon"><i class="fas fa-certificate"></i></div>
+                            <div style="flex:1;overflow:hidden">
+                                <div style="font-weight:700;font-size:13px">3. Akta Kelahiran *</div>
+                                <div style="font-size:11px;color:var(--text2)">Akta kelahiran calon siswa</div>
+                                <div id="status_dok_akta" style="font-size:11px;color:#10b981;display:none;margin-top:2px"><i class="fas fa-check"></i> Terunggah</div>
+                            </div>
+                            <div style="display:flex;gap:6px">
+                                <label for="up_akta" class="btn btn-outline btn-xs" style="cursor:pointer"><i class="fas fa-upload"></i> Unggah</label>
+                                <input type="file" id="up_akta" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleSpmbDocFile('akta', this)"/>
+                                <button type="button" class="btn btn-outline btn-xs" id="prev_akta" style="display:none" onclick="previewSpmbDoc('akta')"><i class="fas fa-eye"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- 4. Ijazah / SKL -->
+                        <div class="spmb-doc-card">
+                            <div class="spmb-doc-icon"><i class="fas fa-graduation-cap"></i></div>
+                            <div style="flex:1;overflow:hidden">
+                                <div style="font-weight:700;font-size:13px">4. Ijazah / SKL *</div>
+                                <div style="font-size:11px;color:var(--text2)">Surat Keterangan Lulus / Ijazah SMP</div>
+                                <div id="status_dok_ijazahSkl" style="font-size:11px;color:#10b981;display:none;margin-top:2px"><i class="fas fa-check"></i> Terunggah</div>
+                            </div>
+                            <div style="display:flex;gap:6px">
+                                <label for="up_ijazahSkl" class="btn btn-outline btn-xs" style="cursor:pointer"><i class="fas fa-upload"></i> Unggah</label>
+                                <input type="file" id="up_ijazahSkl" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleSpmbDocFile('ijazahSkl', this)"/>
+                                <button type="button" class="btn btn-outline btn-xs" id="prev_ijazahSkl" style="display:none" onclick="previewSpmbDoc('ijazahSkl')"><i class="fas fa-eye"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- 5. Rapor Semester 1-5 -->
+                        <div class="spmb-doc-card">
+                            <div class="spmb-doc-icon"><i class="fas fa-book-open"></i></div>
+                            <div style="flex:1;overflow:hidden">
+                                <div style="font-weight:700;font-size:13px">5. Rapor Semester 1–5 *</div>
+                                <div style="font-size:11px;color:var(--text2)">Scan bundel rapor (PDF / JPG gabung)</div>
+                                <div id="status_dok_rapor" style="font-size:11px;color:#10b981;display:none;margin-top:2px"><i class="fas fa-check"></i> Terunggah</div>
+                            </div>
+                            <div style="display:flex;gap:6px">
+                                <label for="up_rapor" class="btn btn-outline btn-xs" style="cursor:pointer"><i class="fas fa-upload"></i> Unggah</label>
+                                <input type="file" id="up_rapor" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleSpmbDocFile('rapor', this)"/>
+                                <button type="button" class="btn btn-outline btn-xs" id="prev_rapor" style="display:none" onclick="previewSpmbDoc('rapor')"><i class="fas fa-eye"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- 6. KTP Orang Tua / Wali -->
+                        <div class="spmb-doc-card">
+                            <div class="spmb-doc-icon"><i class="fas fa-address-card"></i></div>
+                            <div style="flex:1;overflow:hidden">
+                                <div style="font-weight:700;font-size:13px">6. KTP Orang Tua / Wali *</div>
+                                <div style="font-size:11px;color:var(--text2)">KTP Ayah, Ibu, atau Wali sah</div>
+                                <div id="status_dok_ktpOrtu" style="font-size:11px;color:#10b981;display:none;margin-top:2px"><i class="fas fa-check"></i> Terunggah</div>
+                            </div>
+                            <div style="display:flex;gap:6px">
+                                <label for="up_ktpOrtu" class="btn btn-outline btn-xs" style="cursor:pointer"><i class="fas fa-upload"></i> Unggah</label>
+                                <input type="file" id="up_ktpOrtu" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleSpmbDocFile('ktpOrtu', this)"/>
+                                <button type="button" class="btn btn-outline btn-xs" id="prev_ktpOrtu" style="display:none" onclick="previewSpmbDoc('ktpOrtu')"><i class="fas fa-eye"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- 7. SPTJM -->
+                        <div class="spmb-doc-card">
+                            <div class="spmb-doc-icon"><i class="fas fa-file-signature"></i></div>
+                            <div style="flex:1;overflow:hidden">
+                                <div style="font-weight:700;font-size:13px">7. Surat SPTJM Kebenaran Data *</div>
+                                <div style="font-size:11px;color:var(--text2)">Surat Pertanggungjawaban Mutlak ortu/wali</div>
+                                <div id="status_dok_sptjm" style="font-size:11px;color:#10b981;display:none;margin-top:2px"><i class="fas fa-check"></i> Terunggah</div>
+                            </div>
+                            <div style="display:flex;gap:6px">
+                                <label for="up_sptjm" class="btn btn-outline btn-xs" style="cursor:pointer"><i class="fas fa-upload"></i> Unggah</label>
+                                <input type="file" id="up_sptjm" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleSpmbDocFile('sptjm', this)"/>
+                                <button type="button" class="btn btn-outline btn-xs" id="prev_sptjm" style="display:none" onclick="previewSpmbDoc('sptjm')"><i class="fas fa-eye"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- 8. Dokumen Jalur Khusus -->
+                        <div class="spmb-doc-card">
+                            <div class="spmb-doc-icon"><i class="fas fa-award"></i></div>
+                            <div style="flex:1;overflow:hidden">
+                                <div style="font-weight:700;font-size:13px">8. Dokumen Jalur Khusus (Opsional)</div>
+                                <div style="font-size:11px;color:var(--text2)">KIP / KKS / Sertifikat Prestasi / SK Mutasi</div>
+                                <div id="status_dok_jalurKhusus" style="font-size:11px;color:#10b981;display:none;margin-top:2px"><i class="fas fa-check"></i> Terunggah</div>
+                            </div>
+                            <div style="display:flex;gap:6px">
+                                <label for="up_jalurKhusus" class="btn btn-outline btn-xs" style="cursor:pointer"><i class="fas fa-upload"></i> Unggah</label>
+                                <input type="file" id="up_jalurKhusus" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleSpmbDocFile('jalurKhusus', this)"/>
+                                <button type="button" class="btn btn-outline btn-xs" id="prev_jalurKhusus" style="display:none" onclick="previewSpmbDoc('jalurKhusus')"><i class="fas fa-eye"></i></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;justify-content:space-between;margin-top:20px">
+                        <button type="button" class="btn btn-outline" onclick="goToSpmbStep(4)"><i class="fas fa-arrow-left"></i> Kembali</button>
+                        <button type="button" class="btn btn-primary" onclick="goToSpmbStep(6)">Lanjut ke Konfirmasi Data <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- ── LANGKAH 6: REVIEW & KONFIRMASI PENDAFTARAN ── -->
+                <div id="spmbStepContent6" class="spmb-step-content" style="display:none">
+                    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:16px">
+                        <h4 style="margin:0 0 12px 0;font-size:15px;color:var(--text);display:flex;align-items:center;gap:8px">
+                            <i class="fas fa-clipboard-check" style="color:#10b981"></i> Rangkuman Pendaftaran Siswa Baru
+                        </h4>
+                        <div id="spmbReviewSummary" style="font-size:13px;line-height:1.7;color:var(--text)"></div>
+                    </div>
+
+                    <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:14px;margin-bottom:18px">
+                        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:12.5px;color:var(--text)">
+                            <input type="checkbox" id="spmbAgreed" style="margin-top:3px"/>
+                            <span>
+                                Saya menyatakan bahwa seluruh data dan dokumen yang saya isikan dan unggah dalam formulir SPMB ini adalah <strong>BENAR dan ASLI</strong>. Apabila di kemudian hari ditemukan pemalsuan data, saya bersedia menerima sanksi pembatalan kelulusan pendaftaran.
+                            </span>
+                        </label>
+                    </div>
+
+                    <div style="display:flex;justify-content:space-between;margin-top:20px">
+                        <button type="button" class="btn btn-outline" onclick="goToSpmbStep(5)"><i class="fas fa-arrow-left"></i> Kembali</button>
+                        <button type="button" class="btn btn-primary" style="background:#10b981;border-color:#10b981;padding:12px 24px;font-weight:700" onclick="submitSpmbForm()">
+                            <i class="fas fa-paper-plane"></i> Kirim Pendaftaran SPMB Sekarang
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════ MODAL BUKTI KARTU PENDAFTARAN SPMB ═══════════════════ -->
+    <div class="modal-overlay hidden" id="spmbReceiptModal">
+        <div class="modal" style="max-width:620px">
+            <div class="modal-header">
+                <h3><i class="fas fa-check-circle" style="color:#10b981"></i> Bukti Pendaftaran SPMB</h3>
+                <button class="btn-close" onclick="closeModal('spmbReceiptModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div id="spmbReceiptContent" style="background:#fff;color:#0f172a;padding:24px;border-radius:12px;border:2px dashed #94a3b8;font-family:sans-serif">
+                    <!-- Dynamic Receipt Content -->
+                </div>
+                <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+                    <button type="button" class="btn btn-primary" onclick="printSpmbReceipt()"><i class="fas fa-print"></i> Cetak Kartu Pendaftaran</button>
+                    <button type="button" class="btn btn-outline" onclick="closeModal('spmbReceiptModal')">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════ MODAL CEK STATUS SPMB SISWA ═══════════════════ -->
+    <div class="modal-overlay hidden" id="spmbCheckStatusModal">
+        <div class="modal" style="max-width:480px">
+            <div class="modal-header">
+                <h3><i class="fas fa-search" style="color:#38bdf8"></i> Cek Status SPMB Calon Siswa</h3>
+                <button class="btn-close" onclick="closeModal('spmbCheckStatusModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size:13px;color:var(--text2);margin-bottom:14px">Masukkan NISN atau Nomor Pendaftaran untuk memeriksa hasil seleksi & verifikasi berkas:</p>
+                <div class="form-group">
+                    <label>NISN atau No. Pendaftaran (Contoh: SPMB/2026/0001)</label>
+                    <div style="display:flex;gap:8px">
+                        <input type="text" class="form-control" id="spmbQueryInput" placeholder="Masukkan NISN / No. Reg" onkeydown="if(event.key==='Enter')doCheckSpmbStatus()"/>
+                        <button type="button" class="btn btn-primary" onclick="doCheckSpmbStatus()"><i class="fas fa-search"></i> Cari</button>
+                    </div>
+                </div>
+                <div id="spmbQueryResult" style="margin-top:16px;display:none"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════ MODAL DETAIL & VERIFIKASI ADMIN SPMB ═══════════════════ -->
+    <div class="modal-overlay hidden" id="spmbDetailAdminModal">
+        <div class="modal spmb-modal-box">
+            <div class="modal-header" style="border-bottom:1px solid var(--border)">
+                <div>
+                    <h3 style="font-size:17px;font-weight:700;display:flex;align-items:center;gap:8px" id="admSpmbTitle">
+                        <i class="fas fa-user-check" style="color:#10b981"></i> Verifikasi Berkas Calon Siswa
+                    </h3>
+                    <span id="admSpmbSub" style="font-size:12px;color:var(--text2)"></span>
+                </div>
+                <button class="btn-close" onclick="closeModal('spmbDetailAdminModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="admSpmbBody" style="padding:18px 22px;overflow-y:auto;max-height:calc(92vh - 140px)">
+                <!-- Dynamic Admin Detail & Verif Body -->
             </div>
         </div>
     </div>
@@ -4216,6 +4947,10 @@
             var day = d.getDate();
             var months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
             return day + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+        }
+
+        function formatCleanDateTime(str) {
+            return formatCleanDate(str);
         }
 
         // ═══════════════════════════════════════════════════
@@ -5107,7 +5842,7 @@
 
         function renderRuangPembelajaran(role) {
             showWaiting('Memuat Data...', 'Mengambil data ruang pembelajaran');
-            var filterGuru = (role === 'guru' && APP.currentUser) ? APP.currentUser.id : '';
+            var filterGuru = (role === 'guru' && APP.currentUser) ? (APP.currentUser.id || APP.currentUser.namaLengkap) : '';
 
             google.script.run.withSuccessHandler(function (res) {
                 hideWaiting();
@@ -5119,6 +5854,15 @@
 
                 APP_LEARNINGS_CACHE = res.data || [];
                 var items = APP_LEARNINGS_CACHE;
+                if (role === 'guru' && APP.currentUser) {
+                    var uid = String(APP.currentUser.id || '').trim().toLowerCase();
+                    var uname = String(APP.currentUser.namaLengkap || '').trim().toLowerCase();
+                    items = items.filter(function (it) {
+                        var matchId = it.idGuru && String(it.idGuru).trim().toLowerCase() === uid;
+                        var matchName = it.namaGuru && uname && String(it.namaGuru).trim().toLowerCase() === uname;
+                        return matchId || matchName;
+                    });
+                }
                 var activeCount = items.filter(function (it) { return it.status === 'active'; }).length;
 
                 var html = '<div class="page-header">' +
@@ -5291,69 +6035,105 @@
         }
 
         function previewLearningModal(learningId) {
-            var item = APP_LEARNINGS_CACHE.find(function (it) { return it.id === learningId; });
-            if (!item) { showToast('Data materi tidak ditemukan.', 'error'); return; }
-            var guruName = APP.currentUser ? (APP.currentUser.namaLengkap + ' (Guru)') : 'Guru Pengampu';
-            renderStudentLearningView(item, guruName, new Date().toISOString(), 'TEACHER_PREVIEW');
+            function doPreview(item) {
+                if (!item) { showToast('Data materi tidak ditemukan.', 'error'); return; }
+                var guruName = APP.currentUser ? (APP.currentUser.namaLengkap + ' (Guru)') : 'Guru Pengampu';
+                renderStudentLearningView(item, guruName, new Date().toISOString(), 'TEACHER_PREVIEW');
+            }
+
+            var item = (APP_LEARNINGS_CACHE || []).find(function (it) { return (it.id === learningId || it.ID === learningId); });
+            if (item) {
+                doPreview(item);
+                return;
+            }
+
+            showWaiting('Memuat Materi...', 'Mengambil data materi pembelajaran');
+            google.script.run.withSuccessHandler(function (res) {
+                hideWaiting();
+                APP_LEARNINGS_CACHE = (res && res.data) ? res.data : [];
+                var found = APP_LEARNINGS_CACHE.find(function (it) { return (it.id === learningId || it.ID === learningId); });
+                doPreview(found);
+            }).withFailureHandler(function (e) {
+                hideWaiting();
+                err(e);
+            }).getLearnings();
         }
 
         function editLearningModal(learningId, role) {
-            var item = APP_LEARNINGS_CACHE.find(function (it) { return it.id === learningId; });
-            if (!item) { showToast('Data materi tidak ditemukan.', 'error'); return; }
+            function proceedEdit(item) {
+                if (!item) { showToast('Data materi tidak ditemukan.', 'error'); return; }
 
-            document.getElementById('generalModalTitle').textContent = 'Edit Ruang Pembelajaran';
-            document.getElementById('generalModalBox').style.maxWidth = '680px';
-            window.TEMP_LEARNING_ATTACHMENTS = (item.attachments && Array.isArray(item.attachments)) ? JSON.parse(JSON.stringify(item.attachments)) : [];
+                document.getElementById('generalModalTitle').textContent = 'Edit Ruang Pembelajaran';
+                document.getElementById('generalModalBox').style.maxWidth = '680px';
+                window.TEMP_LEARNING_ATTACHMENTS = (item.attachments && Array.isArray(item.attachments)) ? JSON.parse(JSON.stringify(item.attachments)) : [];
 
-            showWaiting('Menyiapkan Form...', 'Memuat data');
-            google.script.run.withSuccessHandler(function (classRes) {
-                google.script.run.withSuccessHandler(function (subjRes) {
-                    hideWaiting();
-                    var classes = (classRes && classRes.success && classRes.data) ? classRes.data : [];
-                    var subjects = (subjRes && subjRes.success && subjRes.data) ? subjRes.data : [];
+                showWaiting('Menyiapkan Form...', 'Memuat data');
+                google.script.run.withSuccessHandler(function (classRes) {
+                    google.script.run.withSuccessHandler(function (subjRes) {
+                        hideWaiting();
+                        var classes = (classRes && classRes.success && classRes.data) ? classRes.data : [];
+                        var subjects = (subjRes && subjRes.success && subjRes.data) ? subjRes.data : [];
 
-                    var classOpts = '<option value="">Semua Kelas</option>' + classes.map(function (c) {
-                        return '<option value="' + c['ID Kelas'] + '"' + (item.idKelas === c['ID Kelas'] ? ' selected' : '') + '>' + esc(c['Nama Kelas']) + '</option>';
-                    }).join('');
+                        var classOpts = '<option value="">Semua Kelas</option>' + classes.map(function (c) {
+                            return '<option value="' + c['ID Kelas'] + '"' + (item.idKelas === c['ID Kelas'] ? ' selected' : '') + '>' + esc(c['Nama Kelas']) + '</option>';
+                        }).join('');
 
-                    var subjOpts = '<option value="">Pilih Mata Pelajaran</option>' + subjects.map(function (s) {
-                        return '<option value="' + s['ID Mapel'] + '"' + (item.idMapel === s['ID Mapel'] ? ' selected' : '') + '>' + esc(s['Nama Mapel']) + '</option>';
-                    }).join('');
+                        var subjOpts = '<option value="">Pilih Mata Pelajaran</option>' + subjects.map(function (s) {
+                            return '<option value="' + s['ID Mapel'] + '"' + (item.idMapel === s['ID Mapel'] ? ' selected' : '') + '>' + esc(s['Nama Mapel']) + '</option>';
+                        }).join('');
 
-                    document.getElementById('generalModalBody').innerHTML =
-                        '<div class="form-group"><label>Judul Pembelajaran / Topik Bahasan *</label><input class="form-control" id="mlJudul" value="' + esc(item.judul) + '"/></div>' +
-                        '<div class="form-row">' +
-                        '<div class="form-group"><label>Mata Pelajaran *</label><select class="form-control" id="mlMapel">' + subjOpts + '</select></div>' +
-                        '<div class="form-group"><label>Kelas Target</label><select class="form-control" id="mlKelas">' + classOpts + '</select></div>' +
-                        '</div>' +
-                        '<div class="form-row">' +
-                        '<div class="form-group"><label>Token Akses Siswa *</label><input class="form-control" id="mlToken" value="' + esc(item.token) + '" style="font-family:monospace;letter-spacing:1.5px;font-weight:700;text-transform:uppercase"/></div>' +
-                        '<div class="form-group"><label>Status Pembelajaran</label><select class="form-control" id="mlStatus"><option value="active"' + (item.status === 'active' ? ' selected' : '') + '>Aktif</option><option value="inactive"' + (item.status === 'inactive' ? ' selected' : '') + '>Nonaktif</option></select></div>' +
-                        '</div>' +
-                        '<div class="form-group"><label>Tautan Video / Materi Eksternal</label><input class="form-control" id="mlMediaUrl" value="' + esc(item.mediaUrl || '') + '"/></div>' +
-                        '<div class="form-group" style="background:var(--bg3);padding:14px;border-radius:10px;border:1px dashed var(--border);margin-top:10px;margin-bottom:14px">' +
-                        '<label style="font-weight:700;display:flex;align-items:center;gap:6px">' +
-                        '<i class="fas fa-paperclip" style="color:var(--primary)"></i> Unggah File Materi (PDF, Presentasi PPT, Foto/Gambar)' +
-                        '</label>' +
-                        '<div style="font-size:12px;color:var(--text2);margin-bottom:10px">Unggah berkas modul (PDF), file presentasi PowerPoint (.ppt, .pptx), atau gambar tugas materi.</div>' +
-                        '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">' +
-                        '<label for="mlFileInput" class="btn btn-outline btn-sm" style="cursor:pointer"><i class="fas fa-upload"></i> Pilih File dari Komputer/HP</label>' +
-                        '<input type="file" id="mlFileInput" multiple accept=".pdf,.ppt,.pptx,.doc,.docx,.png,.jpg,.jpeg,.webp" style="display:none" onchange="handleLearningFileUpload(this)"/>' +
-                        '<span id="mlFileUploadStatus" style="font-size:12px;color:var(--text2)"></span>' +
-                        '</div>' +
-                        '<div id="mlUploadedFilesList" style="margin-top:10px;display:flex;flex-direction:column;gap:6px"></div>' +
-                        '</div>' +
-                        '<div class="form-group"><label>Ringkasan / Petunjuk Belajar</label><textarea class="form-control" id="mlRingkasan" rows="2">' + esc(item.ringkasan || '') + '</textarea></div>' +
-                        '<div class="form-group"><label>Isi Catatan & Modul Pembelajaran *</label><textarea class="form-control" id="mlKonten" rows="6">' + esc(item.konten || '') + '</textarea></div>' +
-                        '<div style="display:flex;gap:10px;margin-top:16px">' +
-                        '<button class="btn btn-primary" onclick="submitUpdateLearning(\'' + item.id + '\', \'' + role + '\')"><i class="fas fa-save"></i> Simpan Perubahan</button>' +
-                        '<button class="btn btn-outline" onclick="closeModal(\'generalModal\')">Batal</button>' +
-                        '</div>';
+                        document.getElementById('generalModalBody').innerHTML =
+                            '<div class="form-group"><label>Judul Pembelajaran / Topik Bahasan *</label><input class="form-control" id="mlJudul" value="' + esc(item.judul) + '"/></div>' +
+                            '<div class="form-row">' +
+                            '<div class="form-group"><label>Mata Pelajaran *</label><select class="form-control" id="mlMapel">' + subjOpts + '</select></div>' +
+                            '<div class="form-group"><label>Kelas Target</label><select class="form-control" id="mlKelas">' + classOpts + '</select></div>' +
+                            '</div>' +
+                            '<div class="form-row">' +
+                            '<div class="form-group"><label>Token Akses Siswa *</label><input class="form-control" id="mlToken" value="' + esc(item.token) + '" style="font-family:monospace;letter-spacing:1.5px;font-weight:700;text-transform:uppercase"/></div>' +
+                            '<div class="form-group"><label>Status Pembelajaran</label><select class="form-control" id="mlStatus"><option value="active"' + (item.status === 'active' ? ' selected' : '') + '>Aktif</option><option value="inactive"' + (item.status === 'inactive' ? ' selected' : '') + '>Nonaktif</option></select></div>' +
+                            '</div>' +
+                            '<div class="form-group"><label>Tautan Video / Materi Eksternal</label><input class="form-control" id="mlMediaUrl" value="' + esc(item.mediaUrl || '') + '"/></div>' +
+                            '<div class="form-group" style="background:var(--bg3);padding:14px;border-radius:10px;border:1px dashed var(--border);margin-top:10px;margin-bottom:14px">' +
+                            '<label style="font-weight:700;display:flex;align-items:center;gap:6px">' +
+                            '<i class="fas fa-paperclip" style="color:var(--primary)"></i> Unggah File Materi (PDF, Presentasi PPT, Foto/Gambar)' +
+                            '</label>' +
+                            '<div style="font-size:12px;color:var(--text2);margin-bottom:10px">Unggah berkas modul (PDF), file presentasi PowerPoint (.ppt, .pptx), atau gambar tugas materi.</div>' +
+                            '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">' +
+                            '<label for="mlFileInput" class="btn btn-outline btn-sm" style="cursor:pointer"><i class="fas fa-upload"></i> Pilih File dari Komputer/HP</label>' +
+                            '<input type="file" id="mlFileInput" multiple accept=".pdf,.ppt,.pptx,.doc,.docx,.png,.jpg,.jpeg,.webp" style="display:none" onchange="handleLearningFileUpload(this)"/>' +
+                            '<span id="mlFileUploadStatus" style="font-size:12px;color:var(--text2)"></span>' +
+                            '</div>' +
+                            '<div id="mlUploadedFilesList" style="margin-top:10px;display:flex;flex-direction:column;gap:6px"></div>' +
+                            '</div>' +
+                            '<div class="form-group"><label>Ringkasan / Petunjuk Belajar</label><textarea class="form-control" id="mlRingkasan" rows="2">' + esc(item.ringkasan || '') + '</textarea></div>' +
+                            '<div class="form-group"><label>Isi Catatan & Modul Pembelajaran *</label><textarea class="form-control" id="mlKonten" rows="6">' + esc(item.konten || '') + '</textarea></div>' +
+                            '<div style="display:flex;gap:10px;margin-top:16px">' +
+                            '<button class="btn btn-primary" onclick="submitUpdateLearning(\'' + item.id + '\', \'' + role + '\')"><i class="fas fa-save"></i> Simpan Perubahan</button>' +
+                            '<button class="btn btn-outline" onclick="closeModal(\'generalModal\')">Batal</button>' +
+                            '</div>';
 
-                    openModal('generalModal');
-                    setTimeout(renderTempLearningAttachments, 100);
-                }).withFailureHandler(function (e) { hideWaiting(); err(e); }).getSubjects();
-            }).withFailureHandler(function (e) { hideWaiting(); err(e); }).getClasses();
+                        openModal('generalModal');
+                        setTimeout(renderTempLearningAttachments, 100);
+                    }).withFailureHandler(function (e) { hideWaiting(); err(e); }).getSubjects();
+                }).withFailureHandler(function (e) { hideWaiting(); err(e); }).getClasses();
+            }
+
+            var item = (APP_LEARNINGS_CACHE || []).find(function (it) { return (it.id === learningId || it.ID === learningId); });
+            if (item) {
+                proceedEdit(item);
+                return;
+            }
+
+            showWaiting('Memuat Data...', 'Mengambil data modul pembelajaran');
+            google.script.run.withSuccessHandler(function (res) {
+                hideWaiting();
+                APP_LEARNINGS_CACHE = (res && res.data) ? res.data : [];
+                var found = APP_LEARNINGS_CACHE.find(function (it) { return (it.id === learningId || it.ID === learningId); });
+                proceedEdit(found);
+            }).withFailureHandler(function (e) {
+                hideWaiting();
+                err(e);
+            }).getLearnings();
         }
 
         function submitUpdateLearning(learningId, role) {
@@ -5724,6 +6504,25 @@
                     } else badge.style.display = 'none';
                 }
             }).getPendingUsers();
+            updateSpmbBadge();
+        }
+
+        function updateSpmbBadge() {
+            var badge = document.getElementById('spmbBadge');
+            if (!badge) return;
+            google.script.run.withSuccessHandler(function (res) {
+                if (res && res.success && Array.isArray(res.data)) {
+                    var pending = res.data.filter(function (it) {
+                        return (it.status || 'menunggu').toLowerCase() === 'menunggu';
+                    });
+                    if (pending.length > 0) {
+                        badge.textContent = pending.length;
+                        badge.style.display = 'inline-flex';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+            }).getSpmbList();
         }
 
         // ═══════════════════════════════════════════════════
@@ -5741,6 +6540,7 @@
                 case 'absenAdmin': renderAbsenAdmin(); break;
                 case 'pembelajaranAdmin': renderRuangPembelajaran('admin'); break;
                 case 'pembelajaranGuru': renderRuangPembelajaran('guru'); break;
+                case 'spmbAdmin': renderSpmbAdmin(); break;
                 case 'daftarKelasAdmin': renderDaftarKelas('admin'); break;
                 case 'daftarMapelAdmin': renderDaftarMapel('admin'); break;
                 case 'ujianAdmin': renderUjian('admin'); break;
@@ -5756,6 +6556,938 @@
                 case 'profileGuru': renderProfile(); break;
                 default: main.innerHTML = '<p>Halaman tidak ditemukan</p>';
             }
+        }
+
+        // ═══════════════════════════════════════════════════
+        // SPMB (SISTEM PENERIMAAN MURID BARU) LOGIC & ADMIN
+        // ═══════════════════════════════════════════════════
+        var SPMB_CURRENT_STEP = 1;
+        var TEMP_SPMB_DOCS = {
+            pasFoto: '',
+            kk: '',
+            akta: '',
+            ijazahSkl: '',
+            rapor: '',
+            ktpOrtu: '',
+            sptjm: '',
+            jalurKhusus: '',
+            fotoRumah: ''
+        };
+        var SPMB_ADMIN_CACHE = [];
+        var SPMB_CURRENT_RECEIPT_ITEM = null;
+
+        // Koordinat Utama SMAN 12 Muna Barat (Lagadi - Tondasi)
+        var SMAN12_LAT = -4.838500;
+        var SMAN12_LON = 122.451200;
+
+        function calculateDistanceKm(lat1, lon1, lat2, lon2) {
+            var R = 6371; // Radius bumi dalam KM
+            var dLat = (lat2 - lat1) * Math.PI / 180;
+            var dLon = (lon2 - lon1) * Math.PI / 180;
+            var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return (R * c).toFixed(2);
+        }
+
+        function openSpmbRegistrationModal() {
+            SPMB_CURRENT_STEP = 1;
+            TEMP_SPMB_DOCS = {
+                pasFoto: '', kk: '', akta: '', ijazahSkl: '', rapor: '', ktpOrtu: '', sptjm: '', jalurKhusus: '', fotoRumah: ''
+            };
+
+            // Reset field nilai
+            calculateSpmbGrades();
+
+            // Reset tampilan dokumen
+            ['pasFoto', 'kk', 'akta', 'ijazahSkl', 'rapor', 'ktpOrtu', 'sptjm', 'jalurKhusus'].forEach(function (k) {
+                var st = document.getElementById('status_dok_' + k);
+                var pr = document.getElementById('prev_dok_' + k) || document.getElementById('prev_' + k);
+                if (st) st.style.display = 'none';
+                if (pr) pr.style.display = 'none';
+            });
+
+            var stFoto = document.getElementById('spmbFotoRumahStatus');
+            if (stFoto) stFoto.textContent = 'Belum ada foto';
+            var prevWrap = document.getElementById('spmbFotoRumahPreviewWrap');
+            if (prevWrap) prevWrap.style.display = 'none';
+
+            goToSpmbStep(1);
+            openModal('spmbModal');
+        }
+
+        function goToSpmbStep(step) {
+            // Validasi sebelum maju ke langkah berikutnya
+            if (step > SPMB_CURRENT_STEP) {
+                if (SPMB_CURRENT_STEP === 1) {
+                    var nisn = v('spmbNisn');
+                    var nik = v('spmbNik');
+                    var nama = v('spmbNamaLengkap');
+                    var tempat = v('spmbTempatLahir');
+                    var tgl = v('spmbTanggalLahir');
+                    var sekolah = v('spmbAsalSekolah');
+                    if (!nisn || !nik || !nama || !tempat || !tgl || !sekolah) {
+                        showToast('Mohon lengkapi seluruh isian Registrasi Awal bertanda bintang (*)!', 'warning');
+                        return;
+                    }
+                    if (nisn.length < 10) {
+                        showToast('NISN harus berjumlah 10 digit angka!', 'warning');
+                        return;
+                    }
+                } else if (SPMB_CURRENT_STEP === 2) {
+                    var ibu = v('spmbNamaIbu');
+                    var kk = v('spmbNoKk');
+                    var ayah = v('spmbNamaAyah');
+                    var telp = v('spmbTeleponOrtu');
+                    if (!ibu || !kk || !ayah || !telp) {
+                        showToast('Mohon lengkapi Biodata Orang Tua dan Nomor HP/WhatsApp!', 'warning');
+                        return;
+                    }
+                } else if (SPMB_CURRENT_STEP === 3) {
+                    var kec = v('spmbKecamatan');
+                    var desa = v('spmbDesa');
+                    var alamat = v('spmbAlamatLengkap');
+                    if (!kec || !desa || !alamat) {
+                        showToast('Mohon lengkapi Kecamatan, Desa, dan Alamat Lengkap tempat tinggal!', 'warning');
+                        return;
+                    }
+                }
+            }
+
+            SPMB_CURRENT_STEP = step;
+
+            // Update Tab Stepper
+            for (var i = 1; i <= 6; i++) {
+                var tab = document.getElementById('spmbStepTab' + i);
+                var content = document.getElementById('spmbStepContent' + i);
+                if (tab) {
+                    tab.classList.remove('active', 'completed');
+                    if (i === step) tab.classList.add('active');
+                    else if (i < step) tab.classList.add('completed');
+                }
+                if (content) {
+                    content.style.display = (i === step) ? 'block' : 'none';
+                }
+            }
+
+            // Jika masuk langkah ke-6 (Konfirmasi), render rangkuman data
+            if (step === 6) {
+                renderSpmbReviewSummary();
+            }
+        }
+
+        function calculateSpmbGrades() {
+            var getVal = function (id) {
+                var el = document.getElementById(id);
+                var num = parseFloat(el ? el.value : 0);
+                return isNaN(num) ? 0 : num;
+            };
+
+            var subjects = [
+                { key: 'mtk', label: 'Matematika' },
+                { key: 'ind', label: 'Bahasa Indonesia' },
+                { key: 'ing', label: 'Bahasa Inggris' },
+                { key: 'ipa', label: 'IPA' }
+            ];
+
+            var grandTotal = 0;
+            var grandCount = 0;
+
+            subjects.forEach(function (sub) {
+                var total = 0;
+                for (var sem = 1; sem <= 5; sem++) {
+                    total += getVal('g_' + sub.key + '_' + sem);
+                }
+                var avg = (total / 5).toFixed(2);
+                var avgEl = document.getElementById('avg_' + sub.key);
+                if (avgEl) avgEl.textContent = avg;
+                grandTotal += parseFloat(avg);
+                grandCount++;
+            });
+
+            var grandAvg = (grandTotal / grandCount).toFixed(2);
+            var totalAvgEl = document.getElementById('spmbTotalAvgScore');
+            if (totalAvgEl) totalAvgEl.textContent = grandAvg;
+            return grandAvg;
+        }
+
+        function getSpmbGeolocation() {
+            if (!navigator.geolocation) {
+                showToast('Fitur GPS tidak didukung di perangkat/browser ini.', 'warning');
+                return;
+            }
+            showToast('Mendeteksi titik koordinat GPS rumah Anda...', 'info');
+            navigator.geolocation.getCurrentPosition(
+                function (pos) {
+                    var lat = pos.coords.latitude;
+                    var lon = pos.coords.longitude;
+                    var coordStr = lat.toFixed(6) + ', ' + lon.toFixed(6);
+                    document.getElementById('spmbKoordinat').value = coordStr;
+                    updateSpmbDistance();
+                    showToast('Koordinat berhasil dideteksi!', 'success');
+                },
+                function (err) {
+                    showToast('Gagal mendeteksi lokasi GPS: ' + (err.message || 'Izin ditolak'), 'warning');
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+        }
+
+        function updateSpmbDistance() {
+            var coordVal = (document.getElementById('spmbKoordinat').value || '').trim();
+            var infoEl = document.getElementById('spmbDistanceInfo');
+            var valEl = document.getElementById('spmbDistanceValue');
+            var gmapsLink = document.getElementById('spmbGmapsLink');
+
+            if (!coordVal || coordVal.indexOf(',') === -1) {
+                if (infoEl) infoEl.style.display = 'none';
+                return;
+            }
+
+            var parts = coordVal.split(',');
+            var lat = parseFloat(parts[0].trim());
+            var lon = parseFloat(parts[1].trim());
+
+            if (!isNaN(lat) && !isNaN(lon)) {
+                var dist = calculateDistanceKm(lat, lon, SMAN12_LAT, SMAN12_LON);
+                if (infoEl && valEl) {
+                    valEl.textContent = dist + ' km (Jalur Domisili)';
+                    infoEl.style.display = 'block';
+                }
+                if (gmapsLink) {
+                    gmapsLink.href = 'https://www.google.com/maps/search/?api=1&query=' + lat + ',' + lon;
+                }
+            }
+        }
+
+        function handleSpmbFotoRumah(input) {
+            if (!input.files || !input.files[0]) return;
+            var file = input.files[0];
+            if (file.size > 2 * 1024 * 1024) {
+                showToast('Ukuran foto rumah melebihi 2MB!', 'warning');
+                input.value = '';
+                return;
+            }
+
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                TEMP_SPMB_DOCS.fotoRumah = e.target.result;
+                var st = document.getElementById('spmbFotoRumahStatus');
+                var pr = document.getElementById('spmbFotoRumahPreview');
+                var prWrap = document.getElementById('spmbFotoRumahPreviewWrap');
+                if (st) st.innerHTML = '<span style="color:#10b981;font-weight:700"><i class="fas fa-check"></i> ' + esc(file.name) + ' (' + (file.size / 1024).toFixed(0) + ' KB)</span>';
+                if (pr) pr.src = e.target.result;
+                if (prWrap) prWrap.style.display = 'block';
+                showToast('Foto rumah berhasil dimuat!', 'success');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function handleSpmbDocFile(docKey, input) {
+            if (!input.files || !input.files[0]) return;
+            var file = input.files[0];
+            if (file.size > 2 * 1024 * 1024) {
+                showToast('Ukuran berkas ' + file.name + ' melebihi batas 2MB!', 'warning');
+                input.value = '';
+                return;
+            }
+
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                TEMP_SPMB_DOCS[docKey] = e.target.result;
+                var st = document.getElementById('status_dok_' + docKey);
+                var pr = document.getElementById('prev_dok_' + docKey) || document.getElementById('prev_' + docKey);
+                if (st) {
+                    st.style.display = 'block';
+                    st.innerHTML = '<i class="fas fa-check-circle" style="color:#10b981"></i> ' + esc(file.name) + ' (' + (file.size / 1024).toFixed(0) + ' KB)';
+                }
+                if (pr) pr.style.display = 'inline-flex';
+                showToast('Berkas ' + file.name + ' berhasil disiapkan!', 'success');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function previewSpmbDoc(docKey) {
+            var dataUri = TEMP_SPMB_DOCS[docKey];
+            if (!dataUri) {
+                showToast('Berkas belum diunggah.', 'warning');
+                return;
+            }
+
+            var titles = {
+                pasFoto: 'Pas Foto Calon Siswa',
+                kk: 'Kartu Keluarga (KK)',
+                akta: 'Akta Kelahiran',
+                ijazahSkl: 'Ijazah / SKL SMP',
+                rapor: 'Bundel Rapor Semester 1–5',
+                ktpOrtu: 'KTP Orang Tua / Wali',
+                sptjm: 'Surat SPTJM Kebenaran Data',
+                jalurKhusus: 'Dokumen Jalur Khusus',
+                fotoRumah: 'Foto Tampak Depan Rumah'
+            };
+
+            var isPdf = dataUri.indexOf('application/pdf') !== -1;
+            var contentHtml = '';
+            if (isPdf) {
+                contentHtml = '<iframe src="' + dataUri + '" style="width:100%;height:70vh;border:none;border-radius:8px"></iframe>';
+            } else {
+                contentHtml = '<div style="text-align:center;padding:12px;background:#0f172a;border-radius:10px">' +
+                    '<img src="' + dataUri + '" style="max-width:100%;max-height:70vh;object-fit:contain;border-radius:6px"/>' +
+                    '</div>';
+            }
+
+            document.getElementById('generalModalTitle').textContent = 'Pratinjau: ' + (titles[docKey] || docKey);
+            document.getElementById('generalModalBox').style.maxWidth = '750px';
+            document.getElementById('generalModalBody').innerHTML = contentHtml +
+                '<div style="display:flex;justify-content:flex-end;gap:10px;margin-top:14px">' +
+                '<a href="' + dataUri + '" download="Dokumen_' + docKey + '" class="btn btn-primary btn-sm"><i class="fas fa-download"></i> Unduh Berkas</a>' +
+                '<button class="btn btn-outline btn-sm" onclick="closeModal(\'generalModal\')">Tutup</button>' +
+                '</div>';
+            openModal('generalModal');
+        }
+
+        function renderSpmbReviewSummary() {
+            var grandAvg = calculateSpmbGrades();
+            var coordVal = v('spmbKoordinat') || '-';
+            var distText = '-';
+            if (coordVal && coordVal.indexOf(',') !== -1) {
+                var p = coordVal.split(',');
+                var lat = parseFloat(p[0].trim());
+                var lon = parseFloat(p[1].trim());
+                if (!isNaN(lat) && !isNaN(lon)) {
+                    distText = calculateDistanceKm(lat, lon, SMAN12_LAT, SMAN12_LON) + ' km';
+                }
+            }
+
+            var docCount = 0;
+            var reqKeys = ['pasFoto', 'kk', 'akta', 'ijazahSkl', 'rapor', 'ktpOrtu', 'sptjm'];
+            reqKeys.forEach(function (k) { if (TEMP_SPMB_DOCS[k]) docCount++; });
+
+            var html =
+                '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));gap:12px">' +
+                '<div><strong>Jalur:</strong> <span class="badge badge-purple">' + esc(v('spmbJalur')) + '</span></div>' +
+                '<div><strong>Nama Lengkap:</strong> ' + esc(v('spmbNamaLengkap')) + '</div>' +
+                '<div><strong>NISN:</strong> ' + esc(v('spmbNisn')) + '</div>' +
+                '<div><strong>NIK:</strong> ' + esc(v('spmbNik')) + '</div>' +
+                '<div><strong>Tempat, Tgl Lahir:</strong> ' + esc(v('spmbTempatLahir')) + ', ' + esc(v('spmbTanggalLahir')) + '</div>' +
+                '<div><strong>Asal Sekolah:</strong> ' + esc(v('spmbAsalSekolah')) + ' (' + esc(v('spmbJenjangAsal')) + ' - ' + esc(v('spmbTahunLulus')) + ')</div>' +
+                '<div><strong>Nama Ibu Kandung:</strong> ' + esc(v('spmbNamaIbu')) + '</div>' +
+                '<div><strong>No. Kartu Keluarga:</strong> ' + esc(v('spmbNoKk')) + '</div>' +
+                '<div><strong>Orang Tua / Wali:</strong> ' + esc(v('spmbNamaAyah')) + ' (' + esc(v('spmbTeleponOrtu')) + ')</div>' +
+                '<div><strong>Kebutuhan Khusus:</strong> ' + esc(v('spmbKebutuhanKhusus')) + '</div>' +
+                '<div><strong>Kecamatan / Desa:</strong> ' + esc(v('spmbKecamatan')) + ' / ' + esc(v('spmbDesa')) + '</div>' +
+                '<div><strong>Perkiraan Jarak:</strong> <strong style="color:#0284c7">' + distText + '</strong></div>' +
+                '<div><strong>Rata-rata Rapor (1–5):</strong> <strong style="color:#10b981;font-size:15px">' + grandAvg + '</strong></div>' +
+                '<div><strong>Kelengkapan Berkas:</strong> <span class="badge ' + (docCount >= 7 ? 'badge-success' : 'badge-warning') + '">' + docCount + ' dari 7 berkas utama</span></div>' +
+                '</div>';
+
+            document.getElementById('spmbReviewSummary').innerHTML = html;
+        }
+
+        function submitSpmbForm() {
+            var agreed = document.getElementById('spmbAgreed');
+            if (!agreed || !agreed.checked) {
+                showToast('Anda wajib mencentang pernyataan kebenaran data sebelum mengirim pendaftaran!', 'warning');
+                return;
+            }
+
+            var grandAvg = calculateSpmbGrades();
+
+            var payload = {
+                jalurPendaftaran: v('spmbJalur'),
+                nisn: v('spmbNisn'),
+                nik: v('spmbNik'),
+                namaLengkap: v('spmbNamaLengkap'),
+                tempatLahir: v('spmbTempatLahir'),
+                tanggalLahir: v('spmbTanggalLahir'),
+                asalSekolah: v('spmbAsalSekolah'),
+                jenjangAsal: v('spmbJenjangAsal'),
+                tahunLulus: v('spmbTahunLulus'),
+                jenisKelamin: v('spmbJenisKelamin'),
+                agama: v('spmbAgama'),
+                namaIbuKandung: v('spmbNamaIbu'),
+                nomorKk: v('spmbNoKk'),
+                namaAyahWali: v('spmbNamaAyah'),
+                teleponOrtu: v('spmbTeleponOrtu'),
+                pekerjaanOrtu: v('spmbPekerjaanOrtu'),
+                kebutuhanKhusus: v('spmbKebutuhanKhusus'),
+                provinsi: v('spmbProvinsi'),
+                kabupaten: v('spmbKabupaten'),
+                kecamatan: v('spmbKecamatan'),
+                desaKelurahan: v('spmbDesa'),
+                rtRw: v('spmbRtRw'),
+                kodePos: v('spmbKodePos'),
+                alamatLengkap: v('spmbAlamatLengkap'),
+                titikKoordinat: v('spmbKoordinat'),
+                fotoRumah: TEMP_SPMB_DOCS.fotoRumah || '',
+                nilaiRataRata: grandAvg,
+                detailNilai: {
+                    mtk: [v('g_mtk_1'), v('g_mtk_2'), v('g_mtk_3'), v('g_mtk_4'), v('g_mtk_5')],
+                    ind: [v('g_ind_1'), v('g_ind_2'), v('g_ind_3'), v('g_ind_4'), v('g_ind_5')],
+                    ing: [v('g_ing_1'), v('g_ing_2'), v('g_ing_3'), v('g_ing_4'), v('g_ing_5')],
+                    ipa: [v('g_ipa_1'), v('g_ipa_2'), v('g_ipa_3'), v('g_ipa_4'), v('g_ipa_5')]
+                },
+                dokumen: {
+                    pasFoto: TEMP_SPMB_DOCS.pasFoto || '',
+                    kk: TEMP_SPMB_DOCS.kk || '',
+                    akta: TEMP_SPMB_DOCS.akta || '',
+                    ijazahSkl: TEMP_SPMB_DOCS.ijazahSkl || '',
+                    rapor: TEMP_SPMB_DOCS.rapor || '',
+                    ktpOrtu: TEMP_SPMB_DOCS.ktpOrtu || '',
+                    sptjm: TEMP_SPMB_DOCS.sptjm || '',
+                    jalurKhusus: TEMP_SPMB_DOCS.jalurKhusus || ''
+                }
+            };
+
+            showWaiting('Mengirim Pendaftaran...', 'Menyimpan berkas dan membuat nomor registrasi peserta');
+            google.script.run.withSuccessHandler(function (res) {
+                hideWaiting();
+                if (res && res.success) {
+                    showToast(res.message, 'success');
+                    closeModal('spmbModal');
+                    showSpmbReceipt(res.data);
+                    updateSpmbBadge();
+                    if (APP.currentUser && APP.currentUser.role === 'admin' && APP.currentPage === 'spmbAdmin') {
+                        renderSpmbAdmin();
+                    }
+                } else {
+                    showToast((res && res.message) ? res.message : 'Gagal mengirim pendaftaran.', 'error');
+                }
+            }).withFailureHandler(function (e) {
+                hideWaiting();
+                err(e);
+            }).submitSpmbRegistration(payload);
+        }
+
+        function showSpmbReceipt(item) {
+            SPMB_CURRENT_RECEIPT_ITEM = item;
+            var regNo = item.nomorPendaftaran || item.id;
+            var tglStr = new Date(item.tanggalDaftar || Date.now()).toLocaleDateString('id-ID', {
+                day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+
+            var photoHtml = (item.dokumen && item.dokumen.pasFoto)
+                ? '<img src="' + item.dokumen.pasFoto + '" style="width:90px;height:120px;object-fit:cover;border:1px solid #cbd5e1;border-radius:6px"/>'
+                : '<div style="width:90px;height:120px;background:#f1f5f9;border:1px solid #cbd5e1;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:12px;text-align:center;padding:4px">Pas Foto<br/>3x4</div>';
+
+            var html =
+                '<div style="text-align:center;border-bottom:2px solid #0f172a;padding-bottom:12px;margin-bottom:14px">' +
+                '<h2 style="margin:0;font-size:18px;color:#0f172a;font-weight:800;letter-spacing:0.5px">SMAN 12 MUNA BARAT</h2>' +
+                '<p style="margin:2px 0 0 0;font-size:11px;color:#475569">PANITIA PENERIMAAN MURID BARU (SPMB) TAHUN AJARAN 2026/2027</p>' +
+                '<p style="margin:2px 0 0 0;font-size:10px;color:#64748b;font-style:italic">Jl. Poros Lagadi-Tondasi, Kab. Muna Barat, Sulawesi Tenggara — NPSN: 69989028</p>' +
+                '</div>' +
+
+                '<div style="text-align:center;background:#f8fafc;padding:10px;border-radius:8px;border:1px solid #e2e8f0;margin-bottom:16px">' +
+                '<div style="font-size:11px;color:#64748b;font-weight:600">KARTU TANDA BUKTI PENDAFTARAN SPMB</div>' +
+                '<div style="font-size:20px;font-weight:900;color:#0284c7;font-family:monospace;letter-spacing:1px">' + regNo + '</div>' +
+                '<div style="font-size:11px;color:#64748b">Waktu Pendaftaran: ' + tglStr + '</div>' +
+                '</div>' +
+
+                '<div style="display:flex;gap:18px;align-items:flex-start;margin-bottom:16px">' +
+                photoHtml +
+                '<div style="flex:1;font-size:12.5px;line-height:1.7">' +
+                '<div><strong>Nama Calon Siswa:</strong> ' + esc(item.namaLengkap) + '</div>' +
+                '<div><strong>NISN / NIK:</strong> ' + esc(item.nisn) + ' / ' + esc(item.nik || '-') + '</div>' +
+                '<div><strong>Tempat, Tgl Lahir:</strong> ' + esc(item.tempatLahir) + ', ' + esc(item.tanggalLahir) + '</div>' +
+                '<div><strong>Asal Sekolah:</strong> ' + esc(item.asalSekolah) + '</div>' +
+                '<div><strong>Jalur Pendaftaran:</strong> <span style="background:#f1f5f9;padding:2px 8px;border-radius:4px;font-weight:700">' + esc(item.jalurPendaftaran) + '</span></div>' +
+                '<div><strong>Nama Orang Tua / Wali:</strong> ' + esc(item.namaAyahWali || item.namaIbuKandung) + ' (' + esc(item.teleponOrtu) + ')</div>' +
+                '<div><strong>Nilai Rata-rata Rapor:</strong> ' + esc(item.nilaiRataRata || '-') + '</div>' +
+                '</div>' +
+                '</div>' +
+
+                '<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px 12px;font-size:11.5px;color:#92400e;line-height:1.5">' +
+                '<strong>Catatan Penting:</strong> Simpan kartu ini sebagai bukti pendaftaran resmi. Status verifikasi berkas dapat dipantau melalui menu <em>Cek Status SPMB</em> dengan memasukkan NISN Anda.' +
+                '</div>';
+
+            document.getElementById('spmbReceiptContent').innerHTML = html;
+            openModal('spmbReceiptModal');
+        }
+
+        function printSpmbReceipt() {
+            if (!SPMB_CURRENT_RECEIPT_ITEM) return;
+            var printArea = document.getElementById('printArea');
+            var content = document.getElementById('spmbReceiptContent').innerHTML;
+
+            printArea.innerHTML =
+                '<div style="max-width:680px;margin:0 auto;padding:20px;border:2px solid #000;font-family:sans-serif">' +
+                content +
+                '<div style="display:flex;justify-content:space-between;margin-top:36px;padding:0 20px;font-size:12px">' +
+                '<div style="text-align:center"><br/>Calon Siswa / Orang Tua,<br/><br/><br/><br/>( ' + esc(SPMB_CURRENT_RECEIPT_ITEM.namaLengkap) + ' )</div>' +
+                '<div style="text-align:center">Muna Barat, ' + new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) + '<br/>Panitia SPMB SMAN 12 Muna Barat,<br/><br/><br/><br/>( ________________________ )</div>' +
+                '</div>' +
+                '</div>';
+
+            window.print();
+        }
+
+        function openSpmbCheckStatusModal() {
+            document.getElementById('spmbQueryInput').value = '';
+            document.getElementById('spmbQueryResult').style.display = 'none';
+            openModal('spmbCheckStatusModal');
+        }
+
+        function doCheckSpmbStatus() {
+            var q = (document.getElementById('spmbQueryInput').value || '').trim();
+            if (!q) {
+                showToast('Masukkan NISN atau Nomor Pendaftaran!', 'warning');
+                return;
+            }
+
+            showWaiting('Memeriksa Status...', 'Mencari berkas pendaftaran');
+            google.script.run.withSuccessHandler(function (res) {
+                hideWaiting();
+                var wrap = document.getElementById('spmbQueryResult');
+                wrap.style.display = 'block';
+
+                if (!res || !res.success || !res.data) {
+                    wrap.innerHTML = '<div style="background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.3);padding:14px;border-radius:10px;font-size:13px;text-align:center">' +
+                        '<i class="fas fa-exclamation-circle fa-2x" style="margin-bottom:6px"></i><br/>' +
+                        ((res && res.message) ? res.message : 'Data pendaftaran tidak ditemukan.') +
+                        '</div>';
+                    return;
+                }
+
+                var it = res.data;
+                var badgeClass = 'badge-warning';
+                var statusText = 'Menunggu Verifikasi Berkas';
+                var statusIcon = 'fa-clock';
+
+                if (it.status === 'diterima') {
+                    badgeClass = 'badge-success';
+                    statusText = 'SELAMAT! DITERIMA / LOLOS SELEKSI';
+                    statusIcon = 'fa-check-circle';
+                } else if (it.status === 'revisi') {
+                    badgeClass = 'badge-warning';
+                    statusText = 'BERKAS BELUM LENGKAP (PERLU REVISI)';
+                    statusIcon = 'fa-exclamation-triangle';
+                } else if (it.status === 'ditolak') {
+                    badgeClass = 'badge-danger';
+                    statusText = 'TIDAK LOLOS SELEKSI / TIDAK MEMENUHI SYARAT';
+                    statusIcon = 'fa-times-circle';
+                }
+
+                wrap.innerHTML =
+                    '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px">' +
+                    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;border-bottom:1px solid var(--border);padding-bottom:8px">' +
+                    '<strong style="font-size:14px">' + esc(it.namaLengkap) + '</strong>' +
+                    '<span class="badge ' + badgeClass + '"><i class="fas ' + statusIcon + '"></i> ' + statusText + '</span>' +
+                    '</div>' +
+                    '<div style="font-size:12.5px;line-height:1.7;color:var(--text)">' +
+                    '<div><strong>No. Pendaftaran:</strong> <code style="color:#0284c7">' + esc(it.nomorPendaftaran || it.id) + '</code></div>' +
+                    '<div><strong>NISN:</strong> ' + esc(it.nisn) + '</div>' +
+                    '<div><strong>Jalur:</strong> ' + esc(it.jalurPendaftaran) + '</div>' +
+                    '<div><strong>Catatan Panitia:</strong> ' + esc(it.catatanPetugas || 'Dalam proses verifikasi oleh panitia penerimaan.') + '</div>' +
+                    '</div>' +
+                    '<div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end">' +
+                    '<button type="button" class="btn btn-outline btn-xs" onclick="showSpmbReceipt(' + JSON.stringify(it).replace(/"/g, '&quot;') + ')"><i class="fas fa-print"></i> Lihat Kartu Bukti</button>' +
+                    '</div>' +
+                    '</div>';
+            }).withFailureHandler(function (e) {
+                hideWaiting();
+                err(e);
+            }).checkSpmbStatus(q);
+        }
+
+        // ═══════════════════════════════════════════════════
+        // RENDER HALAMAN SPMB DI DASHBOARD ADMIN
+        // ═══════════════════════════════════════════════════
+        function renderSpmbAdmin() {
+            showWaiting('Memuat Data SPMB...', 'Mengambil daftar pendaftaran calon siswa');
+            google.script.run.withSuccessHandler(function (res) {
+                hideWaiting();
+                var main = document.getElementById('dashMain');
+                if (!res || !res.success) {
+                    main.innerHTML = errHtml((res && res.message) ? res.message : 'Gagal memuat data SPMB');
+                    return;
+                }
+
+                SPMB_ADMIN_CACHE = res.data || [];
+                var list = SPMB_ADMIN_CACHE;
+
+                var totalCount = list.length;
+                var pendingCount = list.filter(function (x) { return (x.status || 'menunggu').toLowerCase() === 'menunggu'; }).length;
+                var acceptedCount = list.filter(function (x) { return x.status === 'diterima'; }).length;
+                var rejectedCount = list.filter(function (x) { return x.status === 'ditolak' || x.status === 'revisi'; }).length;
+
+                var html =
+                    '<div class="page-header">' +
+                    '<h1><i class="fas fa-id-card-alt" style="color:#10b981"></i> Penerimaan Murid Baru (SPMB)</h1>' +
+                    '<p>Kelola berkas pendaftaran calon siswa, seleksi zonasi & rapor, serta verifikasi kelengkapan dokumen online</p>' +
+                    '</div>' +
+
+                    // Kartu Statistik
+                    '<div class="stats-grid" style="margin-bottom:20px">' +
+                    '<div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,0.15);color:#10b981"><i class="fas fa-user-graduate"></i></div><div><div class="stat-value">' + totalCount + '</div><div class="stat-label">Total Pendaftar</div></div></div>' +
+                    '<div class="stat-card"><div class="stat-icon" style="background:rgba(245,158,11,0.15);color:#f59e0b"><i class="fas fa-clock"></i></div><div><div class="stat-value">' + pendingCount + '</div><div class="stat-label">Menunggu Verifikasi</div></div></div>' +
+                    '<div class="stat-card"><div class="stat-icon" style="background:rgba(2,132,199,0.15);color:#0284c7"><i class="fas fa-check-double"></i></div><div><div class="stat-value">' + acceptedCount + '</div><div class="stat-label">Diterima / Lolos</div></div></div>' +
+                    '<div class="stat-card"><div class="stat-icon" style="background:rgba(239,68,68,0.15);color:#ef4444"><i class="fas fa-exclamation-triangle"></i></div><div><div class="stat-value">' + rejectedCount + '</div><div class="stat-label">Revisi / Ditolak</div></div></div>' +
+                    '</div>' +
+
+                    // Card Tabel Data Pendaftar
+                    '<div class="card">' +
+                    '<div class="card-header" style="flex-wrap:wrap;gap:10px">' +
+                    '<div style="display:flex;gap:8px;flex:1;min-width:280px;align-items:center;flex-wrap:wrap">' +
+                    '<div class="search-box" style="flex:1;min-width:200px"><i class="fas fa-search"></i><input type="text" id="spmbSearchInput" placeholder="Cari NISN / Nama / Asal Sekolah..." oninput="filterSpmbTable()"/></div>' +
+                    '<select class="form-control" id="spmbFilterStatus" style="width:auto" onchange="filterSpmbTable()">' +
+                    '<option value="all">Semua Status</option>' +
+                    '<option value="menunggu">Menunggu Verifikasi</option>' +
+                    '<option value="diterima">Diterima</option>' +
+                    '<option value="revisi">Perlu Revisi</option>' +
+                    '<option value="ditolak">Ditolak</option>' +
+                    '</select>' +
+                    '<select class="form-control" id="spmbFilterJalur" style="width:auto" onchange="filterSpmbTable()">' +
+                    '<option value="all">Semua Jalur</option>' +
+                    '<option value="Zonasi/Domisili">Zonasi/Domisili</option>' +
+                    '<option value="Prestasi/Rapor">Prestasi/Rapor</option>' +
+                    '<option value="Afirmasi/KIP">Afirmasi/KIP</option>' +
+                    '<option value="Mutasi/Pindahan">Mutasi/Pindahan</option>' +
+                    '</select>' +
+                    '</div>' +
+                    '<div style="display:flex;gap:8px;align-items:center">' +
+                    '<button class="btn btn-outline btn-sm" onclick="exportSpmbToCsv()"><i class="fas fa-file-excel"></i> Ekspor CSV</button>' +
+                    '<button class="btn btn-primary btn-sm" onclick="openSpmbRegistrationModal()"><i class="fas fa-plus"></i> Tambah Pendaftar Manual</button>' +
+                    '</div>' +
+                    '</div>' +
+
+                    '<div class="table-wrap"><table id="spmbAdminTable"><thead><tr><th>#</th><th>Foto</th><th>No. Reg & NISN</th><th>Nama Calon Siswa</th><th>Asal Sekolah</th><th>Jalur & Domisili</th><th>Rata Rapor</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="spmbAdminTbody">';
+
+                if (list.length === 0) {
+                    html += '<tr><td colspan="9" style="text-align:center;padding:36px;color:var(--text2)">Belum ada data pendaftar SPMB yang masuk.</td></tr>';
+                } else {
+                    html += renderSpmbTableRows(list);
+                }
+
+                html += '</tbody></table></div></div>';
+                main.innerHTML = html;
+            }).withFailureHandler(function (e) {
+                hideWaiting();
+                errPage(e);
+            }).getSpmbList();
+        }
+
+        function renderSpmbTableRows(list) {
+            return list.map(function (it, idx) {
+                var badge = '<span class="badge badge-warning">Menunggu</span>';
+                if (it.status === 'diterima') badge = '<span class="badge badge-success">Diterima</span>';
+                else if (it.status === 'revisi') badge = '<span class="badge badge-warning" style="background:rgba(245,158,11,0.2);color:#f59e0b">Revisi</span>';
+                else if (it.status === 'ditolak') badge = '<span class="badge badge-danger">Ditolak</span>';
+
+                var photo = (it.dokumen && it.dokumen.pasFoto)
+                    ? '<img src="' + it.dokumen.pasFoto + '" style="width:34px;height:44px;object-fit:cover;border-radius:4px;border:1px solid var(--border)">'
+                    : '<div style="width:34px;height:44px;background:var(--bg3);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text2)"><i class="fas fa-user"></i></div>';
+
+                var distText = '';
+                if (it.titikKoordinat && it.titikKoordinat.indexOf(',') !== -1) {
+                    var p = it.titikKoordinat.split(',');
+                    var lat = parseFloat(p[0].trim());
+                    var lon = parseFloat(p[1].trim());
+                    if (!isNaN(lat) && !isNaN(lon)) {
+                        distText = ' <span style="font-size:11px;color:#0284c7;display:block">~' + calculateDistanceKm(lat, lon, SMAN12_LAT, SMAN12_LON) + ' km</span>';
+                    }
+                }
+
+                return '<tr>' +
+                    '<td>' + (idx + 1) + '</td>' +
+                    '<td>' + photo + '</td>' +
+                    '<td><code style="color:#10b981;font-weight:700">' + esc(it.nomorPendaftaran || it.id) + '</code><div style="font-size:11px;color:var(--text2)">NISN: ' + esc(it.nisn) + '</div></td>' +
+                    '<td><strong>' + esc(it.namaLengkap) + '</strong><div style="font-size:11px;color:var(--text2)">' + esc(it.jenisKelamin || '-') + ' • ' + esc(it.tempatLahir || '') + '</div></td>' +
+                    '<td>' + esc(it.asalSekolah || '-') + '<div style="font-size:11px;color:var(--text2)">Lulus: ' + esc(it.tahunLulus || '2026') + '</div></td>' +
+                    '<td><span class="badge badge-outline">' + esc(it.jalurPendaftaran || 'Zonasi') + '</span>' + distText + '</td>' +
+                    '<td><strong style="color:#10b981">' + esc(it.nilaiRataRata || '-') + '</strong></td>' +
+                    '<td>' + badge + '</td>' +
+                    '<td>' +
+                    '<div class="action-btns">' +
+                    '<button class="btn btn-primary btn-sm btn-icon" title="Periksa Berkas & Verifikasi" onclick="openSpmbDetailAdmin(\'' + it.id + '\')"><i class="fas fa-clipboard-check"></i></button>' +
+                    '<button class="btn btn-outline btn-sm btn-icon" title="Cetak Kartu Pendaftaran" onclick="showSpmbReceipt(' + JSON.stringify(it).replace(/"/g, '&quot;') + ')"><i class="fas fa-print"></i></button>' +
+                    '<button class="btn btn-danger btn-sm btn-icon" title="Hapus Pendaftar" onclick="deleteSpmbConfirm(\'' + it.id + '\', \'' + esc(it.namaLengkap) + '\')"><i class="fas fa-trash"></i></button>' +
+                    '</div>' +
+                    '</td>' +
+                    '</tr>';
+            }).join('');
+        }
+
+        function filterSpmbTable() {
+            var q = (document.getElementById('spmbSearchInput') ? document.getElementById('spmbSearchInput').value : '').toLowerCase().trim();
+            var st = (document.getElementById('spmbFilterStatus') ? document.getElementById('spmbFilterStatus').value : 'all');
+            var jl = (document.getElementById('spmbFilterJalur') ? document.getElementById('spmbFilterJalur').value : 'all');
+
+            var filtered = SPMB_ADMIN_CACHE.filter(function (it) {
+                var matchQ = !q ||
+                    (it.namaLengkap && it.namaLengkap.toLowerCase().indexOf(q) !== -1) ||
+                    (it.nisn && it.nisn.indexOf(q) !== -1) ||
+                    (it.nomorPendaftaran && it.nomorPendaftaran.toLowerCase().indexOf(q) !== -1) ||
+                    (it.asalSekolah && it.asalSekolah.toLowerCase().indexOf(q) !== -1);
+
+                var matchSt = (st === 'all') || ((it.status || 'menunggu').toLowerCase() === st.toLowerCase());
+                var matchJl = (jl === 'all') || ((it.jalurPendaftaran || '').toLowerCase() === jl.toLowerCase());
+                return matchQ && matchSt && matchJl;
+            });
+
+            var tbody = document.getElementById('spmbAdminTbody');
+            if (tbody) {
+                if (filtered.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:36px;color:var(--text2)">Tidak ada pendaftar yang cocok dengan filter pencarian.</td></tr>';
+                } else {
+                    tbody.innerHTML = renderSpmbTableRows(filtered);
+                }
+            }
+        }
+
+        function openSpmbDetailAdmin(id) {
+            showWaiting('Memuat Berkas...', 'Mengambil data lengkap calon siswa');
+            google.script.run.withSuccessHandler(function (res) {
+                hideWaiting();
+                if (!res || !res.success || !res.data) {
+                    showToast((res && res.message) ? res.message : 'Gagal memuat detail pendaftar.', 'error');
+                    return;
+                }
+
+                var it = res.data;
+                document.getElementById('admSpmbTitle').innerHTML = '<i class="fas fa-user-check" style="color:#10b981"></i> Verifikasi: ' + esc(it.namaLengkap);
+                document.getElementById('admSpmbSub').textContent = 'No. Reg: ' + (it.nomorPendaftaran || it.id) + ' • NISN: ' + it.nisn + ' • Jalur: ' + it.jalurPendaftaran;
+
+                // Hitung Jarak
+                var distHtml = 'Tidak ada koordinat';
+                if (it.titikKoordinat && it.titikKoordinat.indexOf(',') !== -1) {
+                    var p = it.titikKoordinat.split(',');
+                    var lat = parseFloat(p[0].trim());
+                    var lon = parseFloat(p[1].trim());
+                    if (!isNaN(lat) && !isNaN(lon)) {
+                        var dist = calculateDistanceKm(lat, lon, SMAN12_LAT, SMAN12_LON);
+                        distHtml = '<strong>' + dist + ' km</strong> ke sekolah (<a target="_blank" href="https://www.google.com/maps/search/?api=1&query=' + lat + ',' + lon + '" style="color:#0284c7">Buka Peta</a>)';
+                    }
+                }
+
+                // Render Dokumen
+                var docs = it.dokumen || {};
+                var docItems = [
+                    { key: 'pasFoto', label: '1. Pas Foto Calon Siswa', uri: docs.pasFoto },
+                    { key: 'kk', label: '2. Kartu Keluarga (KK)', uri: docs.kk },
+                    { key: 'akta', label: '3. Akta Kelahiran', uri: docs.akta },
+                    { key: 'ijazahSkl', label: '4. Ijazah / SKL SMP', uri: docs.ijazahSkl },
+                    { key: 'rapor', label: '5. Rapor Semester 1–5', uri: docs.rapor },
+                    { key: 'ktpOrtu', label: '6. KTP Orang Tua / Wali', uri: docs.ktpOrtu },
+                    { key: 'sptjm', label: '7. Surat SPTJM Kebenaran Data', uri: docs.sptjm },
+                    { key: 'jalurKhusus', label: '8. Dokumen Jalur Khusus', uri: docs.jalurKhusus }
+                ];
+
+                var docsHtml = docItems.map(function (d) {
+                    if (!d.uri) {
+                        return '<div style="background:var(--bg3);border:1px dashed var(--border);border-radius:8px;padding:10px;display:flex;align-items:center;justify-content:space-between">' +
+                            '<span style="font-size:12px;color:var(--text2)">' + d.label + '</span>' +
+                            '<span class="badge badge-outline" style="font-size:10px">Belum Diunggah</span>' +
+                            '</div>';
+                    }
+                    var isPdf = d.uri.indexOf('application/pdf') !== -1;
+                    return '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;display:flex;align-items:center;justify-content:space-between;gap:8px">' +
+                        '<div style="overflow:hidden">' +
+                        '<div style="font-size:12px;font-weight:700">' + d.label + '</div>' +
+                        '<span class="badge badge-success" style="font-size:10px"><i class="fas fa-check"></i> ' + (isPdf ? 'Berkas PDF' : 'Gambar/Foto') + '</span>' +
+                        '</div>' +
+                        '<div style="display:flex;gap:4px">' +
+                        '<button type="button" class="btn btn-outline btn-xs" onclick="window.TEMP_PREV_DOC=\'' + d.uri + '\';openModalDocPreview(\'' + esc(d.label) + '\')"><i class="fas fa-eye"></i> Buka</button>' +
+                        '<a href="' + d.uri + '" download="' + d.key + '_' + it.nisn + '" class="btn btn-primary btn-xs"><i class="fas fa-download"></i></a>' +
+                        '</div>' +
+                        '</div>';
+                }).join('');
+
+                var bodyHtml =
+                    '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:18px;margin-bottom:20px">' +
+
+                    // Kolom Kiri: Biodata Calon Siswa & Orang Tua
+                    '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px">' +
+                    '<h4 style="margin:0 0 10px 0;font-size:14px;color:var(--text);border-bottom:1px solid var(--border);padding-bottom:6px"><i class="fas fa-user" style="color:#0284c7"></i> Biodata Calon Siswa & Orang Tua</h4>' +
+                    '<div style="font-size:12.5px;line-height:1.8">' +
+                    '<div><strong>Nama Lengkap:</strong> ' + esc(it.namaLengkap) + '</div>' +
+                    '<div><strong>NISN:</strong> ' + esc(it.nisn) + ' • <strong>NIK:</strong> ' + esc(it.nik || '-') + '</div>' +
+                    '<div><strong>Tempat, Tgl Lahir:</strong> ' + esc(it.tempatLahir) + ', ' + esc(it.tanggalLahir) + '</div>' +
+                    '<div><strong>Jenis Kelamin:</strong> ' + esc(it.jenisKelamin) + ' • <strong>Agama:</strong> ' + esc(it.agama) + '</div>' +
+                    '<div><strong>Asal Sekolah:</strong> ' + esc(it.asalSekolah) + ' (' + esc(it.jenjangAsal || 'SMP') + ' - Lulus ' + esc(it.tahunLulus || '2026') + ')</div>' +
+                    '<div><strong>Nama Ibu Kandung:</strong> ' + esc(it.namaIbuKandung) + '</div>' +
+                    '<div><strong>Nomor Kartu Keluarga:</strong> ' + esc(it.nomorKk || '-') + '</div>' +
+                    '<div><strong>Nama Ayah / Wali:</strong> ' + esc(it.namaAyahWali || '-') + ' (' + esc(it.pekerjaanOrtu || '-') + ')</div>' +
+                    '<div><strong>No. HP / WhatsApp:</strong> <a href="https://wa.me/' + (it.teleponOrtu || '').replace(/^0/, '62') + '" target="_blank" style="color:#10b981;font-weight:700"><i class="fab fa-whatsapp"></i> ' + esc(it.teleponOrtu) + '</a></div>' +
+                    '<div><strong>Kebutuhan Khusus:</strong> ' + esc(it.kebutuhanKhusus || 'Tidak Ada') + '</div>' +
+                    '</div>' +
+                    '</div>' +
+
+                    // Kolom Kanan: Alamat, Jarak Domisili & Nilai Rapor
+                    '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px">' +
+                    '<h4 style="margin:0 0 10px 0;font-size:14px;color:var(--text);border-bottom:1px solid var(--border);padding-bottom:6px"><i class="fas fa-map-marked-alt" style="color:#10b981"></i> Alamat & Nilai Rapor</h4>' +
+                    '<div style="font-size:12.5px;line-height:1.8">' +
+                    '<div><strong>Alamat:</strong> ' + esc(it.alamatLengkap || '-') + '</div>' +
+                    '<div><strong>Desa / Kelurahan:</strong> ' + esc(it.desaKelurahan || '-') + ', Kec. ' + esc(it.kecamatan || '-') + '</div>' +
+                    '<div><strong>Titik Koordinat:</strong> ' + esc(it.titikKoordinat || '-') + '</div>' +
+                    '<div><strong>Jarak ke Sekolah:</strong> ' + distHtml + '</div>' +
+                    '<div style="margin-top:6px;padding-top:6px;border-top:1px dashed var(--border)"><strong>Rata-rata Nilai Rapor:</strong> <span style="font-size:16px;font-weight:800;color:#10b981">' + esc(it.nilaiRataRata || '-') + '</span></div>' +
+                    '</div>' +
+                    (it.fotoRumah ? '<div style="margin-top:10px"><strong>Foto Tampak Depan Rumah:</strong><br/><img src="' + it.fotoRumah + '" style="max-height:120px;border-radius:6px;border:1px solid var(--border);margin-top:4px;cursor:pointer" onclick="window.TEMP_PREV_DOC=\'' + it.fotoRumah + '\';openModalDocPreview(\'Foto Tampak Depan Rumah\')"/></div>' : '') +
+                    '</div>' +
+
+                    '</div>' +
+
+                    // Dokumen yang Diunggah
+                    '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px">' +
+                    '<h4 style="margin:0 0 12px 0;font-size:14px;color:var(--text);display:flex;align-items:center;gap:8px"><i class="fas fa-folder-open" style="color:#a855f7"></i> Dokumen Persyaratan yang Diunggah</h4>' +
+                    '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));gap:10px">' +
+                    docsHtml +
+                    '</div>' +
+                    '</div>' +
+
+                    // Box Form Hasil Verifikasi Oleh Admin
+                    '<div style="background:linear-gradient(135deg, rgba(2,132,199,0.08), rgba(16,185,129,0.08));border:1px solid rgba(2,132,199,0.25);border-radius:12px;padding:16px">' +
+                    '<h4 style="margin:0 0 10px 0;font-size:14px;color:var(--text);display:flex;align-items:center;gap:8px"><i class="fas fa-stamp" style="color:#0284c7"></i> Keputusan Hasil Verifikasi Panitia SPMB</h4>' +
+                    '<div class="form-row">' +
+                    '<div class="form-group" style="flex:1">' +
+                    '<label>Status Seleksi / Verifikasi *</label>' +
+                    '<select class="form-control" id="admVerifStatus">' +
+                    '<option value="menunggu"' + (it.status === 'menunggu' ? ' selected' : '') + '>Menunggu Verifikasi</option>' +
+                    '<option value="diterima"' + (it.status === 'diterima' ? ' selected' : '') + '>Diterima / Lolos Seleksi</option>' +
+                    '<option value="revisi"' + (it.status === 'revisi' ? ' selected' : '') + '>Berkas Belum Lengkap (Perlu Revisi)</option>' +
+                    '<option value="ditolak"' + (it.status === 'ditolak' ? ' selected' : '') + '>Ditolak / Tidak Memenuhi Syarat</option>' +
+                    '</select>' +
+                    '</div>' +
+                    '<div class="form-group" style="flex:2">' +
+                    '<label>Catatan untuk Calon Siswa / Catatan Panitia</label>' +
+                    '<input type="text" class="form-control" id="admVerifCatatan" value="' + esc(it.catatanPetugas || '') + '" placeholder="Contoh: Berkas telah diverifikasi lengkap dan valid..."/>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div style="display:flex;justify-content:flex-end;gap:10px;margin-top:10px">' +
+                    '<button type="button" class="btn btn-outline" onclick="closeModal(\'spmbDetailAdminModal\')">Batal</button>' +
+                    '<button type="button" class="btn btn-primary" onclick="saveSpmbVerification(\'' + it.id + '\')"><i class="fas fa-save"></i> Simpan Hasil Verifikasi</button>' +
+                    '</div>' +
+                    '</div>';
+
+                document.getElementById('admSpmbBody').innerHTML = bodyHtml;
+                openModal('spmbDetailAdminModal');
+            }).withFailureHandler(function (e) {
+                hideWaiting();
+                err(e);
+            }).getSpmbById(id);
+        }
+
+        function openModalDocPreview(title) {
+            var dataUri = window.TEMP_PREV_DOC;
+            if (!dataUri) return;
+            var isPdf = dataUri.indexOf('application/pdf') !== -1;
+            document.getElementById('generalModalTitle').textContent = 'Pratinjau: ' + title;
+            document.getElementById('generalModalBox').style.maxWidth = '750px';
+            document.getElementById('generalModalBody').innerHTML = (isPdf
+                ? '<iframe src="' + dataUri + '" style="width:100%;height:70vh;border:none;border-radius:8px"></iframe>'
+                : '<div style="text-align:center;padding:10px;background:#0f172a;border-radius:8px"><img src="' + dataUri + '" style="max-width:100%;max-height:70vh;object-fit:contain"/></div>') +
+                '<div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn btn-outline btn-sm" onclick="closeModal(\'generalModal\')">Tutup</button></div>';
+            openModal('generalModal');
+        }
+
+        function saveSpmbVerification(id) {
+            var st = v('admVerifStatus');
+            var cat = v('admVerifCatatan');
+            var adminName = (APP.currentUser ? APP.currentUser.namaLengkap : 'Admin SPMB');
+
+            showWaiting('Menyimpan Verifikasi...', 'Memperbarui status pendaftaran calon siswa');
+            google.script.run.withSuccessHandler(function (res) {
+                hideWaiting();
+                if (res && res.success) {
+                    showToast(res.message, 'success');
+                    closeModal('spmbDetailAdminModal');
+                    renderSpmbAdmin();
+                    updateSpmbBadge();
+                } else {
+                    showToast((res && res.message) ? res.message : 'Gagal memperbarui verifikasi.', 'error');
+                }
+            }).withFailureHandler(function (e) {
+                hideWaiting();
+                err(e);
+            }).updateSpmbStatus(id, st, cat, adminName);
+        }
+
+        function deleteSpmbConfirm(id, nama) {
+            showConfirm(
+                'Hapus Pendaftar SPMB?',
+                'Apakah Anda yakin ingin menghapus data calon siswa <strong>' + esc(nama) + '</strong> (' + id + ')? Tindakan ini tidak dapat dibatalkan.',
+                function () {
+                    showWaiting('Menghapus...', 'Menghapus pendaftar dari sistem');
+                    google.script.run.withSuccessHandler(function (res) {
+                        hideWaiting();
+                        if (res && res.success) {
+                            showToast(res.message, 'success');
+                            renderSpmbAdmin();
+                            updateSpmbBadge();
+                        } else {
+                            showToast((res && res.message) ? res.message : 'Gagal menghapus.', 'error');
+                        }
+                    }).withFailureHandler(function (e) {
+                        hideWaiting();
+                        err(e);
+                    }).deleteSpmb(id);
+                }
+            );
+        }
+
+        function exportSpmbToCsv() {
+            if (!SPMB_ADMIN_CACHE || SPMB_ADMIN_CACHE.length === 0) {
+                showToast('Tidak ada data SPMB untuk diekspor.', 'warning');
+                return;
+            }
+
+            var headers = [
+                'No. Pendaftaran', 'Tanggal Daftar', 'Status', 'Jalur', 'NISN', 'NIK', 'Nama Lengkap',
+                'Tempat Lahir', 'Tanggal Lahir', 'Jenis Kelamin', 'Agama', 'Asal Sekolah', 'Jenjang',
+                'Tahun Lulus', 'Nama Ibu', 'No KK', 'Nama Ayah/Wali', 'No HP Ortu', 'Pekerjaan Ortu',
+                'Kebutuhan Khusus', 'Provinsi', 'Kabupaten', 'Kecamatan', 'Desa', 'Alamat Lengkap',
+                'Titik Koordinat', 'Nilai Rata Rapor', 'Catatan Panitia'
+            ];
+
+            var rows = [headers.join(',')];
+            SPMB_ADMIN_CACHE.forEach(function (x) {
+                var escapeCsv = function (val) {
+                    return '"' + String(val || '').replace(/"/g, '""').replace(/\n/g, ' ') + '"';
+                };
+                var r = [
+                    escapeCsv(x.nomorPendaftaran || x.id),
+                    escapeCsv(x.tanggalDaftar),
+                    escapeCsv(x.status),
+                    escapeCsv(x.jalurPendaftaran),
+                    escapeCsv(x.nisn),
+                    escapeCsv(x.nik),
+                    escapeCsv(x.namaLengkap),
+                    escapeCsv(x.tempatLahir),
+                    escapeCsv(x.tanggalLahir),
+                    escapeCsv(x.jenisKelamin),
+                    escapeCsv(x.agama),
+                    escapeCsv(x.asalSekolah),
+                    escapeCsv(x.jenjangAsal),
+                    escapeCsv(x.tahunLulus),
+                    escapeCsv(x.namaIbuKandung),
+                    escapeCsv(x.nomorKk),
+                    escapeCsv(x.namaAyahWali),
+                    escapeCsv(x.teleponOrtu),
+                    escapeCsv(x.pekerjaanOrtu),
+                    escapeCsv(x.kebutuhanKhusus),
+                    escapeCsv(x.provinsi),
+                    escapeCsv(x.kabupaten),
+                    escapeCsv(x.kecamatan),
+                    escapeCsv(x.desaKelurahan),
+                    escapeCsv(x.alamatLengkap),
+                    escapeCsv(x.titikKoordinat),
+                    escapeCsv(x.nilaiRataRata),
+                    escapeCsv(x.catatanPetugas)
+                ];
+                rows.push(r.join(','));
+            });
+
+            var csvContent = '\uFEFF' + rows.join('\r\n');
+            var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'Data_Pendaftar_SPMB_SMAN12_MunaBarat_' + new Date().toISOString().slice(0, 10) + '.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showToast('Data SPMB berhasil diekspor ke file CSV/Excel!', 'success');
         }
 
         // ═══════════════════════════════════════════════════
@@ -8709,6 +10441,7 @@
                             var allSubjects = subjRes.data || [];
                             var allExams = examRes.data || [];
                             var allLearnings = (learnRes && learnRes.data) ? learnRes.data : [];
+                            APP_LEARNINGS_CACHE = allLearnings;
 
                             // Filter mapel yang diampu guru ini
                             var mySubjects = allSubjects.filter(function (s) {
@@ -8728,9 +10461,10 @@
                             });
 
                             var myLearnings = allLearnings.filter(function (l) {
-                                return !l.idGuru || l.idGuru === u.id || (l.namaGuru && l.namaGuru.toLowerCase() === (u.namaLengkap || '').toLowerCase());
+                                var matchId = l.idGuru && String(l.idGuru).trim().toLowerCase() === String(u.id || '').trim().toLowerCase();
+                                var matchName = l.namaGuru && u.namaLengkap && String(l.namaGuru).trim().toLowerCase() === String(u.namaLengkap || '').trim().toLowerCase();
+                                return matchId || matchName;
                             });
-                            if (myLearnings.length === 0) myLearnings = allLearnings; // fallback tampilkan pembelajaran yang ada
 
                             var avatar = u.fotoProfil
                                 ? '<img src="' + u.fotoProfil + '" class="guru-dash-avatar" id="dashGuruAvatarImg" onerror="this.outerHTML=\'<div class=guru-dash-avatar-placeholder>' + u.namaLengkap[0] + '</div>\'">'
@@ -8792,7 +10526,6 @@
                                             '</div>' +
                                             '<div style="display:flex;flex-direction:column;gap:6px">' +
                                             '<button class="btn btn-outline btn-xs" onclick="loadPage(\'absenGuru\')"><i class="fas fa-check"></i> Absen</button>' +
-                                            '<button class="btn btn-primary btn-xs" onclick="openAddLearningModal(\'guru\')"><i class="fas fa-plus"></i> Modul</button>' +
                                             '</div>' +
                                             '</div>';
                                     }).join('') +

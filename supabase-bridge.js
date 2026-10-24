@@ -1329,28 +1329,61 @@
     },
 
     // --- RUANG PEMBELAJARAN (LEARNING ROOM) ---
+    _normalizeLearning(item) {
+      if (!item || typeof item !== 'object') return item;
+      let atts = item.attachments || item['Attachments'] || [];
+      if (typeof atts === 'string') {
+        try { atts = JSON.parse(atts); } catch (e) { atts = []; }
+      }
+      if (!Array.isArray(atts)) atts = [];
+
+      return {
+        id: item.id || item['ID'] || '',
+        judul: item.judul || item['Judul'] || 'Materi Pembelajaran',
+        idMapel: item.idMapel || item['ID Mapel'] || '',
+        namaMapel: item.namaMapel || item['Nama Mapel'] || 'Umum',
+        idKelas: item.idKelas || item['ID Kelas'] || '',
+        namaKelas: item.namaKelas || item['Nama Kelas'] || 'Semua Kelas',
+        idGuru: item.idGuru || item['ID Guru'] || '',
+        namaGuru: item.namaGuru || item['Nama Guru'] || 'Guru Pengampu',
+        token: (item.token || item['Token'] || '').trim().toUpperCase(),
+        ringkasan: item.ringkasan || item['Ringkasan'] || '',
+        konten: item.konten || item['Konten'] || '',
+        mediaUrl: item.mediaUrl || item['Media URL'] || item.media_url || '',
+        attachments: atts,
+        status: (item.status || item['Status'] || 'active').toLowerCase(),
+        tanggalBuat: item.tanggalBuat || item['Tanggal Buat'] || item.created_at || new Date().toISOString()
+      };
+    },
+
     async _loadLearningsStore() {
       const sb = getClient();
       if (sb) {
         try {
           const { data, error } = await sb.from('Learnings').select('*').order('Tanggal Buat', { ascending: false });
-          if (!error && Array.isArray(data)) return data;
-        } catch (e) {}
+          if (!error && Array.isArray(data) && data.length > 0) {
+            return data.map(it => this._normalizeLearning(it));
+          }
+        } catch (e) { }
         try {
           const { data, error } = await sb.from('Settings').select('Value').eq('Key', 'app_learnings_data').maybeSingle();
           if (!error && data && data.Value) {
             const parsed = JSON.parse(data.Value);
-            if (Array.isArray(parsed)) return parsed;
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              return parsed.map(it => this._normalizeLearning(it));
+            }
           }
-        } catch (e) {}
+        } catch (e) { }
       }
       try {
         const local = localStorage.getItem('portal_learnings_data');
         if (local) {
           const parsed = JSON.parse(local);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed.map(it => this._normalizeLearning(it));
+          }
         }
-      } catch (e) {}
+      } catch (e) { }
 
       // Default sample learning jika belum ada data sama sekali
       const defaultList = [
@@ -1374,26 +1407,27 @@
       ];
       try {
         localStorage.setItem('portal_learnings_data', JSON.stringify(defaultList));
-      } catch (e) {}
-      return defaultList;
+      } catch (e) { }
+      return defaultList.map(it => this._normalizeLearning(it));
     },
 
     async _saveLearningsStore(list) {
+      const normalized = (list || []).map(it => this._normalizeLearning(it));
       const sb = getClient();
       if (sb) {
         try {
           await sb.from('Settings').upsert([{
             'Key': 'app_learnings_data',
-            'Value': JSON.stringify(list),
+            'Value': JSON.stringify(normalized),
             'Label': 'Data Ruang Pembelajaran',
             'Keterangan': 'Sync modul ruang pembelajaran mandiri',
             'Diupdate': new Date().toISOString()
           }]);
-        } catch (e) {}
+        } catch (e) { }
       }
       try {
-        localStorage.setItem('portal_learnings_data', JSON.stringify(list));
-      } catch (e) {}
+        localStorage.setItem('portal_learnings_data', JSON.stringify(normalized));
+      } catch (e) { }
     },
 
     async getLearnings(filterGuruId) {
@@ -1401,7 +1435,12 @@
         const list = await this._loadLearningsStore();
         let result = list;
         if (filterGuruId) {
-          result = list.filter(item => !item.idGuru || item.idGuru === filterGuruId || item.idGuru === '');
+          const fStr = String(filterGuruId).trim().toLowerCase();
+          result = list.filter(item => {
+            const matchId = item.idGuru && String(item.idGuru).trim().toLowerCase() === fStr;
+            const matchName = item.namaGuru && String(item.namaGuru).trim().toLowerCase() === fStr;
+            return matchId || matchName;
+          });
         }
         return { success: true, data: result };
       } catch (e) {
@@ -1489,14 +1528,17 @@
         const cleanTok = tokenInput.trim().toUpperCase();
         const list = await this._loadLearningsStore();
         const match = list.find(item => {
-          const itemTok = (item.token || '').trim().toUpperCase();
-          const itemId = (item.id || '').trim().toUpperCase();
-          return (itemTok === cleanTok || itemId === cleanTok) && item.status !== 'inactive';
+          const itemTok = (item.token || item['Token'] || '').trim().toUpperCase();
+          const itemId = (item.id || item['ID'] || '').trim().toUpperCase();
+          const status = (item.status || item['Status'] || 'active').toLowerCase();
+          return (itemTok === cleanTok || itemId === cleanTok) && status !== 'inactive';
         });
 
         if (!match) {
           return { success: false, message: 'Token Pembelajaran tidak valid atau materi sudah tidak aktif!' };
         }
+
+        const normalizedMatch = this._normalizeLearning(match);
 
         // Catat kehadiran siswa (status aktif)
         const attendees = await this._loadLearningAttendeesStore();
@@ -1504,8 +1546,8 @@
         const attId = generateId('ATT');
         attendees.unshift({
           id: attId,
-          idPembelajaran: match.id,
-          judulPembelajaran: match.judul,
+          idPembelajaran: normalizedMatch.id,
+          judulPembelajaran: normalizedMatch.judul,
           namaSiswa: namaSiswa.trim(),
           waktuMasuk: now,
           waktuAkses: now,
@@ -1517,7 +1559,7 @@
         return {
           success: true,
           message: 'Berhasil bergabung!',
-          learning: match,
+          learning: normalizedMatch,
           namaSiswa: namaSiswa.trim(),
           waktuMasuk: now,
           attendeeId: attId
@@ -1568,7 +1610,7 @@
             const parsed = JSON.parse(data.Value);
             if (Array.isArray(parsed)) return parsed;
           }
-        } catch (e) {}
+        } catch (e) { }
       }
       try {
         const local = localStorage.getItem('portal_learning_attendees_data');
@@ -1576,7 +1618,7 @@
           const parsed = JSON.parse(local);
           if (Array.isArray(parsed) && parsed.length > 0) return parsed;
         }
-      } catch (e) {}
+      } catch (e) { }
       const defaultAttendees = [
         {
           id: 'ATT-DEMO-01',
@@ -1599,7 +1641,7 @@
       ];
       try {
         localStorage.setItem('portal_learning_attendees_data', JSON.stringify(defaultAttendees));
-      } catch (e) {}
+      } catch (e) { }
       return defaultAttendees;
     },
 
@@ -1614,11 +1656,11 @@
             'Keterangan': 'Sync riwayat siswa masuk & keluar ruang pembelajaran',
             'Diupdate': new Date().toISOString()
           }]);
-        } catch (e) {}
+        } catch (e) { }
       }
       try {
         localStorage.setItem('portal_learning_attendees_data', JSON.stringify(list));
-      } catch (e) {}
+      } catch (e) { }
     },
 
     // ── FORUM DISKUSI INTERAKTIF RUANG PEMBELAJARAN ──
@@ -1676,7 +1718,7 @@
             const parsed = JSON.parse(data.Value);
             if (Array.isArray(parsed) && parsed.length > 0) return parsed;
           }
-        } catch (e) {}
+        } catch (e) { }
       }
       try {
         const local = localStorage.getItem('portal_learning_discussions_data');
@@ -1684,7 +1726,7 @@
           const parsed = JSON.parse(local);
           if (Array.isArray(parsed) && parsed.length > 0) return parsed;
         }
-      } catch (e) {}
+      } catch (e) { }
 
       const defaultDiscussions = [
         {
@@ -1720,7 +1762,7 @@
       ];
       try {
         localStorage.setItem('portal_learning_discussions_data', JSON.stringify(defaultDiscussions));
-      } catch (e) {}
+      } catch (e) { }
       return defaultDiscussions;
     },
 
@@ -1735,11 +1777,285 @@
             'Keterangan': 'Sync forum tanya jawab & saran materi pembelajaran',
             'Diupdate': new Date().toISOString()
           }]);
-        } catch (e) {}
+        } catch (e) { }
       }
       try {
         localStorage.setItem('portal_learning_discussions_data', JSON.stringify(list));
-      } catch (e) {}
+      } catch (e) { }
+    },
+
+    // ══════════════════════════════════════════════════════════════════
+    // SPMB (SISTEM PENERIMAAN MURID BARU) HANDLERS
+    // ══════════════════════════════════════════════════════════════════
+    async _loadSpmbStore() {
+      const sb = getClient();
+      if (sb) {
+        try {
+          const { data, error } = await sb.from('Settings').select('Value').eq('Key', 'app_spmb_registrations').maybeSingle();
+          if (!error && data && data.Value) {
+            const parsed = JSON.parse(data.Value);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          }
+        } catch (e) { }
+      }
+      try {
+        const local = localStorage.getItem('portal_spmb_registrations');
+        if (local) {
+          const parsed = JSON.parse(local);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) { }
+
+      // Default sample pendaftar jika baru pertama kali dibuka
+      const defaultSpmb = [
+        {
+          id: 'SPMB-2026-0001',
+          nomorPendaftaran: 'SPMB/2026/0001',
+          tanggalDaftar: new Date(Date.now() - 86400000 * 2).toISOString(),
+          status: 'menunggu', // 'menunggu', 'diterima', 'revisi', 'ditolak'
+          catatanPetugas: 'Menunggu kelengkapan verifikasi berkas',
+          // 1. Data Akun & Registrasi Awal
+          nisn: '0089123456',
+          nik: '7403011205080001',
+          namaLengkap: 'Muh. Fadhil Ramadhan',
+          tempatLahir: 'Tondasi',
+          tanggalLahir: '2008-05-12',
+          asalSekolah: 'SMP Negeri 1 Barangka',
+          jenjangAsal: 'SMP',
+          tahunLulus: '2026',
+          jalurPendaftaran: 'Zonasi/Domisili',
+          // 2. Biodata Calon Siswa & Orang Tua
+          jenisKelamin: 'Laki-laki',
+          agama: 'Islam',
+          namaIbuKandung: 'Wa Ode Rosmawati',
+          nomorKk: '7403011205080005',
+          namaAyahWali: 'La Ode Baharuddin',
+          teleponOrtu: '081234567890',
+          pekerjaanOrtu: 'Wiraswasta/Pedagang',
+          kebutuhanKhusus: 'Tidak Ada',
+          // 3. Data Alamat & Titik Domisili
+          provinsi: 'Sulawesi Tenggara',
+          kabupaten: 'Muna Barat',
+          kecamatan: 'Barangka',
+          desaKelurahan: 'Lawa',
+          rtRw: '002/001',
+          kodePos: '93653',
+          alamatLengkap: 'Jl. Poros Barangka RT 02 RW 01, Muna Barat',
+          titikKoordinat: '-4.842105, 122.458912',
+          fotoRumah: '',
+          // 4. Data Akademik & Nilai Rapor
+          nilaiRataRata: '87.50',
+          detailNilai: {
+            mtk: [85, 88, 86, 90, 89],
+            ind: [88, 86, 89, 87, 90],
+            ing: [84, 85, 86, 88, 87],
+            ipa: [86, 87, 88, 89, 90]
+          },
+          // 5. Dokumen Persyaratan
+          dokumen: {
+            pasFoto: '',
+            kk: '',
+            akta: '',
+            ijazahSkl: '',
+            rapor: '',
+            ktpOrtu: '',
+            sptjm: '',
+            jalurKhusus: ''
+          }
+        }
+      ];
+      try {
+        localStorage.setItem('portal_spmb_registrations', JSON.stringify(defaultSpmb));
+      } catch (e) { }
+      return defaultSpmb;
+    },
+
+    async _saveSpmbStore(list) {
+      const sb = getClient();
+      if (sb) {
+        try {
+          await sb.from('Settings').upsert([{
+            'Key': 'app_spmb_registrations',
+            'Value': JSON.stringify(list),
+            'Label': 'Data SPMB Pendaftar Baru',
+            'Keterangan': 'Sync data pendaftaran penerimaan murid baru online',
+            'Diupdate': new Date().toISOString()
+          }]);
+        } catch (e) { }
+      }
+      try {
+        localStorage.setItem('portal_spmb_registrations', JSON.stringify(list));
+      } catch (e) { }
+    },
+
+    async getSpmbList(filterStatus, filterJalur) {
+      try {
+        let list = await this._loadSpmbStore();
+        if (filterStatus && filterStatus !== 'all') {
+          list = list.filter(item => (item.status || 'menunggu').toLowerCase() === filterStatus.toLowerCase());
+        }
+        if (filterJalur && filterJalur !== 'all') {
+          list = list.filter(item => (item.jalurPendaftaran || '').toLowerCase() === filterJalur.toLowerCase());
+        }
+        return { success: true, data: list };
+      } catch (e) {
+        return { success: false, message: e.message, data: [] };
+      }
+    },
+
+    async getSpmbById(id) {
+      try {
+        const list = await this._loadSpmbStore();
+        const found = list.find(item => item.id === id);
+        if (!found) return { success: false, message: 'Data pendaftar tidak ditemukan.' };
+        return { success: true, data: found };
+      } catch (e) {
+        return { success: false, message: e.message };
+      }
+    },
+
+    async submitSpmbRegistration(data) {
+      try {
+        if (!data.namaLengkap || !data.nisn) {
+          return { success: false, message: 'Nama lengkap dan NISN calon siswa wajib diisi!' };
+        }
+        const list = await this._loadSpmbStore();
+
+        // Cek apakah NISN sudah terdaftar
+        const existing = list.find(item => item.nisn === data.nisn.trim());
+        if (existing) {
+          return {
+            success: false,
+            message: 'NISN ' + data.nisn + ' sudah pernah didaftarkan pada nomor registrasi ' + (existing.nomorPendaftaran || existing.id) + '!'
+          };
+        }
+
+        const nextNum = list.length + 1;
+        const regCode = 'SPMB-2026-' + String(nextNum).padStart(4, '0');
+        const regNomor = 'SPMB/2026/' + String(nextNum).padStart(4, '0');
+
+        const newApplicant = {
+          id: regCode,
+          nomorPendaftaran: regNomor,
+          tanggalDaftar: new Date().toISOString(),
+          status: 'menunggu',
+          catatanPetugas: 'Pendaftaran baru diterima, menunggu verifikasi berkas.',
+          verifikator: '',
+          // 1. Data Akun & Registrasi Awal
+          nisn: (data.nisn || '').trim(),
+          nik: (data.nik || '').trim(),
+          namaLengkap: (data.namaLengkap || '').trim(),
+          tempatLahir: (data.tempatLahir || '').trim(),
+          tanggalLahir: (data.tanggalLahir || '').trim(),
+          asalSekolah: (data.asalSekolah || '').trim(),
+          jenjangAsal: (data.jenjangAsal || 'SMP').trim(),
+          tahunLulus: (data.tahunLulus || '2026').trim(),
+          jalurPendaftaran: (data.jalurPendaftaran || 'Zonasi/Domisili').trim(),
+          // 2. Biodata Calon Siswa & Orang Tua
+          jenisKelamin: (data.jenisKelamin || 'Laki-laki').trim(),
+          agama: (data.agama || 'Islam').trim(),
+          namaIbuKandung: (data.namaIbuKandung || '').trim(),
+          nomorKk: (data.nomorKk || '').trim(),
+          namaAyahWali: (data.namaAyahWali || '').trim(),
+          teleponOrtu: (data.teleponOrtu || '').trim(),
+          pekerjaanOrtu: (data.pekerjaanOrtu || '').trim(),
+          kebutuhanKhusus: (data.kebutuhanKhusus || 'Tidak Ada').trim(),
+          // 3. Data Alamat & Titik Domisili
+          provinsi: (data.provinsi || 'Sulawesi Tenggara').trim(),
+          kabupaten: (data.kabupaten || 'Muna Barat').trim(),
+          kecamatan: (data.kecamatan || '').trim(),
+          desaKelurahan: (data.desaKelurahan || '').trim(),
+          rtRw: (data.rtRw || '').trim(),
+          kodePos: (data.kodePos || '').trim(),
+          alamatLengkap: (data.alamatLengkap || '').trim(),
+          titikKoordinat: (data.titikKoordinat || '').trim(),
+          fotoRumah: data.fotoRumah || '',
+          // 4. Data Akademik & Nilai Rapor
+          nilaiRataRata: (data.nilaiRataRata || '0.00').trim(),
+          detailNilai: data.detailNilai || {},
+          // 5. Dokumen Persyaratan
+          dokumen: data.dokumen || {}
+        };
+
+        list.unshift(newApplicant);
+        await this._saveSpmbStore(list);
+        return {
+          success: true,
+          message: 'Pendaftaran SPMB Berhasil Dikirim!',
+          data: newApplicant
+        };
+      } catch (e) {
+        return { success: false, message: e.message };
+      }
+    },
+
+    async updateSpmbStatus(id, newStatus, catatan, verifikatorNama) {
+      try {
+        const list = await this._loadSpmbStore();
+        const idx = list.findIndex(item => item.id === id);
+        if (idx === -1) return { success: false, message: 'Data pendaftar tidak ditemukan.' };
+
+        list[idx].status = newStatus;
+        if (catatan !== undefined) list[idx].catatanPetugas = catatan;
+        if (verifikatorNama) list[idx].verifikator = verifikatorNama;
+        list[idx].tanggalVerifikasi = new Date().toISOString();
+
+        await this._saveSpmbStore(list);
+        return { success: true, message: 'Status verifikasi pendaftaran berhasil diperbarui!' };
+      } catch (e) {
+        return { success: false, message: e.message };
+      }
+    },
+
+    async updateSpmbRegistration(id, updatedData) {
+      try {
+        const list = await this._loadSpmbStore();
+        const idx = list.findIndex(item => item.id === id);
+        if (idx === -1) return { success: false, message: 'Data pendaftar tidak ditemukan.' };
+
+        list[idx] = {
+          ...list[idx],
+          ...updatedData,
+          id: list[idx].id,
+          nomorPendaftaran: list[idx].nomorPendaftaran,
+          tanggalUpdate: new Date().toISOString()
+        };
+
+        await this._saveSpmbStore(list);
+        return { success: true, message: 'Data pendaftar SPMB berhasil diperbarui!' };
+      } catch (e) {
+        return { success: false, message: e.message };
+      }
+    },
+
+    async deleteSpmb(id) {
+      try {
+        let list = await this._loadSpmbStore();
+        list = list.filter(item => item.id !== id);
+        await this._saveSpmbStore(list);
+        return { success: true, message: 'Data pendaftar berhasil dihapus.' };
+      } catch (e) {
+        return { success: false, message: e.message };
+      }
+    },
+
+    async checkSpmbStatus(nisnOrNoReg) {
+      try {
+        if (!nisnOrNoReg) return { success: false, message: 'Masukkan NISN atau Nomor Pendaftaran!' };
+        const query = String(nisnOrNoReg).trim().toLowerCase();
+        const list = await this._loadSpmbStore();
+        const match = list.find(item => {
+          return (item.nisn && item.nisn.toLowerCase() === query) ||
+            (item.id && item.id.toLowerCase() === query) ||
+            (item.nomorPendaftaran && item.nomorPendaftaran.toLowerCase() === query);
+        });
+        if (!match) {
+          return { success: false, message: 'Data pendaftar dengan NISN / Nomor "' + nisnOrNoReg + '" tidak ditemukan.' };
+        }
+        return { success: true, data: match };
+      } catch (e) {
+        return { success: false, message: e.message };
+      }
     }
   };
 
