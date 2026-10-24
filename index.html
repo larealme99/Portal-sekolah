@@ -1830,14 +1830,25 @@
         }
 
         #dashboardPage.active {
-            display: flex
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 100vh;
+            max-height: 100vh;
+            overflow: hidden;
+            z-index: 100;
         }
 
         .dash-layout {
             display: flex;
             flex: 1;
             overflow: hidden;
-            height: calc(100vh - 60px)
+            height: calc(100vh - 60px);
+            max-height: calc(100vh - 60px);
+            min-height: 0;
         }
 
         .dash-topbar {
@@ -1917,7 +1928,11 @@
             border-right: 1px solid var(--border);
             overflow-y: auto;
             flex-shrink: 0;
-            transition: width .3s
+            transition: width .3s;
+            position: sticky;
+            top: 0;
+            height: calc(100vh - 60px);
+            align-self: flex-start;
         }
 
         .sidebar.collapsed {
@@ -1987,7 +2002,56 @@
         .dash-main {
             flex: 1;
             overflow-y: auto;
-            padding: 24px
+            height: calc(100vh - 60px);
+            padding: 24px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Student Space Cards & Ruang Pembelajaran Interactive Components */
+        .student-space-card {
+            transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+        }
+        .student-space-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+            border-color: rgba(56, 189, 248, 0.6) !important;
+        }
+
+        .guru-bento-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px;
+            transition: border-color .2s;
+        }
+        .guru-bento-card:hover {
+            border-color: rgba(56, 189, 248, 0.4);
+        }
+
+        .live-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+            box-shadow: 0 0 8px #10b981;
+            animation: pulse-live 1.8s infinite;
+            margin-right: 5px;
+        }
+        @keyframes pulse-live {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.3); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+
+        .discussion-reply-item {
+            margin-left: 20px;
+            border-left: 2px solid rgba(168, 85, 247, 0.4);
+            padding-left: 14px;
+            margin-top: 10px;
+            background: rgba(168, 85, 247, 0.04);
+            border-radius: 0 8px 8px 0;
+            padding: 10px 14px;
         }
 
         .page-header {
@@ -3191,17 +3255,20 @@
             </div>
 
             <h1 class="lp-hero-title" id="lpHeroSchoolTitle">SMAN 12 Muna Barat</h1>
+            <!-- ALAMAT & NPSN SEKOLAH (TULISAN MIRING TEPAT DIBAWAH NAMA SEKOLAH) -->
+            <p class="lp-hero-school-meta" id="lpHeroSchoolMeta" style="font-style: italic; font-size: 14.5px; color: #cbd5e1; margin-top: -6px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;">
+                <span><i class="fas fa-map-marker-alt" style="color:#38bdf8;margin-right:5px"></i><span id="lpHeroAddress">Jl. Poros Lagadi-Tondasi, Muna Barat</span></span>
+                <span style="opacity:0.5">•</span>
+                <span><i class="fas fa-id-card" style="color:#38bdf8;margin-right:5px"></i>NPSN: <span id="lpHeroNpsn">69989028</span></span>
+            </p>
             <p class="lp-hero-subtitle">
                 Portal resmi layanan akademik, absensi cerdas, dan sistem ujian berbasis komputer (CBT) terpadu.
             </p>
 
-            <!-- TOMBOL DI LANDING PAGE: RUANG BELAJAR, UJIAN SISWA, LOGIN ADMIN & GURU -->
+            <!-- TOMBOL DI LANDING PAGE: RUANG SISWA & LOGIN (ADMIN & GURU) -->
             <div class="lp-hero-actions">
-                <button type="button" class="lp-btn-learn" onclick="openStudentLearningModal()">
-                    <i class="fas fa-chalkboard-teacher"></i> Ruang Pembelajaran
-                </button>
-                <button type="button" class="lp-btn-exam" onclick="openStudentExamModal()">
-                    <i class="fas fa-pencil-alt"></i> Ujian Siswa
+                <button type="button" class="lp-btn-student" onclick="openStudentSpaceModal()" style="background:linear-gradient(135deg, #0284c7, #2563eb);color:#fff;border:none;box-shadow:0 8px 25px rgba(37,99,235,0.4);border-radius:12px;padding:12px 24px;font-size:14px;font-weight:700;display:inline-flex;align-items:center;gap:8px;cursor:pointer;transition:all .2s ease">
+                    <i class="fas fa-user-graduate"></i> Ruang Siswa
                 </button>
                 <button type="button" class="lp-btn-login" onclick="showLogin('guru')">
                     <i class="fas fa-sign-in-alt"></i> Login (Admin & Guru)
@@ -3250,6 +3317,50 @@
         <footer class="lp-footer">
             <p>&copy; 2026 SMAN 12 Muna Barat &bull; Portal Sekolah. Seluruh Hak Cipta Dilindungi.</p>
         </footer>
+    </div>
+
+    <!-- ═══════════════════ MODAL MENU RUANG SISWA (BOX KONTAINER TERPADU) ═══════════════════ -->
+    <div class="modal-glass-overlay hidden" id="studentSpaceModal">
+        <div class="modal-glass-card" style="max-width:580px;width:95%;padding:28px 24px">
+            <button class="btn-glass-close" onclick="closeModal('studentSpaceModal')"><i class="fas fa-times"></i></button>
+            <div style="text-align:center;margin-bottom:24px">
+                <div style="width:64px;height:64px;background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:26px;color:#38bdf8">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <div class="glass-auth-title" style="font-size:22px">Ruang Siswa Terpadu</div>
+                <div class="glass-auth-subtitle" style="font-size:13px">Pilih layanan pembelajaran mandiri atau ruang ujian komputer:</div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(230px, 1fr));gap:16px;margin-bottom:8px">
+                <!-- BOX 1: RUANG PEMBELAJARAN -->
+                <div class="student-space-card" onclick="closeModal('studentSpaceModal');openStudentLearningModal()" style="background:rgba(124,58,237,0.12);border:1px solid rgba(168,85,247,0.35);border-radius:14px;padding:20px;cursor:pointer;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:space-between">
+                    <div>
+                        <div style="width:52px;height:52px;background:rgba(168,85,247,0.25);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#c084fc;margin:0 auto 12px">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <h3 style="font-size:16px;font-weight:700;color:#fff;margin-bottom:6px">Ruang Pembelajaran</h3>
+                        <p style="font-size:12px;color:#cbd5e1;line-height:1.55;margin-bottom:16px">Pelajari modul digital, video referensi, unduh berkas materi (PDF, PPT, Foto), dan tanya jawab di forum diskusi.</p>
+                    </div>
+                    <button type="button" class="btn btn-primary btn-sm" style="width:100%;background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;border-radius:10px;padding:10px;font-weight:700">
+                        <i class="fas fa-door-open"></i> Masuk Pembelajaran
+                    </button>
+                </div>
+
+                <!-- BOX 2: UJIAN / ULANGAN SISWA -->
+                <div class="student-space-card" onclick="closeModal('studentSpaceModal');openStudentExamModal()" style="background:rgba(14,165,233,0.12);border:1px solid rgba(56,189,248,0.35);border-radius:14px;padding:20px;cursor:pointer;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:space-between">
+                    <div>
+                        <div style="width:52px;height:52px;background:rgba(56,189,248,0.25);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#38bdf8;margin:0 auto 12px">
+                            <i class="fas fa-pencil-alt"></i>
+                        </div>
+                        <h3 style="font-size:16px;font-weight:700;color:#fff;margin-bottom:6px">Ujian / Ulangan Siswa</h3>
+                        <p style="font-size:12px;color:#cbd5e1;line-height:1.55;margin-bottom:16px">Ikuti tes CBT, ulangan harian, PTS, dan PAS dengan memasukkan token ujian resmi dari guru.</p>
+                    </div>
+                    <button type="button" class="btn btn-primary btn-sm" style="width:100%;background:linear-gradient(135deg,#0284c7,#2563eb);border:none;border-radius:10px;padding:10px;font-weight:700">
+                        <i class="fas fa-pen-nib"></i> Masuk Ruang Ujian
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- ── MODAL INPUT TOKEN UJIAN SISWA ── -->
@@ -3335,14 +3446,14 @@
 
     <!-- ═══════════════════ MODAL RUANG PEMBELAJARAN SISWA ═══════════════════ -->
     <div class="modal-glass-overlay hidden" id="studentLearningModal">
-        <div class="modal-glass-card" style="max-width:440px">
+        <div class="modal-glass-card" style="max-width:520px;width:95%">
             <button class="btn-glass-close" onclick="closeModal('studentLearningModal')"><i class="fas fa-times"></i></button>
             <div style="text-align:center;margin-bottom:20px">
                 <div style="width:64px;height:64px;background:rgba(124,58,237,0.2);border:1px solid rgba(168,85,247,0.4);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:26px;color:#a855f7">
                     <i class="fas fa-laptop-code"></i>
                 </div>
                 <div class="glass-auth-title" style="font-size:24px">Ruang Pembelajaran</div>
-                <div class="glass-auth-subtitle">Masukkan Nama Lengkap dan Token Materi dari Guru</div>
+                <div class="glass-auth-subtitle">Masukkan Nama Lengkap Anda dan Token Materi Pembelajaran</div>
             </div>
 
             <div class="glass-input-box">
@@ -3352,7 +3463,7 @@
             </div>
 
             <div class="glass-input-box">
-                <input type="text" id="modalTokenBelajar" placeholder="Token Pembelajaran (Contoh: LRN1234)"
+                <input type="text" id="modalTokenBelajar" placeholder="Token Pembelajaran (Contoh: BIO10)"
                     style="text-transform:uppercase;letter-spacing:2px;font-weight:700"
                     onkeydown="if(event.key==='Enter')doStudentLearningFromModal()" />
                 <div class="glass-input-icon"><i class="fas fa-key"></i></div>
@@ -3362,15 +3473,79 @@
                 onclick="doStudentLearningFromModal()">
                 <span><i class="fas fa-sign-in-alt" style="margin-right:8px"></i> Masuk Pembelajaran</span>
             </button>
+
+            <!-- DAFTAR MATERI AKTIF (1-KLIK PILIH TOKEN) -->
+            <div style="margin-top:20px;border-top:1px solid rgba(255,255,255,0.1);padding-top:14px">
+                <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;justify-content:space-between">
+                    <span><i class="fas fa-book-open" style="color:#a855f7;margin-right:4px"></i> Materi Aktif yang Tersedia:</span>
+                    <span style="font-size:10px;color:#38bdf8;cursor:pointer" onclick="openStudentLearningModal()"><i class="fas fa-sync-alt"></i> Muat Ulang</span>
+                </div>
+                <div id="modalActiveLearningsList" style="max-height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:6px">
+                    <div style="font-size:12px;color:var(--text2);text-align:center;padding:10px"><i class="fas fa-spinner fa-spin"></i> Memeriksa materi...</div>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- ── MODAL VIEWER MATERI SISWA (INTERAKTIF & ELEGAN) ── -->
     <div class="modal-glass-overlay hidden" id="learningViewModal" style="z-index:9999">
-        <div class="modal-glass-card" style="max-width:850px;width:95%;max-height:92vh;overflow-y:auto;padding:28px 24px;border:1px solid rgba(168,85,247,0.3)">
-            <button class="btn-glass-close" onclick="closeModal('learningViewModal')"><i class="fas fa-times"></i></button>
+        <div class="modal-glass-card" style="max-width:920px;width:95%;max-height:92vh;overflow-y:auto;padding:28px 24px;border:1px solid rgba(168,85,247,0.3)">
+            <button class="btn-glass-close" onclick="exitStudentLearningRoom()"><i class="fas fa-times"></i></button>
             <div id="learningViewContent">
                 <!-- Dynamically populated by renderStudentLearningView() -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ── MODAL MONITOR KEHADIRAN SISWA DI RUANG PEMBELAJARAN (GURU & ADMIN) ── -->
+    <div class="modal-glass-overlay hidden" id="learningMonitorModal" style="z-index:99999">
+        <div class="modal-glass-card" style="max-width:880px;width:95%;max-height:90vh;overflow-y:auto;padding:26px 22px;border:1px solid rgba(56,189,248,0.35)">
+            <button class="btn-glass-close" onclick="closeModal('learningMonitorModal')"><i class="fas fa-times"></i></button>
+            <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:18px;flex-wrap:wrap;gap:10px">
+                <div>
+                    <h3 style="font-size:18px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:8px">
+                        <i class="fas fa-users-cog" style="color:#38bdf8"></i> Monitor Kehadiran Siswa
+                    </h3>
+                    <p style="font-size:12px;color:var(--text2)" id="learningMonitorSubtitle">Memantau aktivitas siswa masuk dan keluar ruangan</p>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px">
+                    <button class="btn btn-outline btn-sm" id="btnRefreshMonitor" onclick="refreshLearningMonitor()"><i class="fas fa-sync-alt"></i> Segarkan Data</button>
+                    <span id="monitorLiveBadge" style="font-size:11px;padding:4px 10px;border-radius:12px;background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);font-weight:600"><span class="live-dot"></span>Live Tracker</span>
+                </div>
+            </div>
+
+            <!-- Stats Monitor -->
+            <div class="stats-grid" style="margin-bottom:18px;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr))">
+                <div class="stat-card" style="padding:14px">
+                    <div class="stat-icon" style="background:rgba(56,189,248,0.15);color:#38bdf8"><i class="fas fa-users"></i></div>
+                    <div><div class="stat-value" id="monTotalCount">0</div><div class="stat-label">Total Akses Siswa</div></div>
+                </div>
+                <div class="stat-card" style="padding:14px">
+                    <div class="stat-icon" style="background:rgba(16,185,129,0.15);color:#10b981"><i class="fas fa-user-check"></i></div>
+                    <div><div class="stat-value" id="monActiveCount" style="color:#10b981">0</div><div class="stat-label">Sedang Aktif di Ruang</div></div>
+                </div>
+                <div class="stat-card" style="padding:14px">
+                    <div class="stat-icon" style="background:rgba(148,163,184,0.15);color:#94a3b8"><i class="fas fa-user-clock"></i></div>
+                    <div><div class="stat-value" id="monFinishedCount">0</div><div class="stat-label">Selesai / Sudah Keluar</div></div>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table id="learningMonitorTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Nama Lengkap Siswa</th>
+                            <th>Status Kehadiran</th>
+                            <th>Waktu Masuk</th>
+                            <th>Waktu Keluar</th>
+                            <th>Durasi Belajar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="learningMonitorTbody">
+                        <!-- Populated dynamically -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -3808,9 +3983,13 @@
         function applySettings() {
             var s = APP.settings || {};
             var sn = s.school_name || 'SMAN 12 Muna Barat';
+            var sAddr = s.school_address || 'Jl. Poros Lagadi-Tondasi, Muna Barat';
+            var sNpsn = s.school_npsn || '69989028';
             function setText(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
             setText('lpSchoolName', sn);
             setText('lpHeroSchoolTitle', sn);
+            setText('lpHeroAddress', sAddr);
+            setText('lpHeroNpsn', sNpsn);
             document.title = sn + ' - Portal';
             if (s.school_logo_url) {
                 var heroLogo = document.getElementById('lpHeroLogo');
@@ -4276,6 +4455,10 @@
         // ═══════════════════════════════════════════════════
         // RUANG PEMBELAJARAN (SISWA FLOW)
         // ═══════════════════════════════════════════════════
+        function openStudentSpaceModal() {
+            openModal('studentSpaceModal');
+        }
+
         function openStudentLearningModal() {
             var n = document.getElementById('modalNamaSiswaBelajar');
             var t = document.getElementById('modalTokenBelajar');
@@ -4285,6 +4468,44 @@
             setTimeout(function () {
                 if (n) n.focus();
             }, 150);
+
+            var listEl = document.getElementById('modalActiveLearningsList');
+            if (listEl) {
+                listEl.innerHTML = '<div style="font-size:12px;color:var(--text2);text-align:center;padding:10px"><i class="fas fa-spinner fa-spin"></i> Memeriksa materi aktif...</div>';
+                google.script.run.withSuccessHandler(function (res) {
+                    var items = (res && res.data) ? res.data.filter(function (it) { return it.status !== 'inactive'; }) : [];
+                    if (items.length === 0) {
+                        listEl.innerHTML = '<div style="font-size:12px;color:var(--text2);text-align:center;padding:8px">Belum ada materi pembelajaran aktif saat ini.</div>';
+                        return;
+                    }
+                    var h = '';
+                    items.forEach(function (it) {
+                        var attCount = (it.attachments && it.attachments.length) ? it.attachments.length : 0;
+                        h += '<div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);padding:8px 12px;border-radius:8px;display:flex;align-items:center;justify-content:space-between;gap:8px">' +
+                            '<div style="text-align:left;overflow:hidden">' +
+                            '<div style="font-weight:700;font-size:13px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(it.judul) + '</div>' +
+                            '<div style="font-size:11px;color:var(--text2)">' + esc(it.namaMapel || 'Umum') + ' • ' + esc(it.namaKelas || 'Semua Kelas') + (attCount ? ' • <span style="color:#38bdf8"><i class="fas fa-paperclip"></i> ' + attCount + ' Berkas</span>' : '') + '</div>' +
+                            '</div>' +
+                            '<button type="button" class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 10px;white-space:nowrap;border-color:rgba(168,85,247,0.5);color:#c084fc" onclick="selectLearningToken(\'' + esc(it.token) + '\')">' +
+                            '<i class="fas fa-key"></i> ' + esc(it.token) +
+                            '</button>' +
+                            '</div>';
+                    });
+                    listEl.innerHTML = h;
+                }).withFailureHandler(function () {
+                    listEl.innerHTML = '<div style="font-size:12px;color:var(--text2);text-align:center;padding:8px">Gunakan token dari guru Anda.</div>';
+                }).getLearnings();
+            }
+        }
+
+        function selectLearningToken(token) {
+            var t = document.getElementById('modalTokenBelajar');
+            if (t) {
+                t.value = token;
+                var n = document.getElementById('modalNamaSiswaBelajar');
+                if (n && !n.value) n.focus();
+                showToast('Token ' + token + ' dipilih! Masukkan nama Anda dan klik Masuk.', 'info');
+            }
         }
 
         function doStudentLearningFromModal() {
@@ -4299,9 +4520,9 @@
                 hideWaiting();
                 if (res && res.success) {
                     closeModal('studentLearningModal');
-                    renderStudentLearningView(res.learning, nama, res.waktuMasuk);
+                    renderStudentLearningView(res.learning, nama, res.waktuMasuk, res.attendeeId);
                 } else {
-                    showToast((res && res.message) ? res.message : 'Token tidak valid.', 'error');
+                    showToast((res && res.message) ? res.message : 'Token tidak valid atau materi sudah nonaktif.', 'error');
                 }
             }).withFailureHandler(function (e) {
                 hideWaiting();
@@ -4309,9 +4530,58 @@
             }).validateAndJoinLearning(nama, token);
         }
 
-        function renderStudentLearningView(learning, studentName, joinTime) {
+        // State Sesi Belajar Siswa yang sedang aktif
+        window.CURRENT_LEARNING_SESSION = null;
+        window.learningDurationTimer = null;
+
+        function exitStudentLearningRoom() {
+            var sess = window.CURRENT_LEARNING_SESSION;
+            if (sess && sess.attendeeId) {
+                google.script.run.recordLearningExit(sess.attendeeId, sess.learningId, sess.studentName);
+                window.CURRENT_LEARNING_SESSION = null;
+            }
+            if (window.learningDurationTimer) {
+                clearInterval(window.learningDurationTimer);
+                window.learningDurationTimer = null;
+            }
+            closeModal('learningViewModal');
+            showToast('Sesi belajar selesai. Kehadiran Anda berhasil tercatat!', 'success');
+        }
+
+        // Otomatis catat waktu keluar jika tab ditutup / browser di-refresh
+        window.addEventListener('beforeunload', function () {
+            var sess = window.CURRENT_LEARNING_SESSION;
+            if (sess && sess.attendeeId) {
+                google.script.run.recordLearningExit(sess.attendeeId, sess.learningId, sess.studentName);
+            }
+        });
+
+        function renderStudentLearningView(learning, studentName, joinTime, attendeeId) {
             var dateStr = joinTime ? formatCleanDateTime(joinTime) : formatCleanDateTime(new Date().toISOString());
-            
+            var isTeacherOrAdmin = (APP.currentUser && (APP.currentUser.role === 'admin' || APP.currentUser.role === 'guru'));
+
+            // Set session aktif jika bukan preview guru
+            if (attendeeId !== 'TEACHER_PREVIEW') {
+                window.CURRENT_LEARNING_SESSION = {
+                    learningId: learning.id,
+                    studentName: studentName,
+                    attendeeId: attendeeId,
+                    waktuMasuk: joinTime || new Date().toISOString()
+                };
+            }
+
+            // Timer durasi belajar
+            var startTs = Date.now();
+            if (window.learningDurationTimer) clearInterval(window.learningDurationTimer);
+            window.learningDurationTimer = setInterval(function () {
+                var el = document.getElementById('learningDurationCounter');
+                if (!el) return;
+                var sec = Math.floor((Date.now() - startTs) / 1000);
+                var m = Math.floor(sec / 60);
+                var s = sec % 60;
+                el.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+            }, 1000);
+
             // Format media URL embed (YouTube support)
             var mediaHtml = '';
             if (learning.mediaUrl) {
@@ -4329,17 +4599,68 @@
                 }
             }
 
+            // Format Attachments / Berkas Lampiran (PDF, PPT, Foto)
+            var attachments = Array.isArray(learning.attachments) ? learning.attachments : [];
+            var attHtml = '';
+            if (attachments.length > 0) {
+                attHtml = '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:22px">' +
+                    '<h4 style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px">' +
+                    '<i class="fas fa-folder-open" style="color:#38bdf8"></i> Berkas & Lampiran Materi Guru (' + attachments.length + ' File)' +
+                    '</h4>' +
+                    '<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(240px, 1fr));gap:12px">';
+
+                attachments.forEach(function (att, aIdx) {
+                    var ext = (att.name || '').split('.').pop().toLowerCase();
+                    var icon = 'fa-file';
+                    var iconColor = '#94a3b8';
+                    var isPdf = (ext === 'pdf');
+                    var isPpt = (ext === 'ppt' || ext === 'pptx');
+                    var isImg = (ext === 'png' || ext === 'jpg' || ext === 'jpeg' || ext === 'webp' || ext === 'gif');
+
+                    if (isPdf) { icon = 'fa-file-pdf'; iconColor = '#ef4444'; }
+                    else if (isPpt) { icon = 'fa-file-powerpoint'; iconColor = '#f97316'; }
+                    else if (isImg) { icon = 'fa-file-image'; iconColor = '#10b981'; }
+                    else if (ext === 'doc' || ext === 'docx') { icon = 'fa-file-word'; iconColor = '#2563eb'; }
+
+                    var sizeKb = att.size ? (Math.round(att.size / 1024) + ' KB') : '';
+
+                    attHtml += '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;flex-direction:column;justify-content:space-between;gap:10px">' +
+                        '<div style="display:flex;align-items:flex-start;gap:10px">' +
+                        '<i class="fas ' + icon + ' fa-2x" style="color:' + iconColor + ';flex-shrink:0"></i>' +
+                        '<div style="overflow:hidden">' +
+                        '<div style="font-weight:700;font-size:13px;word-break:break-word;color:var(--text)">' + esc(att.name || 'Berkas Materi') + '</div>' +
+                        '<div style="font-size:11px;color:var(--text2)">' + sizeKb + '</div>' +
+                        '</div>' +
+                        '</div>' +
+                        '<div style="display:flex;gap:6px;margin-top:6px">' +
+                        (isImg ? '<button type="button" class="btn btn-outline btn-xs" style="flex:1" onclick="previewLearningImage(\'' + esc(att.dataUrl || '') + '\', \'' + esc(att.name || '') + '\')"><i class="fas fa-search-plus"></i> Lihat Foto</button>' : '') +
+                        (isPdf ? '<button type="button" class="btn btn-outline btn-xs" style="flex:1" onclick="previewLearningPdf(\'' + esc(att.dataUrl || '') + '\', \'' + esc(att.name || '') + '\')"><i class="fas fa-eye"></i> Buka PDF</button>' : '') +
+                        '<a href="' + (att.dataUrl || '#') + '" download="' + esc(att.name || 'file') + '" class="btn btn-primary btn-xs" style="flex:1;text-align:center;justify-content:center"><i class="fas fa-download"></i> Unduh</a>' +
+                        '</div>' +
+                        '</div>';
+                });
+
+                attHtml += '</div></div>';
+            }
+
             var html = '<div style="border-bottom:1px solid var(--border);padding-bottom:16px;margin-bottom:18px">' +
-                '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px">' +
-                '<span class="badge badge-purple" style="font-size:12px;padding:5px 10px"><i class="fas fa-laptop-code"></i> Ruang Pembelajaran</span>' +
-                '<span style="font-size:12px;color:#10b981;background:rgba(16,185,129,0.15);padding:4px 10px;border-radius:20px;border:1px solid rgba(16,185,129,0.3);font-weight:600"><i class="fas fa-check-circle"></i> Kehadiran Siswa Tercatat</span>' +
+                '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">' +
+                '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
+                '<span class="badge badge-purple" style="font-size:12px;padding:5px 12px"><i class="fas fa-laptop-code"></i> Ruang Pembelajaran Interaktif</span>' +
+                '<span style="font-size:12px;color:#10b981;background:rgba(16,185,129,0.15);padding:4px 12px;border-radius:20px;border:1px solid rgba(16,185,129,0.3);font-weight:600"><span class="live-dot"></span> Sedang Aktif di Ruangan</span>' +
+                '<span style="font-size:12px;color:var(--text2);margin-left:4px"><i class="far fa-clock"></i> Waktu: <strong id="learningDurationCounter" style="color:#38bdf8">00:00</strong></span>' +
+                '</div>' +
+                '<div style="display:flex;gap:8px;align-items:center">' +
+                (isTeacherOrAdmin ? '<button type="button" class="btn btn-outline btn-sm" onclick="openLearningMonitor(\'' + learning.id + '\', \'' + esc(learning.judul) + '\')"><i class="fas fa-users-cog"></i> Monitor Siswa</button>' : '') +
+                '<button type="button" class="btn btn-danger btn-sm" onclick="exitStudentLearningRoom()"><i class="fas fa-sign-out-alt"></i> Selesai & Keluar</button>' +
+                '</div>' +
                 '</div>' +
                 '<h2 style="font-size:22px;font-weight:800;color:var(--text);margin-bottom:8px">' + esc(learning.judul) + '</h2>' +
                 '<div style="display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--text2)">' +
                 '<span><i class="fas fa-book" style="color:var(--primary);margin-right:5px"></i>' + esc(learning.namaMapel || 'Mata Pelajaran') + '</span>' +
                 '<span><i class="fas fa-school" style="color:var(--accent);margin-right:5px"></i>' + esc(learning.namaKelas || 'Semua Kelas') + '</span>' +
                 '<span><i class="fas fa-chalkboard-teacher" style="color:#a855f7;margin-right:5px"></i>' + esc(learning.namaGuru || 'Guru Pengampu') + '</span>' +
-                '<span><i class="fas fa-user-graduate" style="color:#38bdf8;margin-right:5px"></i>Siswa: <strong>' + esc(studentName) + '</strong></span>' +
+                '<span><i class="fas fa-user-graduate" style="color:#38bdf8;margin-right:5px"></i>Peserta: <strong>' + esc(studentName) + '</strong></span>' +
                 '</div>' +
                 '</div>';
 
@@ -4357,17 +4678,426 @@
                 '<i class="fas fa-file-alt" style="color:var(--primary)"></i> Modul & Isi Materi Pembelajaran' +
                 '</h4>' +
                 '<div style="font-size:15px;line-height:1.75;color:var(--text);white-space:pre-wrap;font-family:inherit">' +
-                (learning.konten ? esc(learning.konten) : '<span style="color:var(--text2)">Tidak ada catatan teks tambahan. Silakan pelajari materi melalui media / tautan di atas.</span>') +
+                (learning.konten ? esc(learning.konten) : '<span style="color:var(--text2)">Tidak ada catatan teks tambahan. Silakan pelajari materi melalui berkas atau media di atas.</span>') +
+                '</div>' +
+                '</div>';
+
+            html += attHtml;
+
+            // ── KOLOM DISKUSI INTERAKTIF SISWA & GURU ──
+            html += '<div style="background:var(--card);border:1px solid rgba(168,85,247,0.3);border-radius:12px;padding:22px;margin-bottom:22px">' +
+                '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:12px">' +
+                '<h4 style="font-size:16px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;margin:0">' +
+                '<i class="fas fa-comments" style="color:#a855f7"></i> Kolom Diskusi, Tanya Jawab & Saran Siswa' +
+                '</h4>' +
+                '<button type="button" class="btn btn-outline btn-xs" onclick="loadLearningDiscussions(\'' + learning.id + '\')"><i class="fas fa-sync-alt"></i> Segarkan Diskusi</button>' +
+                '</div>' +
+
+                // Form Tulis Pesan Diskusi
+                '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:18px">' +
+                '<div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap">' +
+                '<label style="font-size:12px;font-weight:700;color:var(--text2)">Kategori:</label>' +
+                '<label style="font-size:12px;display:inline-flex;align-items:center;gap:4px;cursor:pointer"><input type="radio" name="discCategory" value="pertanyaan" checked/> ❓ Pertanyaan</label>' +
+                '<label style="font-size:12px;display:inline-flex;align-items:center;gap:4px;cursor:pointer"><input type="radio" name="discCategory" value="saran"/> 💡 Saran / Masukan</label>' +
+                '<label style="font-size:12px;display:inline-flex;align-items:center;gap:4px;cursor:pointer"><input type="radio" name="discCategory" value="diskusi"/> 💬 Diskusi Materi</label>' +
+                '</div>' +
+                '<textarea class="form-control" id="discContentInput" rows="2" placeholder="Tuliskan pertanyaan Anda, beri saran perbaikan, atau diskusikan materi ini..." style="margin-bottom:10px"></textarea>' +
+                '<div style="display:flex;justify-content:flex-end">' +
+                '<button type="button" class="btn btn-primary btn-sm" onclick="submitLearningDiscussionComment(\'' + learning.id + '\', \'' + esc(studentName) + '\')"><i class="fas fa-paper-plane"></i> Kirim Pesan</button>' +
+                '</div>' +
+                '</div>' +
+
+                // Container Daftar Pesan
+                '<div id="learningDiscussionsContainer" style="display:flex;flex-direction:column;gap:12px">' +
+                '<div style="font-size:12px;color:var(--text2);text-align:center;padding:14px"><i class="fas fa-spinner fa-spin"></i> Memuat forum diskusi...</div>' +
                 '</div>' +
                 '</div>';
 
             html += '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;padding-top:14px;border-top:1px solid var(--border)">' +
                 '<span style="font-size:12px;color:var(--text2)"><i class="far fa-clock"></i> Masuk pada: ' + dateStr + '</span>' +
-                '<button class="btn btn-primary" onclick="closeModal(\'learningViewModal\');showToast(\'Selamat, Anda telah menyelesaikan pembelajaran ini!\', \'success\')"><i class="fas fa-check"></i> Selesai Mempelajari</button>' +
+                '<button class="btn btn-primary" onclick="exitStudentLearningRoom()"><i class="fas fa-check-circle"></i> Selesai & Keluar</button>' +
                 '</div>';
 
             document.getElementById('learningViewContent').innerHTML = html;
             openModal('learningViewModal');
+
+            // Muat diskusi setelah modal terbuka
+            loadLearningDiscussions(learning.id);
+        }
+
+        // ═══════════════════════════════════════════════════
+        // DISKUSI & TANYA JAWAB INTERAKTIF RUANG PEMBELAJARAN
+        // ═══════════════════════════════════════════════════
+        function loadLearningDiscussions(learningId) {
+            var container = document.getElementById('learningDiscussionsContainer');
+            if (!container) return;
+            google.script.run.withSuccessHandler(function (res) {
+                var comments = (res && res.data) ? res.data : [];
+                if (comments.length === 0) {
+                    container.innerHTML = '<div style="font-size:13px;color:var(--text2);text-align:center;padding:20px;background:rgba(255,255,255,0.02);border-radius:8px">' +
+                        '<i class="fas fa-comment-dots fa-2x" style="opacity:0.4;margin-bottom:8px"></i><br/>Belum ada pertanyaan atau saran. Jadilah yang pertama memulai diskusi!' +
+                        '</div>';
+                    return;
+                }
+
+                var parents = comments.filter(function (c) { return !c.parentId; });
+                var repliesMap = {};
+                comments.forEach(function (c) {
+                    if (c.parentId) {
+                        repliesMap[c.parentId] = repliesMap[c.parentId] || [];
+                        repliesMap[c.parentId].push(c);
+                    }
+                });
+
+                var isTeacher = (APP.currentUser && (APP.currentUser.role === 'admin' || APP.currentUser.role === 'guru'));
+
+                var h = '';
+                parents.forEach(function (p) {
+                    var categoryBadge = '<span class="badge badge-purple" style="font-size:10px">💬 Diskusi</span>';
+                    if (p.category === 'pertanyaan') categoryBadge = '<span class="badge badge-warning" style="font-size:10px">❓ Pertanyaan</span>';
+                    else if (p.category === 'saran') categoryBadge = '<span class="badge badge-info" style="font-size:10px">💡 Saran</span>';
+
+                    var authorBadge = p.senderRole === 'guru'
+                        ? '<span class="badge badge-success" style="font-size:10px;margin-left:6px"><i class="fas fa-check-circle"></i> Guru Pengampu</span>'
+                        : '<span class="badge badge-outline" style="font-size:10px;margin-left:6px">Siswa</span>';
+
+                    var pReplies = repliesMap[p.id] || [];
+
+                    h += '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px" id="discItem_' + p.id + '">' +
+                        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px">' +
+                        '<div style="display:flex;align-items:center;gap:8px">' +
+                        '<div style="width:30px;height:30px;border-radius:50%;background:rgba(168,85,247,0.2);display:flex;align-items:center;justify-content:center;font-weight:700;color:#c084fc;font-size:13px">' +
+                        esc((p.senderName || 'S')[0].toUpperCase()) +
+                        '</div>' +
+                        '<div>' +
+                        '<strong style="font-size:13px;color:var(--text)">' + esc(p.senderName) + '</strong>' + authorBadge +
+                        '<div style="font-size:11px;color:var(--text2)">' + formatCleanDateTime(p.createdAt) + '</div>' +
+                        '</div>' +
+                        '</div>' +
+                        '<div style="display:flex;align-items:center;gap:6px">' +
+                        categoryBadge +
+                        (isTeacher ? '<button type="button" class="btn btn-outline btn-xs" style="color:#ef4444" title="Hapus komentar" onclick="deleteLearningDiscussionComment(\'' + learningId + '\', \'' + p.id + '\')"><i class="fas fa-trash"></i></button>' : '') +
+                        '</div>' +
+                        '</div>' +
+                        '<div style="font-size:13.5px;color:var(--text);line-height:1.6;white-space:pre-wrap;margin-bottom:8px">' + esc(p.content) + '</div>' +
+                        '<div style="display:flex;align-items:center;justify-content:space-between">' +
+                        '<button type="button" class="btn btn-outline btn-xs" onclick="toggleDiscussionReplyBox(\'' + p.id + '\')"><i class="fas fa-reply"></i> ' + (isTeacher ? 'Jawab Siswa' : 'Balas') + '</button>' +
+                        '<span style="font-size:11px;color:var(--text2)">' + (pReplies.length ? (pReplies.length + ' Jawaban') : '') + '</span>' +
+                        '</div>' +
+
+                        // Reply input box
+                        '<div id="replyBox_' + p.id + '" style="display:none;margin-top:10px;background:var(--bg3);padding:10px;border-radius:8px;border:1px solid var(--border)">' +
+                        '<textarea class="form-control" id="replyInput_' + p.id + '" rows="2" placeholder="' + (isTeacher ? 'Tuliskan jawaban penjelasan guru untuk siswa...' : 'Tulis balasan...') + '"></textarea>' +
+                        '<div style="display:flex;justify-content:flex-end;gap:6px;margin-top:8px">' +
+                        '<button type="button" class="btn btn-outline btn-xs" onclick="toggleDiscussionReplyBox(\'' + p.id + '\')">Batal</button>' +
+                        '<button type="button" class="btn btn-primary btn-xs" onclick="submitLearningReplyComment(\'' + learningId + '\', \'' + p.id + '\')"><i class="fas fa-paper-plane"></i> Kirim</button>' +
+                        '</div>' +
+                        '</div>';
+
+                    // Render nested replies
+                    if (pReplies.length > 0) {
+                        h += '<div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">';
+                        pReplies.forEach(function (r) {
+                            var rBadge = r.senderRole === 'guru'
+                                ? '<span class="badge badge-success" style="font-size:10px;margin-left:6px"><i class="fas fa-check-circle"></i> Jawaban Guru</span>'
+                                : '<span class="badge badge-outline" style="font-size:10px;margin-left:6px">Siswa</span>';
+
+                            h += '<div class="discussion-reply-item">' +
+                                '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">' +
+                                '<div style="display:flex;align-items:center;gap:6px">' +
+                                '<strong style="font-size:12.5px;color:var(--text)">' + esc(r.senderName) + '</strong>' + rBadge +
+                                '<span style="font-size:10.5px;color:var(--text2);margin-left:4px">' + formatCleanDateTime(r.createdAt) + '</span>' +
+                                '</div>' +
+                                (isTeacher ? '<button type="button" class="btn btn-outline btn-xs" style="color:#ef4444;padding:2px 6px" onclick="deleteLearningDiscussionComment(\'' + learningId + '\', \'' + r.id + '\')"><i class="fas fa-trash"></i></button>' : '') +
+                                '</div>' +
+                                '<div style="font-size:13px;color:var(--text);white-space:pre-wrap;line-height:1.5">' + esc(r.content) + '</div>' +
+                                '</div>';
+                        });
+                        h += '</div>';
+                    }
+
+                    h += '</div>';
+                });
+
+                container.innerHTML = h;
+            }).withFailureHandler(function () {
+                container.innerHTML = '<div style="font-size:12px;color:var(--text2);text-align:center;padding:12px">Gagal memuat diskusi. Silakan coba lagi.</div>';
+            }).getLearningDiscussions(learningId);
+        }
+
+        function toggleDiscussionReplyBox(parentId) {
+            var el = document.getElementById('replyBox_' + parentId);
+            if (!el) return;
+            if (el.style.display === 'none' || !el.style.display) {
+                el.style.display = 'block';
+                var inp = document.getElementById('replyInput_' + parentId);
+                if (inp) inp.focus();
+            } else {
+                el.style.display = 'none';
+            }
+        }
+
+        function submitLearningDiscussionComment(learningId, fallbackName) {
+            var inp = document.getElementById('discContentInput');
+            if (!inp || !inp.value.trim()) {
+                showToast('Tuliskan pertanyaan atau saran materi terlebih dahulu!', 'warning');
+                return;
+            }
+
+            var catEl = document.querySelector('input[name="discCategory"]:checked');
+            var category = catEl ? catEl.value : 'pertanyaan';
+
+            var senderName = fallbackName || 'Siswa';
+            var senderRole = 'siswa';
+            if (APP.currentUser) {
+                senderName = APP.currentUser.namaLengkap;
+                senderRole = APP.currentUser.role === 'admin' ? 'guru' : (APP.currentUser.role || 'siswa');
+            }
+
+            var payload = {
+                senderName: senderName,
+                senderRole: senderRole,
+                category: category,
+                content: inp.value.trim(),
+                parentId: null
+            };
+
+            showWaiting('Mengirim Pesan...', 'Memposting ke forum diskusi');
+            google.script.run.withSuccessHandler(function (res) {
+                hideWaiting();
+                if (res && res.success) {
+                    showToast('Pesan berhasil dikirim!', 'success');
+                    inp.value = '';
+                    loadLearningDiscussions(learningId);
+                } else {
+                    showToast((res && res.message) ? res.message : 'Gagal mengirim pesan.', 'error');
+                }
+            }).withFailureHandler(function (e) {
+                hideWaiting();
+                err(e);
+            }).postLearningComment(learningId, payload);
+        }
+
+        function submitLearningReplyComment(learningId, parentId) {
+            var inp = document.getElementById('replyInput_' + parentId);
+            if (!inp || !inp.value.trim()) {
+                showToast('Tuliskan jawaban atau balasan terlebih dahulu!', 'warning');
+                return;
+            }
+
+            var senderName = 'Peserta Diskusi';
+            var senderRole = 'siswa';
+            if (APP.currentUser) {
+                senderName = APP.currentUser.namaLengkap;
+                senderRole = (APP.currentUser.role === 'admin' || APP.currentUser.role === 'guru') ? 'guru' : 'siswa';
+            }
+
+            var payload = {
+                senderName: senderName,
+                senderRole: senderRole,
+                category: senderRole === 'guru' ? 'jawaban' : 'diskusi',
+                content: inp.value.trim(),
+                parentId: parentId
+            };
+
+            showWaiting('Mengirim Balasan...', 'Memposting tanggapan');
+            google.script.run.withSuccessHandler(function (res) {
+                hideWaiting();
+                if (res && res.success) {
+                    showToast('Balasan terkirim!', 'success');
+                    inp.value = '';
+                    toggleDiscussionReplyBox(parentId);
+                    loadLearningDiscussions(learningId);
+                } else {
+                    showToast((res && res.message) ? res.message : 'Gagal membalas.', 'error');
+                }
+            }).withFailureHandler(function (e) {
+                hideWaiting();
+                err(e);
+            }).postLearningComment(learningId, payload);
+        }
+
+        function deleteLearningDiscussionComment(learningId, commentId) {
+            showConfirmDialog('Hapus Komentar', 'Apakah Anda yakin ingin menghapus komentar diskusi ini?', function () {
+                showWaiting('Menghapus...', 'Menghapus pesan diskusi');
+                google.script.run.withSuccessHandler(function (res) {
+                    hideWaiting();
+                    showToast(res.message, res.success ? 'success' : 'error');
+                    loadLearningDiscussions(learningId);
+                }).withFailureHandler(function (e) {
+                    hideWaiting();
+                    err(e);
+                }).deleteLearningComment(learningId, commentId);
+            });
+        }
+
+        // ═══════════════════════════════════════════════════
+        // MONITOR SISWA MASUK & KELUAR RUANG BELAJAR
+        // ═══════════════════════════════════════════════════
+        window.CURRENT_MONITOR_LEARNING_ID = null;
+
+        function openLearningMonitor(learningId, learningTitle) {
+            window.CURRENT_MONITOR_LEARNING_ID = learningId;
+            var sub = document.getElementById('learningMonitorSubtitle');
+            if (sub) sub.textContent = 'Materi: ' + (learningTitle || 'Ruang Pembelajaran');
+            openModal('learningMonitorModal');
+            refreshLearningMonitor();
+        }
+
+        function refreshLearningMonitor() {
+            var learningId = window.CURRENT_MONITOR_LEARNING_ID;
+            if (!learningId) return;
+            var tbody = document.getElementById('learningMonitorTbody');
+            if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px"><i class="fas fa-spinner fa-spin"></i> Memuat data kehadiran siswa...</td></tr>';
+
+            google.script.run.withSuccessHandler(function (res) {
+                var attendees = (res && res.data) ? res.data : [];
+                var activeCount = 0;
+                var finishedCount = 0;
+
+                attendees.forEach(function (a) {
+                    if (a.status === 'active' || (!a.waktuKeluar && a.waktuMasuk)) activeCount++;
+                    else finishedCount++;
+                });
+
+                var elTot = document.getElementById('monTotalCount');
+                var elAct = document.getElementById('monActiveCount');
+                var elFin = document.getElementById('monFinishedCount');
+                if (elTot) elTot.textContent = attendees.length;
+                if (elAct) elAct.textContent = activeCount;
+                if (elFin) elFin.textContent = finishedCount;
+
+                if (!tbody) return;
+                if (attendees.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text2)">Belum ada siswa yang masuk ke ruang pembelajaran ini.</td></tr>';
+                    return;
+                }
+
+                var rows = '';
+                attendees.forEach(function (a, idx) {
+                    var isActive = (a.status === 'active' || (!a.waktuKeluar && a.waktuMasuk));
+                    var statusBadge = isActive
+                        ? '<span class="badge badge-success" style="padding:4px 10px"><span class="live-dot"></span> Sedang Aktif</span>'
+                        : '<span class="badge badge-secondary" style="padding:4px 10px"><i class="fas fa-check"></i> Selesai Keluar</span>';
+
+                    var wMasuk = a.waktuMasuk ? formatCleanDateTime(a.waktuMasuk) : '-';
+                    var wKeluar = a.waktuKeluar ? formatCleanDateTime(a.waktuKeluar) : (isActive ? '<span style="color:#10b981;font-weight:600">Masih Belajar</span>' : '-');
+
+                    var durText = '-';
+                    if (a.waktuMasuk) {
+                        var endTs = a.waktuKeluar ? new Date(a.waktuKeluar).getTime() : Date.now();
+                        var startTs = new Date(a.waktuMasuk).getTime();
+                        var diffMin = Math.max(1, Math.round((endTs - startTs) / 60000));
+                        durText = diffMin + ' Menit';
+                    }
+
+                    rows += '<tr>' +
+                        '<td>' + (idx + 1) + '</td>' +
+                        '<td><strong>' + esc(a.namaSiswa || 'Siswa') + '</strong></td>' +
+                        '<td>' + statusBadge + '</td>' +
+                        '<td>' + wMasuk + '</td>' +
+                        '<td>' + wKeluar + '</td>' +
+                        '<td><span class="badge badge-purple">' + durText + '</span></td>' +
+                        '</tr>';
+                });
+
+                tbody.innerHTML = rows;
+            }).withFailureHandler(function (e) {
+                if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#ef4444;padding:20px">Gagal memuat data kehadiran: ' + esc(e.message || '') + '</td></tr>';
+            }).getLearningAttendees(learningId);
+        }
+
+        function viewLearningAttendees(learningId, title) {
+            openLearningMonitor(learningId, title);
+        }
+
+        // ═══════════════════════════════════════════════════
+        // UNGGAH & PREVIEW FILE MATERI (PDF, PPT, FOTO)
+        // ═══════════════════════════════════════════════════
+        window.TEMP_LEARNING_ATTACHMENTS = [];
+
+        function handleLearningFileUpload(input) {
+            if (!input.files || input.files.length === 0) return;
+            var files = Array.from(input.files);
+            var statusEl = document.getElementById('mlFileUploadStatus');
+            if (statusEl) statusEl.textContent = 'Memproses ' + files.length + ' file...';
+
+            var loaded = 0;
+            files.forEach(function (f) {
+                if (f.size > 15 * 1024 * 1024) {
+                    showToast('File ' + f.name + ' melebihi 15MB. Gunakan Google Drive/YouTube untuk file sangat besar.', 'warning');
+                    loaded++;
+                    return;
+                }
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    window.TEMP_LEARNING_ATTACHMENTS.push({
+                        name: f.name,
+                        size: f.size,
+                        type: f.type,
+                        dataUrl: e.target.result
+                    });
+                    loaded++;
+                    if (loaded >= files.length) {
+                        if (statusEl) statusEl.textContent = 'Berhasil memuat ' + window.TEMP_LEARNING_ATTACHMENTS.length + ' file.';
+                        renderTempLearningAttachments();
+                        input.value = '';
+                    }
+                };
+                reader.readAsDataURL(f);
+            });
+        }
+
+        function renderTempLearningAttachments() {
+            var listEl = document.getElementById('mlUploadedFilesList');
+            if (!listEl) return;
+            var atts = window.TEMP_LEARNING_ATTACHMENTS || [];
+            if (atts.length === 0) {
+                listEl.innerHTML = '<div style="font-size:12px;color:var(--text2)">Belum ada file materi dilampirkan.</div>';
+                return;
+            }
+
+            var h = '';
+            atts.forEach(function (att, idx) {
+                var ext = (att.name || '').split('.').pop().toLowerCase();
+                var icon = 'fa-file';
+                var iconColor = '#94a3b8';
+                if (ext === 'pdf') { icon = 'fa-file-pdf'; iconColor = '#ef4444'; }
+                else if (ext === 'ppt' || ext === 'pptx') { icon = 'fa-file-powerpoint'; iconColor = '#f97316'; }
+                else if (ext === 'png' || ext === 'jpg' || ext === 'jpeg' || ext === 'webp') { icon = 'fa-file-image'; iconColor = '#10b981'; }
+                else if (ext === 'doc' || ext === 'docx') { icon = 'fa-file-word'; iconColor = '#2563eb'; }
+
+                var sizeKb = att.size ? (Math.round(att.size / 1024) + ' KB') : '';
+
+                h += '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px">' +
+                    '<div style="display:flex;align-items:center;gap:8px;overflow:hidden">' +
+                    '<i class="fas ' + icon + '" style="color:' + iconColor + '"></i>' +
+                    '<span style="font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(att.name) + '</span>' +
+                    '<span style="font-size:11px;color:var(--text2)">(' + sizeKb + ')</span>' +
+                    '</div>' +
+                    '<button type="button" class="btn btn-outline btn-xs" style="color:#ef4444" onclick="removeTempLearningAttachment(' + idx + ')"><i class="fas fa-trash"></i></button>' +
+                    '</div>';
+            });
+            listEl.innerHTML = h;
+        }
+
+        function removeTempLearningAttachment(idx) {
+            window.TEMP_LEARNING_ATTACHMENTS.splice(idx, 1);
+            renderTempLearningAttachments();
+        }
+
+        function previewLearningImage(dataUrl, name) {
+            var w = window.open('');
+            if (w) {
+                w.document.write('<!DOCTYPE html><html><head><title>' + esc(name) + '</title><style>body{margin:0;background:#0b0f19;display:flex;align-items:center;justify-content:center;min-height:100vh}img{max-width:95vw;max-height:95vh;border-radius:8px;box-shadow:0 10px 40px rgba(0,0,0,0.8)}</style></head><body><img src="' + dataUrl + '" alt="' + esc(name) + '"/></body></html>');
+            }
+        }
+
+        function previewLearningPdf(dataUrl, name) {
+            var w = window.open('');
+            if (w) {
+                w.document.write('<!DOCTYPE html><html><head><title>' + esc(name) + '</title><style>body,html{margin:0;padding:0;height:100%;overflow:hidden}</style></head><body><iframe src="' + dataUrl + '" style="width:100%;height:100%;border:none"></iframe></body></html>');
+            }
         }
 
         // ═══════════════════════════════════════════════════
@@ -4451,6 +5181,7 @@
         function openAddLearningModal(role) {
             document.getElementById('generalModalTitle').textContent = 'Buat Ruang Pembelajaran Baru';
             document.getElementById('generalModalBox').style.maxWidth = '680px';
+            window.TEMP_LEARNING_ATTACHMENTS = [];
 
             var defaultToken = 'LRN' + Math.random().toString(36).substr(2, 4).toUpperCase();
             var guruId = (role === 'guru' && APP.currentUser) ? APP.currentUser.id : '';
@@ -4483,6 +5214,18 @@
                         '<div class="form-group"><label>Status Pembelajaran</label><select class="form-control" id="mlStatus"><option value="active">Aktif (Dapat diakses siswa)</option><option value="inactive">Nonaktif</option></select></div>' +
                         '</div>' +
                         '<div class="form-group"><label>Tautan Video / Materi Eksternal (Opsional - YouTube / Google Drive / Dokumen)</label><input class="form-control" id="mlMediaUrl" placeholder="Contoh: https://www.youtube.com/watch?v=... atau link materi"/></div>' +
+                        '<div class="form-group" style="background:var(--bg3);padding:14px;border-radius:10px;border:1px dashed var(--border);margin-top:10px;margin-bottom:14px">' +
+                        '<label style="font-weight:700;display:flex;align-items:center;gap:6px">' +
+                        '<i class="fas fa-paperclip" style="color:var(--primary)"></i> Unggah File Materi (PDF, Presentasi PPT, Foto/Gambar)' +
+                        '</label>' +
+                        '<div style="font-size:12px;color:var(--text2);margin-bottom:10px">Unggah berkas modul (PDF), file presentasi PowerPoint (.ppt, .pptx), atau gambar tugas materi.</div>' +
+                        '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">' +
+                        '<label for="mlFileInput" class="btn btn-outline btn-sm" style="cursor:pointer"><i class="fas fa-upload"></i> Pilih File dari Komputer/HP</label>' +
+                        '<input type="file" id="mlFileInput" multiple accept=".pdf,.ppt,.pptx,.doc,.docx,.png,.jpg,.jpeg,.webp" style="display:none" onchange="handleLearningFileUpload(this)"/>' +
+                        '<span id="mlFileUploadStatus" style="font-size:12px;color:var(--text2)"></span>' +
+                        '</div>' +
+                        '<div id="mlUploadedFilesList" style="margin-top:10px;display:flex;flex-direction:column;gap:6px"></div>' +
+                        '</div>' +
                         '<div class="form-group"><label>Ringkasan / Petunjuk Belajar</label><textarea class="form-control" id="mlRingkasan" rows="2" placeholder="Petunjuk singkat sebelum membaca modul..."></textarea></div>' +
                         '<div class="form-group"><label>Isi Catatan & Modul Pembelajaran *</label><textarea class="form-control" id="mlKonten" rows="6" placeholder="Tuliskan rangkuman materi lengkap, teori, rumus, atau tugas belajar di sini..."></textarea></div>' +
                         '<div style="display:flex;gap:10px;margin-top:16px">' +
@@ -4491,6 +5234,7 @@
                         '</div>';
 
                     openModal('generalModal');
+                    setTimeout(renderTempLearningAttachments, 100);
                 }).withFailureHandler(function (e) { hideWaiting(); err(e); }).getSubjects();
             }).withFailureHandler(function (e) { hideWaiting(); err(e); }).getClasses();
         }
@@ -4526,7 +5270,8 @@
                 status: status || 'active',
                 mediaUrl: mediaUrl,
                 ringkasan: ringkasan,
-                konten: konten
+                konten: konten,
+                attachments: window.TEMP_LEARNING_ATTACHMENTS || []
             };
 
             showWaiting('Menyimpan Data...', 'Menerbitkan pembelajaran baru');
@@ -4548,7 +5293,8 @@
         function previewLearningModal(learningId) {
             var item = APP_LEARNINGS_CACHE.find(function (it) { return it.id === learningId; });
             if (!item) { showToast('Data materi tidak ditemukan.', 'error'); return; }
-            renderStudentLearningView(item, 'Pratinjau Guru', new Date().toISOString());
+            var guruName = APP.currentUser ? (APP.currentUser.namaLengkap + ' (Guru)') : 'Guru Pengampu';
+            renderStudentLearningView(item, guruName, new Date().toISOString(), 'TEACHER_PREVIEW');
         }
 
         function editLearningModal(learningId, role) {
@@ -4557,6 +5303,7 @@
 
             document.getElementById('generalModalTitle').textContent = 'Edit Ruang Pembelajaran';
             document.getElementById('generalModalBox').style.maxWidth = '680px';
+            window.TEMP_LEARNING_ATTACHMENTS = (item.attachments && Array.isArray(item.attachments)) ? JSON.parse(JSON.stringify(item.attachments)) : [];
 
             showWaiting('Menyiapkan Form...', 'Memuat data');
             google.script.run.withSuccessHandler(function (classRes) {
@@ -4584,6 +5331,18 @@
                         '<div class="form-group"><label>Status Pembelajaran</label><select class="form-control" id="mlStatus"><option value="active"' + (item.status === 'active' ? ' selected' : '') + '>Aktif</option><option value="inactive"' + (item.status === 'inactive' ? ' selected' : '') + '>Nonaktif</option></select></div>' +
                         '</div>' +
                         '<div class="form-group"><label>Tautan Video / Materi Eksternal</label><input class="form-control" id="mlMediaUrl" value="' + esc(item.mediaUrl || '') + '"/></div>' +
+                        '<div class="form-group" style="background:var(--bg3);padding:14px;border-radius:10px;border:1px dashed var(--border);margin-top:10px;margin-bottom:14px">' +
+                        '<label style="font-weight:700;display:flex;align-items:center;gap:6px">' +
+                        '<i class="fas fa-paperclip" style="color:var(--primary)"></i> Unggah File Materi (PDF, Presentasi PPT, Foto/Gambar)' +
+                        '</label>' +
+                        '<div style="font-size:12px;color:var(--text2);margin-bottom:10px">Unggah berkas modul (PDF), file presentasi PowerPoint (.ppt, .pptx), atau gambar tugas materi.</div>' +
+                        '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">' +
+                        '<label for="mlFileInput" class="btn btn-outline btn-sm" style="cursor:pointer"><i class="fas fa-upload"></i> Pilih File dari Komputer/HP</label>' +
+                        '<input type="file" id="mlFileInput" multiple accept=".pdf,.ppt,.pptx,.doc,.docx,.png,.jpg,.jpeg,.webp" style="display:none" onchange="handleLearningFileUpload(this)"/>' +
+                        '<span id="mlFileUploadStatus" style="font-size:12px;color:var(--text2)"></span>' +
+                        '</div>' +
+                        '<div id="mlUploadedFilesList" style="margin-top:10px;display:flex;flex-direction:column;gap:6px"></div>' +
+                        '</div>' +
                         '<div class="form-group"><label>Ringkasan / Petunjuk Belajar</label><textarea class="form-control" id="mlRingkasan" rows="2">' + esc(item.ringkasan || '') + '</textarea></div>' +
                         '<div class="form-group"><label>Isi Catatan & Modul Pembelajaran *</label><textarea class="form-control" id="mlKonten" rows="6">' + esc(item.konten || '') + '</textarea></div>' +
                         '<div style="display:flex;gap:10px;margin-top:16px">' +
@@ -4592,6 +5351,7 @@
                         '</div>';
 
                     openModal('generalModal');
+                    setTimeout(renderTempLearningAttachments, 100);
                 }).withFailureHandler(function (e) { hideWaiting(); err(e); }).getSubjects();
             }).withFailureHandler(function (e) { hideWaiting(); err(e); }).getClasses();
         }
@@ -4625,7 +5385,8 @@
                 status: status,
                 mediaUrl: mediaUrl,
                 ringkasan: ringkasan,
-                konten: konten
+                konten: konten,
+                attachments: window.TEMP_LEARNING_ATTACHMENTS || []
             };
 
             showWaiting('Menyimpan Perubahan...', 'Memperbarui materi');
@@ -7941,79 +8702,162 @@
             google.script.run.withSuccessHandler(function (classRes) {
                 google.script.run.withSuccessHandler(function (subjRes) {
                     google.script.run.withSuccessHandler(function (examRes) {
-                        hideWaiting();
-                        var main = document.getElementById('dashMain');
-                        var allClasses = classRes.data || [];
-                        var allSubjects = subjRes.data || [];
-                        var allExams = examRes.data || [];
+                        google.script.run.withSuccessHandler(function (learnRes) {
+                            hideWaiting();
+                            var main = document.getElementById('dashMain');
+                            var allClasses = classRes.data || [];
+                            var allSubjects = subjRes.data || [];
+                            var allExams = examRes.data || [];
+                            var allLearnings = (learnRes && learnRes.data) ? learnRes.data : [];
 
-                        // Filter mapel yang diampu guru ini
-                        var mySubjects = allSubjects.filter(function (s) {
-                            return s['ID Guru'] === u.id || (s['Nama Guru'] && s['Nama Guru'].toLowerCase() === (u.namaLengkap || '').toLowerCase());
-                        });
+                            // Filter mapel yang diampu guru ini
+                            var mySubjects = allSubjects.filter(function (s) {
+                                return s['ID Guru'] === u.id || (s['Nama Guru'] && s['Nama Guru'].toLowerCase() === (u.namaLengkap || '').toLowerCase());
+                            });
 
-                        // Filter kelas yang diampu guru ini (dari mapel atau wali kelas)
-                        var myClassIds = {};
-                        mySubjects.forEach(function (s) { if (s['ID Kelas']) myClassIds[s['ID Kelas']] = true; });
-                        var myClasses = allClasses.filter(function (c) {
-                            return myClassIds[c['ID Kelas']] || c['ID Wali Kelas'] === u.id || (c['Nama Wali Kelas'] && c['Nama Wali Kelas'].toLowerCase() === (u.namaLengkap || '').toLowerCase());
-                        });
-                        if (myClasses.length === 0) myClasses = allClasses; // jika belum difilter, tampilkan daftar kelas
+                            // Filter kelas yang diampu guru ini (dari mapel atau wali kelas)
+                            var myClassIds = {};
+                            mySubjects.forEach(function (s) { if (s['ID Kelas']) myClassIds[s['ID Kelas']] = true; });
+                            var myClasses = allClasses.filter(function (c) {
+                                return myClassIds[c['ID Kelas']] || c['ID Wali Kelas'] === u.id || (c['Nama Wali Kelas'] && c['Nama Wali Kelas'].toLowerCase() === (u.namaLengkap || '').toLowerCase());
+                            });
+                            if (myClasses.length === 0) myClasses = allClasses;
 
-                        var myExams = allExams.filter(function (e) {
-                            return e['ID Guru'] === u.id || (e['Nama Guru'] && e['Nama Guru'].toLowerCase() === (u.namaLengkap || '').toLowerCase());
-                        });
+                            var myExams = allExams.filter(function (e) {
+                                return e['ID Guru'] === u.id || (e['Nama Guru'] && e['Nama Guru'].toLowerCase() === (u.namaLengkap || '').toLowerCase());
+                            });
 
-                        var avatar = u.fotoProfil
-                            ? '<img src="' + u.fotoProfil + '" class="guru-dash-avatar" id="dashGuruAvatarImg" onerror="this.outerHTML=\'<div class=guru-dash-avatar-placeholder>' + u.namaLengkap[0] + '</div>\'">'
-                            : '<div class="guru-dash-avatar-placeholder" id="dashGuruAvatarImg">' + u.namaLengkap[0] + '</div>';
+                            var myLearnings = allLearnings.filter(function (l) {
+                                return !l.idGuru || l.idGuru === u.id || (l.namaGuru && l.namaGuru.toLowerCase() === (u.namaLengkap || '').toLowerCase());
+                            });
+                            if (myLearnings.length === 0) myLearnings = allLearnings; // fallback tampilkan pembelajaran yang ada
 
-                        main.innerHTML =
-                            '<div class="page-header"><h1><i class="fas fa-chalkboard-teacher" style="color:var(--primary)"></i> Dashboard Guru</h1><p>Selamat datang, <strong>' + esc(u.namaLengkap) + '</strong></p></div>' +
+                            var avatar = u.fotoProfil
+                                ? '<img src="' + u.fotoProfil + '" class="guru-dash-avatar" id="dashGuruAvatarImg" onerror="this.outerHTML=\'<div class=guru-dash-avatar-placeholder>' + u.namaLengkap[0] + '</div>\'">'
+                                : '<div class="guru-dash-avatar-placeholder" id="dashGuruAvatarImg">' + u.namaLengkap[0] + '</div>';
 
-                            '<div class="guru-dash-hero">' +
-                            avatar +
-                            '<div class="guru-dash-info" style="flex:1">' +
-                            '<h2>' + esc(u.namaLengkap) + '</h2>' +
-                            '<p><i class="fas fa-id-card" style="width:20px;color:var(--primary)"></i> <strong>NIP:</strong> ' + esc(u.nip || '-') + '</p>' +
-                            '<p><i class="fas fa-envelope" style="width:20px;color:var(--primary)"></i> <strong>Email:</strong> ' + esc(u.email || '-') + '</p>' +
-                            '<p><i class="fas fa-phone" style="width:20px;color:var(--primary)"></i> <strong>Telepon:</strong> ' + esc(u.telepon || '-') + '</p>' +
-                            '<p><i class="fas fa-map-marker-alt" style="width:20px;color:var(--primary)"></i> <strong>Alamat:</strong> ' + esc(u.alamat || '-') + '</p>' +
-                            '</div>' +
-                            '<div style="display:flex;flex-direction:column;gap:8px">' +
-                            '<label class="btn btn-primary btn-sm" for="dashGuruPhotoInput" style="cursor:pointer"><i class="fas fa-camera"></i> Ganti Foto Profil</label>' +
-                            '<input type="file" id="dashGuruPhotoInput" accept="image/*" style="display:none" onchange="handleGuruDashPhoto(this)"/>' +
-                            '<button class="btn btn-outline btn-sm" onclick="loadPage(\'profileGuru\')"><i class="fas fa-user-edit"></i> Edit Biodata</button>' +
-                            '</div>' +
-                            '</div>' +
+                            var html =
+                                '<div class="page-header"><h1><i class="fas fa-chalkboard-teacher" style="color:var(--primary)"></i> Dashboard Guru</h1><p>Selamat datang, <strong>' + esc(u.namaLengkap) + '</strong></p></div>' +
 
-                            '<div class="stat-grid">' +
-                            '<div class="stat-card"><div class="stat-icon" style="background:rgba(26,115,232,.15);color:var(--primary)"><i class="fas fa-school"></i></div><div class="stat-info"><h4>' + myClasses.length + '</h4><p>Kelas Diampu</p></div></div>' +
-                            '<div class="stat-card"><div class="stat-icon" style="background:rgba(15,157,88,.15);color:var(--secondary)"><i class="fas fa-book"></i></div><div class="stat-info"><h4>' + mySubjects.length + '</h4><p>Mata Pelajaran</p></div></div>' +
-                            '<div class="stat-card"><div class="stat-icon" style="background:rgba(124,77,255,.15);color:var(--purple)"><i class="fas fa-file-alt"></i></div><div class="stat-info"><h4>' + myExams.length + '</h4><p>Ujian Aktif</p></div></div>' +
-                            '<div class="stat-card"><div class="stat-icon" style="background:rgba(244,180,0,.15);color:var(--accent)"><i class="fas fa-calendar-check"></i></div><div class="stat-info"><h4>Aktif</h4><p>Status Mengajar</p></div></div>' +
-                            '</div>' +
+                                '<div class="guru-dash-hero">' +
+                                avatar +
+                                '<div class="guru-dash-info" style="flex:1">' +
+                                '<h2>' + esc(u.namaLengkap) + '</h2>' +
+                                '<p><i class="fas fa-id-card" style="width:20px;color:var(--primary)"></i> <strong>NIP:</strong> ' + esc(u.nip || '-') + '</p>' +
+                                '<p><i class="fas fa-envelope" style="width:20px;color:var(--primary)"></i> <strong>Email:</strong> ' + esc(u.email || '-') + '</p>' +
+                                '<p><i class="fas fa-phone" style="width:20px;color:var(--primary)"></i> <strong>Telepon:</strong> ' + esc(u.telepon || '-') + '</p>' +
+                                '<p><i class="fas fa-map-marker-alt" style="width:20px;color:var(--primary)"></i> <strong>Alamat:</strong> ' + esc(u.alamat || '-') + '</p>' +
+                                '</div>' +
+                                '<div style="display:flex;flex-direction:column;gap:8px">' +
+                                '<label class="btn btn-primary btn-sm" for="dashGuruPhotoInput" style="cursor:pointer"><i class="fas fa-camera"></i> Ganti Foto Profil</label>' +
+                                '<input type="file" id="dashGuruPhotoInput" accept="image/*" style="display:none" onchange="handleGuruDashPhoto(this)"/>' +
+                                '<button class="btn btn-outline btn-sm" onclick="loadPage(\'profileGuru\')"><i class="fas fa-user-edit"></i> Edit Biodata</button>' +
+                                '</div>' +
+                                '</div>' +
 
-                            '<div class="card" style="margin-bottom:24px">' +
-                            '<div class="card-header"><div class="card-title"><i class="fas fa-users" style="color:var(--primary)"></i> Daftar Kelas yang Diampu</div>' +
-                            '<button class="btn btn-primary btn-sm" onclick="loadPage(\'absenGuru\')"><i class="fas fa-calendar-check"></i> Buka Absen Siswa</button></div>' +
-                            '<div class="table-wrap"><table><thead><tr><th>#</th><th>Nama Kelas</th><th>Wali Kelas</th><th>Aksi Cepat</th></tr></thead><tbody>' +
-                            (myClasses.length ? myClasses.map(function (c, i) {
-                                return '<tr><td>' + (i + 1) + '</td><td><strong>' + esc(c['Nama Kelas']) + '</strong></td><td>' + esc(c['Nama Wali Kelas'] || '-') + '</td>' +
-                                    '<td><div class="action-btns"><button class="btn btn-outline btn-sm" onclick="loadPage(\'absenGuru\')"><i class="fas fa-check"></i> Absen</button><button class="btn btn-outline btn-sm" onclick="loadPage(\'rekapNilaiGuru\')"><i class="fas fa-chart-line"></i> Rekap Nilai</button></div></td></tr>';
-                            }).join('') : '<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--text2)">Belum ada kelas yang diampu</td></tr>') +
-                            '</tbody></table></div></div>' +
+                                '<div class="stat-grid" style="margin-bottom:24px">' +
+                                '<div class="stat-card"><div class="stat-icon" style="background:rgba(26,115,232,.15);color:var(--primary)"><i class="fas fa-school"></i></div><div class="stat-info"><h4>' + myClasses.length + '</h4><p>Kelas Diampu</p></div></div>' +
+                                '<div class="stat-card"><div class="stat-icon" style="background:rgba(245,158,11,.15);color:#f59e0b"><i class="fas fa-calendar-alt"></i></div><div class="stat-info"><h4>' + mySubjects.length + '</h4><p>Jadwal Mengajar</p></div></div>' +
+                                '<div class="stat-card"><div class="stat-icon" style="background:rgba(168,85,247,.15);color:#a855f7"><i class="fas fa-laptop-code"></i></div><div class="stat-info"><h4>' + myLearnings.length + '</h4><p>Ruang Pembelajaran</p></div></div>' +
+                                '<div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,.15);color:#10b981"><i class="fas fa-file-alt"></i></div><div class="stat-info"><h4>' + myExams.length + '</h4><p>Ujian Aktif</p></div></div>' +
+                                '</div>' +
 
-                            '<div class="card">' +
-                            '<div class="card-header"><div class="card-title"><i class="fas fa-book-open" style="color:var(--purple)"></i> Jadwal & Mata Pelajaran Saya</div>' +
-                            '<button class="btn btn-primary btn-sm" onclick="loadPage(\'ujianGuru\')"><i class="fas fa-pencil-alt"></i> Kelola Ujian</button></div>' +
-                            '<div class="table-wrap"><table><thead><tr><th>#</th><th>Mata Pelajaran</th><th>Kelas</th><th>Hari</th><th>Rentang Waktu (Jam)</th></tr></thead><tbody>' +
-                            (mySubjects.length ? mySubjects.map(function (s, i) {
-                                var jamText = '-';
-                                if (s['Jam Mulai'] || s['Jam Selesai']) jamText = esc((s['Jam Mulai'] || '') + ' - ' + (s['Jam Selesai'] || ''));
-                                return '<tr><td>' + (i + 1) + '</td><td><strong>' + esc(s['Nama Mapel']) + '</strong></td><td><span class="badge badge-info">' + esc(s['Nama Kelas'] || '-') + '</span></td><td>' + esc(s['Hari'] || '-') + '</td><td><span class="badge badge-purple"><i class="fas fa-clock" style="margin-right:4px"></i>' + jamText + '</span></td></tr>';
-                            }).join('') : '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text2)">Belum ada jadwal mengajar</td></tr>') +
-                            '</tbody></table></div></div>';
+                                // ═══════════════════════════════════════════════════
+                                // DUA BOX KONTAINER UTAMA DASHBOARD GURU
+                                // ═══════════════════════════════════════════════════
+                                '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(420px, 1fr));gap:20px;margin-bottom:24px">' +
+
+                                // ── BOX KONTAINER 1: JADWAL MENGAJAR GURU ──
+                                '<div class="guru-bento-card">' +
+                                '<div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:16px;flex-wrap:wrap;gap:8px">' +
+                                '<div style="display:flex;align-items:center;gap:10px">' +
+                                '<div style="width:38px;height:38px;border-radius:10px;background:rgba(245,158,11,0.15);display:flex;align-items:center;justify-content:center;color:#f59e0b;font-size:16px"><i class="fas fa-calendar-alt"></i></div>' +
+                                '<div><h3 style="font-size:16px;font-weight:700;color:var(--text);margin:0">Jadwal Mengajar Saya</h3><span style="font-size:12px;color:var(--text2)">Jadwal mata pelajaran dan jam tatap muka</span></div>' +
+                                '</div>' +
+                                '<button class="btn btn-outline btn-xs" onclick="loadPage(\'absenGuru\')"><i class="fas fa-calendar-check"></i> Presensi Kelas</button>' +
+                                '</div>' +
+
+                                (mySubjects.length ?
+                                    '<div style="display:flex;flex-direction:column;gap:10px;max-height:360px;overflow-y:auto;padding-right:4px">' +
+                                    mySubjects.map(function (s) {
+                                        var jamText = (s['Jam Mulai'] || s['Jam Selesai']) ? ((s['Jam Mulai'] || '') + ' - ' + (s['Jam Selesai'] || '')) : 'Jam Sesuai Jadwal';
+                                        return '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px">' +
+                                            '<div>' +
+                                            '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">' +
+                                            '<span class="badge badge-info" style="font-size:11px">' + esc(s['Hari'] || 'Hari Aktif') + '</span>' +
+                                            '<span class="badge badge-purple" style="font-size:11px"><i class="fas fa-clock" style="margin-right:3px"></i>' + esc(jamText) + '</span>' +
+                                            '</div>' +
+                                            '<strong style="font-size:14px;color:var(--text)">' + esc(s['Nama Mapel']) + '</strong>' +
+                                            '<div style="font-size:12px;color:var(--text2)"><i class="fas fa-school" style="margin-right:4px"></i>' + esc(s['Nama Kelas'] || 'Semua Kelas') + '</div>' +
+                                            '</div>' +
+                                            '<div style="display:flex;flex-direction:column;gap:6px">' +
+                                            '<button class="btn btn-outline btn-xs" onclick="loadPage(\'absenGuru\')"><i class="fas fa-check"></i> Absen</button>' +
+                                            '<button class="btn btn-primary btn-xs" onclick="openAddLearningModal(\'guru\')"><i class="fas fa-plus"></i> Modul</button>' +
+                                            '</div>' +
+                                            '</div>';
+                                    }).join('') +
+                                    '</div>'
+                                    : '<div style="text-align:center;padding:32px;color:var(--text2)"><i class="fas fa-calendar-times fa-2x" style="opacity:0.3;margin-bottom:8px"></i><br/>Belum ada jadwal mengajar yang terdaftar.</div>'
+                                ) +
+                                '</div>' +
+
+                                // ── BOX KONTAINER 2: RUANG PEMBELAJARAN GURU ──
+                                '<div class="guru-bento-card">' +
+                                '<div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:16px;flex-wrap:wrap;gap:8px">' +
+                                '<div style="display:flex;align-items:center;gap:10px">' +
+                                '<div style="width:38px;height:38px;border-radius:10px;background:rgba(168,85,247,0.15);display:flex;align-items:center;justify-content:center;color:#a855f7;font-size:16px"><i class="fas fa-laptop-code"></i></div>' +
+                                '<div><h3 style="font-size:16px;font-weight:700;color:var(--text);margin:0">Ruang Pembelajaran Guru</h3><span style="font-size:12px;color:var(--text2)">Modul, berkas materi & forum diskusi siswa</span></div>' +
+                                '</div>' +
+                                '<div style="display:flex;gap:6px">' +
+                                '<button class="btn btn-primary btn-xs" onclick="openAddLearningModal(\'guru\')"><i class="fas fa-plus"></i> Buat Baru</button>' +
+                                '<button class="btn btn-outline btn-xs" onclick="loadPage(\'pembelajaranGuru\')"><i class="fas fa-list"></i> Kelola</button>' +
+                                '</div>' +
+                                '</div>' +
+
+                                (myLearnings.length ?
+                                    '<div style="display:flex;flex-direction:column;gap:10px;max-height:360px;overflow-y:auto;padding-right:4px">' +
+                                    myLearnings.map(function (it) {
+                                        var attCount = (it.attachments && it.attachments.length) ? it.attachments.length : 0;
+                                        return '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px">' +
+                                            '<div style="overflow:hidden">' +
+                                            '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap">' +
+                                            '<span class="badge badge-purple" style="font-size:10px">' + esc(it.namaMapel || 'Umum') + '</span>' +
+                                            '<span class="badge badge-outline" style="font-size:10px">' + esc(it.namaKelas || 'Semua Kelas') + '</span>' +
+                                            (attCount ? '<span style="font-size:10px;color:#38bdf8"><i class="fas fa-paperclip"></i> ' + attCount + ' File</span>' : '') +
+                                            '</div>' +
+                                            '<strong style="font-size:13.5px;color:var(--text);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(it.judul) + '</strong>' +
+                                            '<div style="font-size:11px;color:var(--text2);margin-top:2px">Token: <code style="color:#c084fc;font-weight:700">' + esc(it.token) + '</code></div>' +
+                                            '</div>' +
+                                            '<div style="display:flex;gap:5px;flex-shrink:0">' +
+                                            '<button class="btn btn-outline btn-xs" title="Buka Materi" onclick="previewLearningModal(\'' + it.id + '\')"><i class="fas fa-eye"></i></button>' +
+                                            '<button class="btn btn-primary btn-xs" title="Monitor Siswa Masuk & Keluar" style="background:#0284c7;border-color:#0284c7" onclick="openLearningMonitor(\'' + it.id + '\', \'' + esc(it.judul) + '\')"><i class="fas fa-users-cog"></i></button>' +
+                                            '<button class="btn btn-warning btn-xs" title="Edit" onclick="editLearningModal(\'' + it.id + '\', \'guru\')"><i class="fas fa-edit"></i></button>' +
+                                            '</div>' +
+                                            '</div>';
+                                    }).join('') +
+                                    '</div>'
+                                    : '<div style="text-align:center;padding:32px;color:var(--text2)">' +
+                                    '<i class="fas fa-chalkboard fa-2x" style="opacity:0.3;margin-bottom:8px"></i><br/>Belum ada ruang pembelajaran aktif.<br/>' +
+                                    '<button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="openAddLearningModal(\'guru\')"><i class="fas fa-plus"></i> Buat Pembelajaran Sekarang</button>' +
+                                    '</div>'
+                                ) +
+                                '</div>' +
+
+                                '</div>' + // Tutup grid dua box kontainer
+
+                                // Card Daftar Kelas yang Diampu
+                                '<div class="card">' +
+                                '<div class="card-header"><div class="card-title"><i class="fas fa-users" style="color:var(--primary)"></i> Daftar Kelas yang Diampu</div>' +
+                                '<button class="btn btn-primary btn-sm" onclick="loadPage(\'absenGuru\')"><i class="fas fa-calendar-check"></i> Buka Absen Siswa</button></div>' +
+                                '<div class="table-wrap"><table><thead><tr><th>#</th><th>Nama Kelas</th><th>Wali Kelas</th><th>Aksi Cepat</th></tr></thead><tbody>' +
+                                (myClasses.length ? myClasses.map(function (c, i) {
+                                    return '<tr><td>' + (i + 1) + '</td><td><strong>' + esc(c['Nama Kelas']) + '</strong></td><td>' + esc(c['Nama Wali Kelas'] || '-') + '</td>' +
+                                        '<td><div class="action-btns"><button class="btn btn-outline btn-sm" onclick="loadPage(\'absenGuru\')"><i class="fas fa-check"></i> Absen</button><button class="btn btn-outline btn-sm" onclick="loadPage(\'rekapNilaiGuru\')"><i class="fas fa-chart-line"></i> Rekap Nilai</button></div></td></tr>';
+                                }).join('') : '<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--text2)">Belum ada kelas yang diampu</td></tr>') +
+                                '</tbody></table></div></div>';
+
+                            main.innerHTML = html;
+                        }).withFailureHandler(function (e) { hideWaiting(); errPage(e); }).getLearnings('');
                     }).getExams('');
                 }).getSubjects('');
             }).withFailureHandler(function (e) { hideWaiting(); errPage(e); }).getClasses();

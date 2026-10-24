@@ -1346,9 +1346,36 @@
       }
       try {
         const local = localStorage.getItem('portal_learnings_data');
-        if (local) return JSON.parse(local);
+        if (local) {
+          const parsed = JSON.parse(local);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
       } catch (e) {}
-      return [];
+
+      // Default sample learning jika belum ada data sama sekali
+      const defaultList = [
+        {
+          id: 'LRN-BIO-01',
+          judul: 'Konsep Ekosistem & Keanekaragaman Hayati',
+          idMapel: '',
+          namaMapel: 'Biologi',
+          idKelas: '',
+          namaKelas: 'Semua Kelas',
+          idGuru: '',
+          namaGuru: 'Guru Pengampu Biologi',
+          token: 'BIO10',
+          ringkasan: 'Pelajari komponen biotik, abiotik, piramida energi, dan aliran rantai makanan di lingkungan sekitar.',
+          konten: 'Ekosistem tersusun atas komponen biotik (produsen, konsumen, pengurai) dan komponen abiotik (tanah, air, suhu, sinar matahari).\n\n1. Tingkat Trofik 1: Produsen (tanaman hijau)\n2. Tingkat Trofik 2: Konsumen Primer (herbivora)\n3. Tingkat Trofik 3: Konsumen Sekunder (karnivora)\n4. Pengurai: Bakteri dan jamur saprofit\n\nSilakan simak modul di atas, unduh berkas yang dilampirkan, serta sampaikan pertanyaan atau masukan Anda di kolom diskusi di bawah!',
+          mediaUrl: 'https://www.youtube.com/watch?v=kYJv4j52y4M',
+          attachments: [],
+          status: 'active',
+          tanggalBuat: new Date().toISOString()
+        }
+      ];
+      try {
+        localStorage.setItem('portal_learnings_data', JSON.stringify(defaultList));
+      } catch (e) {}
+      return defaultList;
     },
 
     async _saveLearningsStore(list) {
@@ -1401,6 +1428,7 @@
           ringkasan: data.ringkasan || '',
           konten: data.konten || '',
           mediaUrl: data.mediaUrl || '',
+          attachments: Array.isArray(data.attachments) ? data.attachments : [],
           status: data.status || 'active',
           tanggalBuat: new Date().toISOString()
         };
@@ -1430,6 +1458,7 @@
           ringkasan: data.ringkasan !== undefined ? data.ringkasan : list[idx].ringkasan,
           konten: data.konten !== undefined ? data.konten : list[idx].konten,
           mediaUrl: data.mediaUrl !== undefined ? data.mediaUrl : list[idx].mediaUrl,
+          attachments: data.attachments !== undefined ? data.attachments : (list[idx].attachments || []),
           status: data.status !== undefined ? data.status : list[idx].status,
           tanggalUpdate: new Date().toISOString()
         };
@@ -1469,15 +1498,19 @@
           return { success: false, message: 'Token Pembelajaran tidak valid atau materi sudah tidak aktif!' };
         }
 
-        // Catat kehadiran siswa
+        // Catat kehadiran siswa (status aktif)
         const attendees = await this._loadLearningAttendeesStore();
         const now = new Date().toISOString();
+        const attId = generateId('ATT');
         attendees.unshift({
-          id: generateId('ATT'),
+          id: attId,
           idPembelajaran: match.id,
           judulPembelajaran: match.judul,
           namaSiswa: namaSiswa.trim(),
-          waktuAkses: now
+          waktuMasuk: now,
+          waktuAkses: now,
+          waktuKeluar: null,
+          status: 'active'
         });
         await this._saveLearningAttendeesStore(attendees);
 
@@ -1486,8 +1519,31 @@
           message: 'Berhasil bergabung!',
           learning: match,
           namaSiswa: namaSiswa.trim(),
-          waktuMasuk: now
+          waktuMasuk: now,
+          attendeeId: attId
         };
+      } catch (e) {
+        return { success: false, message: e.message };
+      }
+    },
+
+    async recordLearningExit(attendeeId, learningId, namaSiswa) {
+      try {
+        const attendees = await this._loadLearningAttendeesStore();
+        const now = new Date().toISOString();
+        let updated = false;
+        for (let a of attendees) {
+          if ((attendeeId && a.id === attendeeId) || (!attendeeId && a.idPembelajaran === learningId && a.namaSiswa === namaSiswa && a.status === 'active')) {
+            a.waktuKeluar = now;
+            a.status = 'selesai';
+            updated = true;
+            break;
+          }
+        }
+        if (updated) {
+          await this._saveLearningAttendeesStore(attendees);
+        }
+        return { success: true, message: 'Kehadiran sesi belajar selesai dicatat' };
       } catch (e) {
         return { success: false, message: e.message };
       }
@@ -1496,7 +1552,7 @@
     async getLearningAttendees(learningId) {
       try {
         const attendees = await this._loadLearningAttendeesStore();
-        const filtered = attendees.filter(a => a.idPembelajaran === learningId);
+        const filtered = learningId ? attendees.filter(a => a.idPembelajaran === learningId) : attendees;
         return { success: true, data: filtered };
       } catch (e) {
         return { success: false, message: e.message, data: [] };
@@ -1516,9 +1572,35 @@
       }
       try {
         const local = localStorage.getItem('portal_learning_attendees_data');
-        if (local) return JSON.parse(local);
+        if (local) {
+          const parsed = JSON.parse(local);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
       } catch (e) {}
-      return [];
+      const defaultAttendees = [
+        {
+          id: 'ATT-DEMO-01',
+          idPembelajaran: 'LRN-BIO-01',
+          judulPembelajaran: 'Konsep Ekosistem & Keanekaragaman Hayati',
+          namaSiswa: 'Ahmad Siswa',
+          waktuMasuk: new Date(Date.now() - 2400000).toISOString(),
+          waktuKeluar: null,
+          status: 'active'
+        },
+        {
+          id: 'ATT-DEMO-02',
+          idPembelajaran: 'LRN-BIO-01',
+          judulPembelajaran: 'Konsep Ekosistem & Keanekaragaman Hayati',
+          namaSiswa: 'Siti Nurhaliza',
+          waktuMasuk: new Date(Date.now() - 5400000).toISOString(),
+          waktuKeluar: new Date(Date.now() - 3600000).toISOString(),
+          status: 'selesai'
+        }
+      ];
+      try {
+        localStorage.setItem('portal_learning_attendees_data', JSON.stringify(defaultAttendees));
+      } catch (e) {}
+      return defaultAttendees;
     },
 
     async _saveLearningAttendeesStore(list) {
@@ -1529,13 +1611,134 @@
             'Key': 'app_learning_attendees_data',
             'Value': JSON.stringify(list),
             'Label': 'Data Hadir Ruang Belajar',
-            'Keterangan': 'Sync riwayat siswa masuk ruang pembelajaran',
+            'Keterangan': 'Sync riwayat siswa masuk & keluar ruang pembelajaran',
             'Diupdate': new Date().toISOString()
           }]);
         } catch (e) {}
       }
       try {
         localStorage.setItem('portal_learning_attendees_data', JSON.stringify(list));
+      } catch (e) {}
+    },
+
+    // ── FORUM DISKUSI INTERAKTIF RUANG PEMBELAJARAN ──
+    async getLearningDiscussions(learningId) {
+      try {
+        const all = await this._loadLearningDiscussionsStore();
+        const filtered = learningId ? all.filter(d => d.idPembelajaran === learningId) : all;
+        return { success: true, data: filtered };
+      } catch (e) {
+        return { success: false, message: e.message, data: [] };
+      }
+    },
+
+    async postLearningComment(learningId, commentData) {
+      try {
+        if (!commentData || !commentData.content || !commentData.content.trim()) {
+          return { success: false, message: 'Isi pertanyaan atau komentar wajib diisi!' };
+        }
+        const all = await this._loadLearningDiscussionsStore();
+        const newComment = {
+          id: generateId('DSC'),
+          idPembelajaran: learningId,
+          senderName: (commentData.senderName || 'Anonim').trim(),
+          senderRole: commentData.senderRole || 'siswa', // 'siswa' atau 'guru'
+          category: commentData.category || 'pertanyaan', // 'pertanyaan', 'saran', 'diskusi'
+          content: commentData.content.trim(),
+          parentId: commentData.parentId || null,
+          createdAt: new Date().toISOString()
+        };
+        all.push(newComment);
+        await this._saveLearningDiscussionsStore(all);
+        return { success: true, message: 'Pesan berhasil dikirim ke forum diskusi!', data: newComment };
+      } catch (e) {
+        return { success: false, message: e.message };
+      }
+    },
+
+    async deleteLearningComment(learningId, commentId) {
+      try {
+        let all = await this._loadLearningDiscussionsStore();
+        all = all.filter(c => c.id !== commentId && c.parentId !== commentId);
+        await this._saveLearningDiscussionsStore(all);
+        return { success: true, message: 'Komentar diskusi berhasil dihapus.' };
+      } catch (e) {
+        return { success: false, message: e.message };
+      }
+    },
+
+    async _loadLearningDiscussionsStore() {
+      const sb = getClient();
+      if (sb) {
+        try {
+          const { data, error } = await sb.from('Settings').select('Value').eq('Key', 'app_learning_discussions_data').maybeSingle();
+          if (!error && data && data.Value) {
+            const parsed = JSON.parse(data.Value);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          }
+        } catch (e) {}
+      }
+      try {
+        const local = localStorage.getItem('portal_learning_discussions_data');
+        if (local) {
+          const parsed = JSON.parse(local);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {}
+
+      const defaultDiscussions = [
+        {
+          id: 'DSC-001',
+          idPembelajaran: 'LRN-BIO-01',
+          senderName: 'Ahmad Siswa',
+          senderRole: 'siswa',
+          category: 'pertanyaan',
+          content: 'Izin bertanya Bu/Pak Guru, apa perbedaan utama dekomposer dengan detritivor pada ekosistem?',
+          parentId: null,
+          createdAt: new Date(Date.now() - 3600000).toISOString()
+        },
+        {
+          id: 'DSC-002',
+          idPembelajaran: 'LRN-BIO-01',
+          senderName: 'Guru Pengampu Biologi',
+          senderRole: 'guru',
+          category: 'jawaban',
+          content: 'Pertanyaan bagus Ahmad! Dekomposer menguraikan sisa organik secara enzimatik/kimiawi (contoh bakteri & jamur), sedangkan detritivor memakan hancuran materi organik secara fisik (contoh cacing tanah & rayap).',
+          parentId: 'DSC-001',
+          createdAt: new Date(Date.now() - 1800000).toISOString()
+        },
+        {
+          id: 'DSC-003',
+          idPembelajaran: 'LRN-BIO-01',
+          senderName: 'Siti Nurhaliza',
+          senderRole: 'siswa',
+          category: 'saran',
+          content: 'Saran untuk pertemuan berikutnya bisa ditambahkan video simulasi interaktif jaring-jaring makanan laut pak/bu.',
+          parentId: null,
+          createdAt: new Date(Date.now() - 900000).toISOString()
+        }
+      ];
+      try {
+        localStorage.setItem('portal_learning_discussions_data', JSON.stringify(defaultDiscussions));
+      } catch (e) {}
+      return defaultDiscussions;
+    },
+
+    async _saveLearningDiscussionsStore(list) {
+      const sb = getClient();
+      if (sb) {
+        try {
+          await sb.from('Settings').upsert([{
+            'Key': 'app_learning_discussions_data',
+            'Value': JSON.stringify(list),
+            'Label': 'Data Diskusi Ruang Pembelajaran',
+            'Keterangan': 'Sync forum tanya jawab & saran materi pembelajaran',
+            'Diupdate': new Date().toISOString()
+          }]);
+        } catch (e) {}
+      }
+      try {
+        localStorage.setItem('portal_learning_discussions_data', JSON.stringify(list));
       } catch (e) {}
     }
   };
