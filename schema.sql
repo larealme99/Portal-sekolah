@@ -17,8 +17,15 @@ CREATE TABLE IF NOT EXISTS "Users" (
     "Tanggal Approve" TEXT,
     "NIP" TEXT,
     "Telepon" TEXT,
-    "Alamat" TEXT
+    "Alamat" TEXT,
+    "Jenis Kelamin" TEXT,
+    "Jenis PTK" TEXT DEFAULT 'Pendidik'
 );
+
+-- Migrasi tambahan untuk tabel Users (dapat dijalankan di Supabase SQL Editor):
+ALTER TABLE IF EXISTS "Users" ADD COLUMN IF NOT EXISTS "Jenis Kelamin" TEXT;
+ALTER TABLE IF EXISTS "Users" ADD COLUMN IF NOT EXISTS "Jenis PTK" TEXT DEFAULT 'Pendidik';
+
 
 -- 2. TABEL PENDING USERS (Registrasi Guru yang Belum Diapprove)
 CREATE TABLE IF NOT EXISTS "PendingUsers" (

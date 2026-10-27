@@ -1,0 +1,2320 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Portal Guru & Ruang Siswa - Simpul Smandum</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0284c7">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Supabase JS Client CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Load Konfigurasi Supabase Eksisting Sekolah -->
+  <script src="../supabase-config.js"></script>
+
+  <style>
+    :root {
+      --primary: #0284c7;
+      --primary-dark: #0369a1;
+      --primary-light: #38bdf8;
+      --primary-subtle: #e0f2fe;
+      --primary-gradient: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      --accent-green: #10b981;
+      --accent-yellow: #f59e0b;
+      --accent-red: #ef4444;
+      --bg-canvas: #f1f5f9;
+      --bg-card: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --shadow-soft: 0 4px 20px -2px rgba(15, 23, 42, 0.06);
+      --shadow-hover: 0 10px 25px -4px rgba(2, 132, 199, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Container HP Mobile Simulator */
+    .app-viewport {
+      width: 100%;
+      max-width: 440px;
+      min-height: 100vh;
+      background: #f8fafc;
+      position: relative;
+      box-shadow: 0 0 40px rgba(0,0,0,0.12);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Top Status Bar Mockup */
+    .mobile-status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #0f172a;
+      background: #ffffff;
+      z-index: 50;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .status-bar-icons {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .sync-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: #dcfce7;
+      color: #15803d;
+    }
+    .sync-indicator.syncing {
+      background: #fef3c7;
+      color: #b45309;
+    }
+    .sync-indicator.offline {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    /* Content Area Scrollable */
+    .app-screen {
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: 90px;
+      display: none;
+    }
+    .app-screen.active {
+      display: block;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Top App Bar Header */
+    .screen-header {
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #ffffff;
+      border-bottom: 1px solid #f1f5f9;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+    .screen-header h2 {
+      font-size: 17px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .back-btn {
+      background: #f1f5f9;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+    }
+    .back-btn:active {
+      background: #e2e8f0;
+    }
+
+    /* ============================================================ */
+    /* 1. LAYAR LOGIN */
+    /* ============================================================ */
+    #screen-login {
+      background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 40%, #0284c7 100%);
+      min-height: 100vh;
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 24px 20px;
+      position: relative;
+    }
+    #screen-login.active {
+      display: flex;
+    }
+    .login-brand {
+      text-align: center;
+      margin-top: 10px;
+    }
+    .login-brand-icon {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 10px;
+      background: #ffffff;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 25px rgba(2, 132, 199, 0.2);
+    }
+    .login-brand-icon img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+    }
+    .login-brand h1 {
+      font-size: 24px;
+      font-weight: 800;
+      color: #0284c7;
+      letter-spacing: -0.5px;
+    }
+    .login-brand p {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 2px;
+      font-weight: 500;
+    }
+
+    .login-card {
+      background: #ffffff;
+      border-radius: 22px;
+      padding: 22px;
+      box-shadow: 0 15px 35px rgba(2, 132, 199, 0.12);
+      margin-top: 16px;
+    }
+    .login-card-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+    .login-card-sub {
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 16px;
+    }
+
+    .role-switcher {
+      display: flex;
+      background: #f1f5f9;
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 16px;
+    }
+    .role-btn {
+      flex: 1;
+      padding: 8px 10px;
+      border: none;
+      background: transparent;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .role-btn.active {
+      background: #ffffff;
+      color: #0284c7;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: #475569;
+      margin-bottom: 6px;
+    }
+    .input-box {
+      display: flex;
+      align-items: center;
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 12px 14px;
+      gap: 10px;
+      transition: border-color 0.2s;
+    }
+    .input-box:focus-within {
+      border-color: #0284c7;
+      background: #ffffff;
+    }
+    .input-box input {
+      border: none;
+      background: transparent;
+      outline: none;
+      width: 100%;
+      font-size: 14px;
+      color: #0f172a;
+    }
+    .btn-primary {
+      width: 100%;
+      padding: 13px;
+      background: var(--primary-gradient);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 8px;
+      box-shadow: 0 8px 20px rgba(2, 132, 199, 0.3);
+      transition: transform 0.15s;
+    }
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+    .login-footer-quote {
+      text-align: center;
+      color: #ffffff;
+      font-size: 11px;
+      opacity: 0.9;
+      padding: 10px 0;
+    }
+
+    /* ============================================================ */
+    /* 2. LAYAR BERANDA (HOME) */
+    /* ============================================================ */
+    .home-header {
+      padding: 12px 20px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #ffffff;
+    }
+    .user-profile-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .user-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #e0f2fe;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      border: 2px solid #bae6fd;
+      overflow: hidden;
+    }
+    .user-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .user-greeting {
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 600;
+    }
+    .user-name {
+      font-size: 15px;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.2;
+    }
+    .user-role-badge {
+      font-size: 11px;
+      color: #0284c7;
+      font-weight: 700;
+    }
+    .bell-btn {
+      position: relative;
+      background: #f1f5f9;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+    }
+    .bell-badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      background: #ef4444;
+      color: white;
+      font-size: 10px;
+      font-weight: 800;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #ffffff;
+    }
+
+    .school-id-card {
+      margin: 12px 20px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .school-id-icon {
+      width: 38px;
+      height: 38px;
+      background: #e0f2fe;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .school-id-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .school-id-year {
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    /* PENGINGAT JADWAL 20 MENIT REAL-TIME */
+    .urgent-reminder-box {
+      margin: 0 20px 16px;
+      background: #fffbeb;
+      border: 1.5px solid #fde68a;
+      border-radius: 18px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.1);
+      transition: all 0.3s;
+    }
+    .reminder-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .reminder-badge-urgent {
+      background: #d97706;
+      color: white;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .reminder-time-left {
+      font-size: 12px;
+      font-weight: 800;
+      color: #b45309;
+    }
+    .reminder-class-info {
+      font-size: 14px;
+      font-weight: 800;
+      color: #78350f;
+    }
+    .reminder-student-roster {
+      font-size: 11px;
+      color: #92400e;
+      line-height: 1.4;
+      background: rgba(255, 255, 255, 0.7);
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #fef3c7;
+    }
+    .btn-quick-absen {
+      background: #d97706;
+      color: white;
+      border: none;
+      padding: 9px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .quote-banner {
+      margin: 0 20px 18px;
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      border-radius: 20px;
+      padding: 18px 20px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 20px rgba(2, 132, 199, 0.18);
+    }
+    .quote-banner h3 {
+      font-size: 14px;
+      font-weight: 800;
+      max-width: 75%;
+      line-height: 1.4;
+    }
+    .quote-banner p {
+      font-size: 11px;
+      opacity: 0.9;
+      margin-top: 4px;
+    }
+    .quote-banner-icon {
+      position: absolute;
+      right: 16px;
+      bottom: 16px;
+      width: 36px;
+      height: 36px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .quick-menu-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 0 20px 18px;
+    }
+    .menu-card {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 16px 8px;
+      text-align: center;
+      border: 1px solid #f1f5f9;
+      box-shadow: var(--shadow-soft);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .menu-card:active {
+      transform: scale(0.96);
+      background: #f8fafc;
+    }
+    .menu-card-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      background: #0284c7;
+      color: #ffffff;
+      margin: 0 auto 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+    }
+    .menu-card-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #334155;
+    }
+
+    .announcement-banner {
+      margin: 0 20px 18px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+    }
+    .announcement-icon {
+      width: 36px;
+      height: 36px;
+      background: #0284c7;
+      color: white;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .announcement-text {
+      flex: 1;
+    }
+    .announcement-tag {
+      font-size: 12px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .announcement-sub {
+      font-size: 11px;
+      color: #64748b;
+    }
+
+    /* ============================================================ */
+    /* 3. LAYAR DAFTAR KELAS */
+    /* ============================================================ */
+    .search-bar-wrap {
+      padding: 12px 20px;
+    }
+    .search-input-box {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 10px 14px;
+      gap: 10px;
+    }
+    .search-input-box input {
+      border: none;
+      outline: none;
+      width: 100%;
+      font-size: 13px;
+    }
+    .class-card-list {
+      padding: 0 20px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .class-item-card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border: 1px solid #f1f5f9;
+      box-shadow: var(--shadow-soft);
+      cursor: pointer;
+    }
+    .class-badge-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: #0284c7;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .class-badge-icon span:first-child { font-size: 14px; }
+    .class-badge-icon span:last-child { font-size: 10px; opacity: 0.9; margin-top: 2px; }
+    .class-info-detail {
+      flex: 1;
+    }
+    .class-info-name {
+      font-size: 14px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .class-info-sub {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    /* ============================================================ */
+    /* 4. LAYAR JADWAL MENGAJAR */
+    /* ============================================================ */
+    .schedule-date-filter {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 12px 20px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .schedule-list {
+      padding: 0 20px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .schedule-card {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 16px;
+      border: 1px solid #f1f5f9;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .schedule-time-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: #0284c7;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .schedule-detail {
+      flex: 1;
+    }
+    .schedule-time-range {
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 700;
+    }
+    .schedule-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-top: 2px;
+    }
+    .schedule-sub {
+      font-size: 12px;
+      color: #64748b;
+    }
+    .schedule-status-badge {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 10px;
+    }
+    .status-terlaksana {
+      background: #dcfce7;
+      color: #15803d;
+    }
+    .status-berlangsung {
+      background: #dbeafe;
+      color: #1d4ed8;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .status-belum-mulai {
+      background: #f1f5f9;
+      color: #64748b;
+    }
+
+    /* ============================================================ */
+    /* 5. LAYAR ABSEN SISWA */
+    /* ============================================================ */
+    .attendance-stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin: 12px 20px;
+    }
+    .stat-pill {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 10px 4px;
+      text-align: center;
+      border: 1px solid #f1f5f9;
+      box-shadow: var(--shadow-soft);
+    }
+    .stat-pill-num {
+      font-size: 18px;
+      font-weight: 800;
+    }
+    .stat-pill-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #64748b;
+      margin-top: 2px;
+    }
+    .roster-card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid #f1f5f9;
+      box-shadow: var(--shadow-soft);
+      margin-bottom: 8px;
+    }
+    .roster-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .roster-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+    .roster-name {
+      font-size: 13px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .roster-nis {
+      font-size: 11px;
+      color: #64748b;
+    }
+    .status-tag-toggle {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 6px 12px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      min-width: 60px;
+      text-align: center;
+    }
+    .tag-hadir { background: #dcfce7; color: #15803d; }
+    .tag-izin { background: #fef3c7; color: #b45309; }
+    .tag-sakit { background: #fee2e2; color: #b91c1c; }
+    .tag-alpa { background: #f1f5f9; color: #475569; }
+
+    .btn-save-attendance {
+      width: calc(100% - 40px);
+      margin: 10px 20px 20px;
+      padding: 14px;
+      background: var(--accent-green);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    /* Modal Pop-up Notifikasi 20 Menit */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal-box {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 24px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+      animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .modal-icon-bell {
+      width: 56px;
+      height: 56px;
+      border-radius: 18px;
+      background: #fef3c7;
+      color: #d97706;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin: 0 auto 14px;
+    }
+
+    /* BOTTOM NAVIGATION */
+    .bottom-nav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 72px;
+      background: #ffffff;
+      border-top: 1px solid #f1f5f9;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0 10px;
+      z-index: 45;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.03);
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      background: none;
+      border: none;
+      color: #64748b;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 700;
+      width: 54px;
+      transition: all 0.2s;
+    }
+    .nav-item.active {
+      color: #0284c7;
+    }
+    .nav-bubble {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transition: all 0.2s;
+    }
+    .nav-item.active .nav-bubble {
+      background: #0284c7;
+      color: #ffffff;
+      transform: translateY(-4px);
+      box-shadow: 0 6px 14px rgba(2, 132, 199, 0.35);
+    }
+
+    /* Toast Notification Alert */
+    .toast-msg {
+      position: fixed;
+      bottom: 84px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0f172a;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      text-align: center;
+      max-width: 90%;
+    }
+    .toast-msg.show {
+      opacity: 1;
+    }
+
+    .empty-state-card {
+      text-align: center;
+      padding: 30px 20px;
+      color: #64748b;
+    }
+    .empty-state-card span {
+      font-size: 36px;
+      display: block;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-viewport">
+    
+    <!-- Top System Mock Bar -->
+    <div class="mobile-status-bar">
+      <span id="system-clock">09:41</span>
+      <div class="status-bar-icons">
+        <span class="sync-indicator" id="sync-status-badge">● Supabase Live</span>
+        <span>📶 5G</span>
+        <span>🔋 100%</span>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SCREEN 1: LOGIN -->
+    <!-- ============================================================ -->
+    <div id="screen-login" class="app-screen active">
+      <div class="login-brand">
+        <div class="login-brand-icon">
+          <img src="../simpul_logo_clean.png" onerror="this.src='../logo-sman12-munabarat.png'" alt="Logo">
+        </div>
+        <h1 id="login-portal-title">Portal Guru</h1>
+        <p>Bersama Mendidik Generasi</p>
+      </div>
+
+      <div class="login-card">
+        <div class="login-card-title">Selamat Datang</div>
+        <div class="login-card-sub" id="login-sub-text">Silakan login menggunakan akun Guru Anda</div>
+
+        <!-- Role Switcher -->
+        <div class="role-switcher">
+          <button type="button" class="role-btn active" id="btn-role-guru" onclick="switchLoginRole('guru')">Akun Guru</button>
+          <button type="button" class="role-btn" id="btn-role-siswa" onclick="switchLoginRole('siswa')">Ruang Siswa</button>
+        </div>
+
+        <form id="form-login" onsubmit="handleLoginSubmit(event)">
+          <div class="form-group">
+            <label id="lbl-username">Username atau NIP</label>
+            <div class="input-box">
+              <span>👤</span>
+              <input type="text" id="input-username" placeholder="Masukkan Username / NIP Guru" required value="admin">
+            </div>
+          </div>
+
+          <div class="form-group" id="group-password">
+            <label>Password</label>
+            <div class="input-box">
+              <span>🔒</span>
+              <input type="password" id="input-password" placeholder="Masukkan Password" required value="admin123">
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary" id="btn-submit-login">
+            Masuk ke Portal ➔
+          </button>
+        </form>
+      </div>
+
+      <div class="login-footer-quote">
+        "Pendidikan adalah investasi terbaik untuk masa depan bangsa"
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SCREEN 2: BERANDA (HOME GURU & SISWA) -->
+    <!-- ============================================================ -->
+    <div id="screen-home" class="app-screen">
+      <div class="home-header">
+        <div class="user-profile-badge">
+          <div class="user-avatar" id="home-user-avatar">
+            👨‍🏫
+          </div>
+          <div>
+            <div class="user-greeting" id="home-greeting">Selamat Pagi,</div>
+            <div class="user-name" id="home-user-name">Memuat Data...</div>
+            <div class="user-role-badge" id="home-user-role">Guru Pengampu</div>
+          </div>
+        </div>
+        <button class="bell-btn" onclick="openUrgentModalManually()">
+          🔔
+          <span class="bell-badge" id="bell-unread-count">1</span>
+        </button>
+      </div>
+
+      <!-- Kartu Identitas Sekolah (Terintegrasi dari Supabase Settings) -->
+      <div class="school-id-card">
+        <div class="school-id-icon">🏫</div>
+        <div class="school-id-info">
+          <div class="school-id-title" id="school-name-text">SMA Negeri 12 Muna Barat</div>
+          <div class="school-id-year" id="school-academic-year">Tahun Ajaran 2024/2025 • Semester Ganjil</div>
+        </div>
+      </div>
+
+      <!-- Banner Pengingat 20 Menit Masuk Kelas (OTOMATIS DARI SUPABASE SUBJECTS & STUDENTS) -->
+      <div class="urgent-reminder-box" id="banner-urgent-reminder" style="display:none;">
+        <div class="reminder-header-row">
+          <div class="reminder-badge-urgent">⏰ 20 Menit Lagi Masuk</div>
+          <div class="reminder-time-left" id="reminder-time-countdown">--:--</div>
+        </div>
+        <div class="reminder-class-info" id="reminder-class-text">
+          Memuat jadwal mengajar...
+        </div>
+        <div class="reminder-student-roster" id="reminder-roster-preview">
+          👥 <strong>Daftar Siswa yang akan masuk:</strong> Menghubungkan ke database...
+        </div>
+        <button class="btn-quick-absen" onclick="openAttendanceForUrgentClass()">
+          ✏️ Buka Absensi Kelas Ini Sekarang ➔
+        </button>
+      </div>
+
+      <!-- Banner Edukasi -->
+      <div class="quote-banner">
+        <h3>"Mendidik dengan Hati Mencetak Generasi Hebat"</h3>
+        <p>Integritas • Karakter • Prestasi</p>
+        <div class="quote-banner-icon">➔</div>
+      </div>
+
+      <!-- Grid 6 Menu Utama -->
+      <div class="quick-menu-grid" id="main-quick-menu">
+        <div class="menu-card" onclick="navTo('kelas')">
+          <div class="menu-card-icon">👥</div>
+          <div class="menu-card-title">Daftar Kelas</div>
+        </div>
+        <div class="menu-card" onclick="navTo('jadwal')">
+          <div class="menu-card-icon">📅</div>
+          <div class="menu-card-title">Jadwal Mengajar</div>
+        </div>
+        <div class="menu-card" onclick="navTo('absen')">
+          <div class="menu-card-icon">📝</div>
+          <div class="menu-card-title">Absen Siswa</div>
+        </div>
+        <div class="menu-card" onclick="navTo('ruang')">
+          <div class="menu-card-icon">🏛️</div>
+          <div class="menu-card-title">Ruang Belajar</div>
+        </div>
+        <div class="menu-card" onclick="navTo('ujian')">
+          <div class="menu-card-icon">📄</div>
+          <div class="menu-card-title">Ujian CBT</div>
+        </div>
+        <div class="menu-card" onclick="navTo('nilai')">
+          <div class="menu-card-icon">📊</div>
+          <div class="menu-card-title">Rekap Nilai</div>
+        </div>
+      </div>
+
+      <!-- Pengumuman Highlight -->
+      <div class="announcement-banner" onclick="navTo('pengumuman')">
+        <div class="announcement-icon">📢</div>
+        <div class="announcement-text">
+          <div class="announcement-tag" id="home-announcement-title">Pengumuman Sekolah</div>
+          <div class="announcement-sub" id="home-announcement-sub">Ketuk untuk membaca pengumuman terbaru</div>
+        </div>
+        <span>➔</span>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SCREEN 3: DAFTAR KELAS -->
+    <!-- ============================================================ -->
+    <div id="screen-kelas" class="app-screen">
+      <div class="screen-header">
+        <button class="back-btn" onclick="navTo('home')">←</button>
+        <h2>Daftar Kelas</h2>
+        <span style="font-size:18px;">📋</span>
+      </div>
+
+      <div class="search-bar-wrap">
+        <div class="search-input-box">
+          <span>🔍</span>
+          <input type="text" id="input-search-class" placeholder="Cari nama kelas..." oninput="handleSearchClass(this.value)">
+        </div>
+      </div>
+
+      <div class="class-card-list" id="class-container">
+        <!-- Render dinamis dari tabel Classes -->
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SCREEN 4: JADWAL MENGAJAR -->
+    <!-- ============================================================ -->
+    <div id="screen-jadwal" class="app-screen">
+      <div class="screen-header">
+        <button class="back-btn" onclick="navTo('home')">←</button>
+        <h2>Jadwal Mengajar</h2>
+        <span style="font-size:18px;">🗓️</span>
+      </div>
+
+      <div class="schedule-date-filter">
+        <button onclick="changeScheduleDay(-1)" style="border:none; background:none; font-size:16px; font-weight:800; cursor:pointer;">‹</button>
+        <span id="schedule-active-day-label">Hari Ini</span>
+        <button onclick="changeScheduleDay(1)" style="border:none; background:none; font-size:16px; font-weight:800; cursor:pointer;">›</button>
+      </div>
+
+      <div class="schedule-list" id="schedule-container">
+        <!-- Render dinamis dari tabel Subjects -->
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SCREEN 5: ABSEN SISWA -->
+    <!-- ============================================================ -->
+    <div id="screen-absen" class="app-screen">
+      <div class="screen-header">
+        <button class="back-btn" onclick="navTo('home')">←</button>
+        <h2>Absen Siswa</h2>
+        <span style="font-size:18px;">✏️</span>
+      </div>
+
+      <div class="schedule-date-filter" style="margin-bottom:8px;">
+        <span id="absen-today-str">Senin, 20 Oktober 2025</span>
+      </div>
+
+      <!-- Filter Dropdown Terintegrasi dari tabel Classes & Subjects -->
+      <div style="display:flex; gap:8px; margin:0 20px 10px;">
+        <select id="absen-select-class" onchange="onClassDropdownChange()" style="flex:1; padding:10px; border-radius:12px; border:1.5px solid #e2e8f0; font-weight:700; font-size:12px;">
+          <option value="">Pilih Kelas...</option>
+        </select>
+        <select id="absen-select-subject" style="flex:1; padding:10px; border-radius:12px; border:1.5px solid #e2e8f0; font-weight:700; font-size:12px;">
+          <option value="">Pilih Mapel...</option>
+        </select>
+      </div>
+
+      <!-- Ringkasan Statistik -->
+      <div class="attendance-stats-row">
+        <div class="stat-pill">
+          <div class="stat-pill-num" id="stat-total" style="color:#0f172a;">0</div>
+          <div class="stat-pill-label">Total</div>
+        </div>
+        <div class="stat-pill">
+          <div class="stat-pill-num" id="stat-hadir" style="color:#10b981;">0</div>
+          <div class="stat-pill-label">Hadir</div>
+        </div>
+        <div class="stat-pill">
+          <div class="stat-pill-num" id="stat-izin" style="color:#f59e0b;">0</div>
+          <div class="stat-pill-label">Izin</div>
+        </div>
+        <div class="stat-pill">
+          <div class="stat-pill-num" id="stat-sakit" style="color:#ef4444;">0</div>
+          <div class="stat-pill-label">Sakit</div>
+        </div>
+      </div>
+
+      <div class="search-bar-wrap" style="padding-top:4px;">
+        <div class="search-input-box">
+          <span>🔍</span>
+          <input type="text" placeholder="Cari nama siswa..." oninput="handleSearchStudent(this.value)">
+        </div>
+      </div>
+
+      <!-- Roster Absensi Siswa -->
+      <div style="padding:0 20px 10px;" id="roster-container">
+        <!-- Render dinamis dari tabel Students & Attendance -->
+      </div>
+
+      <button class="btn-save-attendance" id="btn-save-absen" onclick="saveAttendanceToSupabase()">
+        💾 Simpan Presensi ke Database Supabase
+      </button>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SCREEN 6: RUANG BELAJAR -->
+    <!-- ============================================================ -->
+    <div id="screen-ruang" class="app-screen">
+      <div class="screen-header">
+        <button class="back-btn" onclick="navTo('home')">←</button>
+        <h2>Ruang Pembelajaran</h2>
+        <span style="font-size:18px;">🏛️</span>
+      </div>
+
+      <div style="padding:14px 20px 20px;" id="rooms-container">
+        <!-- Render modul / pembelajaran -->
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SCREEN 7: UJIAN (CBT) -->
+    <!-- ============================================================ -->
+    <div id="screen-ujian" class="app-screen">
+      <div class="screen-header">
+        <button class="back-btn" onclick="navTo('home')">←</button>
+        <h2>Ujian CBT Online</h2>
+        <span style="font-size:18px;">📝</span>
+      </div>
+
+      <div style="padding:14px 20px 20px;" id="exams-container">
+        <!-- Render ujian dari tabel Exams -->
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SCREEN 8: REKAP NILAI -->
+    <!-- ============================================================ -->
+    <div id="screen-nilai" class="app-screen">
+      <div class="screen-header">
+        <button class="back-btn" onclick="navTo('home')">←</button>
+        <h2>Rekap Nilai Siswa</h2>
+        <span style="font-size:18px;">📈</span>
+      </div>
+
+      <div class="attendance-stats-row" style="grid-template-columns: repeat(3, 1fr);">
+        <div class="stat-pill">
+          <div class="stat-pill-num" id="grade-avg" style="color:#0284c7;">-</div>
+          <div class="stat-pill-label">Rata-rata</div>
+        </div>
+        <div class="stat-pill">
+          <div class="stat-pill-num" id="grade-max" style="color:#10b981;">-</div>
+          <div class="stat-pill-label">Tertinggi</div>
+        </div>
+        <div class="stat-pill">
+          <div class="stat-pill-num" id="grade-min" style="color:#ef4444;">-</div>
+          <div class="stat-pill-label">Terendah</div>
+        </div>
+      </div>
+
+      <div style="padding:0 20px 20px;" id="grades-container">
+        <!-- Render rekap nilai dari tabel Grades -->
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SCREEN 9: PENGUMUMAN -->
+    <!-- ============================================================ -->
+    <div id="screen-pengumuman" class="app-screen">
+      <div class="screen-header">
+        <button class="back-btn" onclick="navTo('home')">←</button>
+        <h2>Pengumuman Resmi</h2>
+        <span style="font-size:18px;">📢</span>
+      </div>
+
+      <div style="padding:14px 20px 20px;" id="announcement-list-container">
+        <!-- Render pengumuman dari tabel Announcements -->
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- BOTTOM NAVIGATION (5 Tab) -->
+    <!-- ============================================================ -->
+    <nav class="bottom-nav" id="app-bottom-nav" style="display:none;">
+      <button class="nav-item active" id="nav-btn-home" onclick="navTo('home')">
+        <div class="nav-bubble">🏠</div>
+        <span>Beranda</span>
+      </button>
+      <button class="nav-item" id="nav-btn-kelas" onclick="navTo('kelas')">
+        <div class="nav-bubble">👥</div>
+        <span>Kelas</span>
+      </button>
+      <button class="nav-item" id="nav-btn-jadwal" onclick="navTo('jadwal')">
+        <div class="nav-bubble">📅</div>
+        <span>Jadwal</span>
+      </button>
+      <button class="nav-item" id="nav-btn-nilai" onclick="navTo('nilai')">
+        <div class="nav-bubble">📊</div>
+        <span>Nilai</span>
+      </button>
+      <button class="nav-item" id="nav-btn-logout" onclick="handleLogout()">
+        <div class="nav-bubble">🚪</div>
+        <span>Keluar</span>
+      </button>
+    </nav>
+
+    <!-- ============================================================ -->
+    <!-- MODAL POPUP NOTIFIKASI PENGINGAT 20 MENIT -->
+    <!-- ============================================================ -->
+    <div class="modal-overlay" id="urgent-modal">
+      <div class="modal-box">
+        <div class="modal-icon-bell">⏰</div>
+        <h3 style="font-size:17px; font-weight:800; color:#0f172a; text-align:center; margin-bottom:6px;">
+          Pengingat Jadwal Mengajar!
+        </h3>
+        <p style="font-size:12px; color:#64748b; text-align:center; margin-bottom:14px;" id="modal-reminder-countdown">
+          Anda dijadwalkan masuk mengajar <strong style="color:#d97706;">20 Menit Lagi</strong>.
+        </p>
+
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:12px; margin-bottom:14px;">
+          <div style="font-size:13px; font-weight:800; color:#0284c7;" id="modal-reminder-title">Memuat...</div>
+          <div style="font-size:12px; color:#475569; margin-top:2px;" id="modal-reminder-time">🕒 -</div>
+          <div style="margin-top:10px; font-size:11px; font-weight:800; color:#0f172a;" id="modal-reminder-roster-count">Daftar Siswa Masuk:</div>
+          <div style="font-size:11px; color:#64748b; margin-top:4px; max-height:100px; overflow-y:auto; line-height:1.5;" id="modal-reminder-roster-list">
+            Memuat daftar siswa dari database...
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px;">
+          <button onclick="closeUrgentModal()" style="flex:1; padding:12px; border:1px solid #cbd5e1; border-radius:12px; background:white; font-weight:700; cursor:pointer;">
+            Tutup
+          </button>
+          <button onclick="closeUrgentModal(); openAttendanceForUrgentClass();" style="flex:1; padding:12px; border:none; border-radius:12px; background:var(--primary-gradient); color:white; font-weight:800; cursor:pointer;">
+            Buka Absen
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification Message -->
+    <div class="toast-msg" id="app-toast">Pemberitahuan</div>
+
+  </div>
+
+  <script>
+    // ============================================================
+    // INTEGRASI PENUH SUPABASE CLIENT DENGAN PORTAL SEKOLAH
+    // ============================================================
+
+    const HARI_INDO = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const BULAN_INDO = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+    let supabaseClient = null;
+    let currentUser = null;
+    let currentRole = 'guru';
+    let currentUrgentSubject = null;
+    let urgentStudentsCache = [];
+    let notifiedSlots = new Set();
+
+    // Cache Data Supabase
+    let dbClasses = [];
+    let dbSubjects = [];
+    let dbStudents = [];
+    let dbAnnouncements = [];
+    let dbExams = [];
+    let dbGrades = [];
+    let dbSettings = {};
+    let activeAttendanceRecords = {}; // NIS -> { status, idAbsen }
+
+    // Hashing password konsisten dengan supabase-bridge.js
+    async function hashPassword(str) {
+      try {
+        const salted = (str || '') + 'SALT_PORTAL_SEKOLAH_2024';
+        const msgBuffer = new TextEncoder().encode(salted);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      } catch (e) {
+        return str;
+      }
+    }
+
+    // Inisialisasi Supabase
+    function initSupabase() {
+      const cfg = window.PORTAL_CONFIG || {};
+      if (cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY && !cfg.SUPABASE_URL.includes('GANTI_DENGAN')) {
+        try {
+          supabaseClient = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+          setSyncStatus(true, 'Supabase Live');
+          console.log('✅ Supabase Client Connected:', cfg.SUPABASE_URL);
+          return true;
+        } catch (e) {
+          console.error('Gagal menghubungkan Supabase:', e);
+          setSyncStatus(false, 'Supabase Error');
+          return false;
+        }
+      } else {
+        setSyncStatus(false, 'Config Belum Diisi');
+        return false;
+      }
+    }
+
+    function setSyncStatus(isLive, text) {
+      const el = document.getElementById('sync-status-badge');
+      if (!el) return;
+      el.className = isLive ? 'sync-indicator' : 'sync-indicator offline';
+      el.innerText = `● ${text}`;
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('app-toast');
+      if (!t) return;
+      t.innerText = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // Registrasi PWA Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(err => console.log('SW register note:', err));
+    }
+
+    function requestNotificationPermission() {
+      if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+      }
+    }
+
+    // ============================================================
+    // AUTHENTICATION & LOGIN
+    // ============================================================
+    function switchLoginRole(role) {
+      currentRole = role;
+      document.getElementById('btn-role-guru').classList.toggle('active', role === 'guru');
+      document.getElementById('btn-role-siswa').classList.toggle('active', role === 'siswa');
+      
+      const lbl = document.getElementById('lbl-username');
+      const inputUser = document.getElementById('input-username');
+      const groupPass = document.getElementById('group-password');
+      const title = document.getElementById('login-portal-title');
+      const sub = document.getElementById('login-sub-text');
+
+      if (role === 'siswa') {
+        title.innerText = 'Ruang Siswa';
+        sub.innerText = 'Masukkan NIS untuk mengakses jadwal, nilai, dan ujian';
+        lbl.innerText = 'NIS (Nomor Induk Siswa)';
+        inputUser.placeholder = 'Contoh: 001234';
+        inputUser.value = '';
+        groupPass.style.display = 'none';
+        document.getElementById('input-password').removeAttribute('required');
+      } else {
+        title.innerText = 'Portal Guru';
+        sub.innerText = 'Silakan login menggunakan akun Guru Anda';
+        lbl.innerText = 'Username atau NIP';
+        inputUser.placeholder = 'Masukkan Username / NIP';
+        inputUser.value = 'admin';
+        groupPass.style.display = 'block';
+        document.getElementById('input-password').setAttribute('required', 'true');
+      }
+    }
+
+    async function handleLoginSubmit(e) {
+      e.preventDefault();
+      requestNotificationPermission();
+
+      const usernameVal = document.getElementById('input-username').value.trim();
+      const passwordVal = document.getElementById('input-password').value.trim();
+
+      if (!supabaseClient) {
+        initSupabase();
+      }
+
+      setSyncStatus(false, 'Memverifikasi...');
+
+      try {
+        if (currentRole === 'guru') {
+          // Login Guru / Admin ke tabel 'Users'
+          const hashed = await hashPassword(passwordVal);
+
+          let query = supabaseClient.from('Users').select('*').eq('Status', 'active');
+          // Cari berdasarkan Username atau NIP
+          const { data: users, error } = await query.or(`Username.eq."${usernameVal}",NIP.eq."${usernameVal}"`);
+
+          if (error) throw error;
+
+          if (!users || users.length === 0) {
+            showToast('Username atau NIP tidak ditemukan / akun belum aktif.');
+            setSyncStatus(true, 'Supabase Live');
+            return;
+          }
+
+          const u = users[0];
+          if (u.Password === hashed || u.Password === passwordVal) {
+            currentUser = {
+              role: u.Role || 'guru',
+              id: u.ID,
+              username: u.Username,
+              name: u['Nama Lengkap'] || u.Username,
+              nip: u.NIP || '-',
+              phone: u.Telepon || '',
+              photo: u['Foto Profil URL'] || ''
+            };
+            localStorage.setItem('smandum_active_user', JSON.stringify(currentUser));
+            loginSuccess();
+          } else {
+            showToast('Password yang dimasukkan salah!');
+            setSyncStatus(true, 'Supabase Live');
+          }
+        } else {
+          // Login Siswa ke tabel 'Students' berdasarkan NIS
+          const { data: students, error } = await supabaseClient.from('Students').select('*').eq('NIS', usernameVal);
+          if (error) throw error;
+
+          if (!students || students.length === 0) {
+            showToast('NIS tidak terdaftar di database sekolah.');
+            setSyncStatus(true, 'Supabase Live');
+            return;
+          }
+
+          const s = students[0];
+          currentUser = {
+            role: 'siswa',
+            id: s['ID Siswa'],
+            nis: s.NIS,
+            name: s['Nama Siswa'],
+            classId: s['ID Kelas'],
+            className: s['Nama Kelas'],
+            gender: s['Jenis Kelamin']
+          };
+          localStorage.setItem('smandum_active_user', JSON.stringify(currentUser));
+          loginSuccess();
+        }
+      } catch (err) {
+        console.error('Error saat login:', err);
+        showToast('Gagal memverifikasi login: ' + (err.message || 'Koneksi error'));
+        setSyncStatus(false, 'Gagal Sinkron');
+      }
+    }
+
+    function loginSuccess() {
+      setSyncStatus(true, 'Supabase Live');
+      document.getElementById('screen-login').classList.remove('active');
+      document.getElementById('app-bottom-nav').style.display = 'flex';
+
+      document.getElementById('home-user-name').innerText = currentUser.name;
+      document.getElementById('home-user-role').innerText = currentUser.role === 'siswa' 
+        ? `Siswa • ${currentUser.className || 'Kelas Belum Terdata'}` 
+        : `Guru • NIP: ${currentUser.nip}`;
+
+      showToast(`Selamat datang, ${currentUser.name}!`);
+      navTo('home');
+
+      // Ambil seluruh data langsung dari Supabase
+      loadAllSupabaseData();
+
+      // Jalankan interval pemantauan jadwal & pengingat 20 menit
+      startReminderDaemon();
+    }
+
+    function handleLogout() {
+      if (confirm('Apakah Anda yakin ingin keluar dari akun?')) {
+        localStorage.removeItem('smandum_active_user');
+        currentUser = null;
+        document.querySelectorAll('.app-screen').forEach(el => el.classList.remove('active'));
+        document.getElementById('app-bottom-nav').style.display = 'none';
+        document.getElementById('screen-login').classList.add('active');
+      }
+    }
+
+    // ============================================================
+    // PENGAMBILAN DATA LENGKAP DARI SUPABASE (100% TERINTEGRASI)
+    // ============================================================
+    async function loadAllSupabaseData() {
+      if (!supabaseClient) return;
+
+      try {
+        setSyncStatus(true, 'Sinkron Data...');
+
+        // 1. Ambil Pengaturan Sekolah
+        const { data: settings } = await supabaseClient.from('Settings').select('Key, Value');
+        if (settings) {
+          settings.forEach(row => { dbSettings[row.Key] = row.Value; });
+          if (dbSettings.school_name) document.getElementById('school-name-text').innerText = dbSettings.school_name;
+          if (dbSettings.academic_year) {
+            document.getElementById('school-academic-year').innerText = `Tahun Ajaran ${dbSettings.academic_year} • Semester ${dbSettings.semester || 'Ganjil'}`;
+          }
+        }
+
+        // 2. Ambil Kelas
+        const { data: classes } = await supabaseClient.from('Classes').select('*').order('Nama Kelas', { ascending: true });
+        dbClasses = classes || [];
+        renderClasses();
+
+        // 3. Ambil Siswa
+        const { data: students } = await supabaseClient.from('Students').select('*').order('Nama Siswa', { ascending: true });
+        dbStudents = students || [];
+
+        // 4. Ambil Jadwal Mata Pelajaran
+        let subjQuery = supabaseClient.from('Subjects').select('*');
+        if (currentUser.role === 'guru') {
+          // Jika bukan admin murni, tampilkan jadwal guru ini
+          if (currentUser.role !== 'admin') {
+            subjQuery = subjQuery.or(`ID Guru.eq."${currentUser.id}",Nama Guru.ilike."%${currentUser.name}%"`);
+          }
+        } else if (currentUser.role === 'siswa') {
+          if (currentUser.classId) {
+            subjQuery = subjQuery.eq('ID Kelas', currentUser.classId);
+          }
+        }
+        const { data: subjects } = await subjQuery;
+        dbSubjects = subjects || [];
+        renderSchedules();
+
+        // 5. Ambil Pengumuman
+        const { data: announcements } = await supabaseClient.from('Announcements').select('*').eq('Status', 'active').order('Tanggal Buat', { ascending: false });
+        dbAnnouncements = announcements || [];
+        renderAnnouncements();
+
+        // 6. Ambil Ujian CBT
+        let examQuery = supabaseClient.from('Exams').select('*').order('Tanggal Mulai', { ascending: false });
+        if (currentUser.role === 'siswa' && currentUser.classId) {
+          examQuery = examQuery.eq('ID Kelas', currentUser.classId);
+        }
+        const { data: exams } = await examQuery;
+        dbExams = exams || [];
+        renderExams();
+
+        // 7. Ambil Nilai
+        let gradeQuery = supabaseClient.from('Grades').select('*');
+        if (currentUser.role === 'siswa') {
+          gradeQuery = gradeQuery.eq('NIS Siswa', currentUser.nis);
+        }
+        const { data: grades } = await gradeQuery;
+        dbGrades = grades || [];
+        renderGrades();
+
+        // 8. Inisialisasi dropdown di layar Absensi
+        populateAttendanceDropdowns();
+
+        // 9. Periksa jadwal mendesak 20 menit sekarang
+        checkUpcomingClassReminder();
+
+        setSyncStatus(true, 'Supabase Live');
+      } catch (err) {
+        console.error('Gagal sinkron data Supabase:', err);
+        setSyncStatus(false, 'Gagal Sinkron');
+      }
+    }
+
+    // ============================================================
+    // SISTEM PENGINGAT 20 MENIT REAL-TIME (FITUR UTAMA)
+    // ============================================================
+    function startReminderDaemon() {
+      // Jalankan setiap 30 detik untuk mendeteksi waktu kelas
+      setInterval(() => {
+        checkUpcomingClassReminder();
+      }, 30000);
+    }
+
+    async function checkUpcomingClassReminder() {
+      if (!currentUser || currentUser.role === 'siswa' || dbSubjects.length === 0) return;
+
+      const now = new Date();
+      const hariIni = HARI_INDO[now.getDay()];
+      const jamSekarang = now.getHours();
+      const menitSekarang = now.getMinutes();
+      const totalMenitSekarang = jamSekarang * 60 + menitSekarang;
+
+      // Filter jadwal guru untuk hari ini
+      const jadwalHariIni = dbSubjects.filter(s => {
+        const matchHari = (s.Hari || '').trim().toLowerCase() === hariIni.toLowerCase();
+        return matchHari && s['Jam Mulai'];
+      });
+
+      let foundUrgent = null;
+      let minDiff = 999999;
+
+      for (const jdw of jadwalHariIni) {
+        const [hMulai, mMulai] = jdw['Jam Mulai'].split(':').map(Number);
+        if (isNaN(hMulai)) continue;
+        const totalMenitMulai = hMulai * 60 + (mMulai || 0);
+        const selisih = totalMenitMulai - totalMenitSekarang;
+
+        // Kriteria 20 Menit: Antara 0 s/d 25 menit sebelum jam mulai
+        if (selisih >= 0 && selisih <= 25) {
+          if (selisih < minDiff) {
+            minDiff = selisih;
+            foundUrgent = { ...jdw, diffMinutes: selisih };
+          }
+        }
+      }
+
+      const banner = document.getElementById('banner-urgent-reminder');
+      if (foundUrgent) {
+        currentUrgentSubject = foundUrgent;
+        banner.style.display = 'flex';
+        document.getElementById('reminder-time-countdown').innerText = `${foundUrgent.diffMinutes} Menit Lagi (${foundUrgent['Jam Mulai']})`;
+        document.getElementById('reminder-class-text').innerText = `${foundUrgent['Nama Kelas']} • ${foundUrgent['Nama Mapel']} (${foundUrgent['Ruangan'] || 'Ruang Kelas'})`;
+
+        // Ambil daftar siswa kelas tersebut
+        const siswaKelas = dbStudents.filter(st => st['ID Kelas'] === foundUrgent['ID Kelas'] || st['Nama Kelas'] === foundUrgent['Nama Kelas']);
+        urgentStudentsCache = siswaKelas;
+
+        const countText = `${siswaKelas.length} Siswa`;
+        const listText = siswaKelas.map((s, idx) => `${idx + 1}. ${s['Nama Siswa']}`).slice(0, 8).join(', ') + (siswaKelas.length > 8 ? ` ...dan ${siswaKelas.length - 8} siswa lainnya` : '');
+        
+        document.getElementById('reminder-roster-preview').innerHTML = `👥 <strong>Daftar ${countText} yang akan masuk:</strong> ${listText || 'Siswa belum terdaftar di kelas ini'}`;
+
+        // Bunyikan getaran & kirim push notifikasi jika belum pernah dinotifikasi pada jam ini
+        const slotKey = `${foundUrgent['ID Mapel']}_${foundUrgent['Jam Mulai']}_${now.toDateString()}`;
+        if (!notifiedSlots.has(slotKey) && foundUrgent.diffMinutes <= 20) {
+          notifiedSlots.add(slotKey);
+          triggerPushNotificationAndAudio(foundUrgent, siswaKelas.length);
+        }
+      } else {
+        banner.style.display = 'none';
+      }
+    }
+
+    function triggerPushNotificationAndAudio(jadwal, totalSiswa) {
+      const title = `⏰ 20 Menit Lagi Masuk Kelas: ${jadwal['Nama Kelas']}`;
+      const body = `Mapel: ${jadwal['Nama Mapel']} (${jadwal['Jam Mulai']} - ${jadwal['Jam Selesai']})\nRuangan: ${jadwal['Ruangan'] || '-'}\nTotal: ${totalSiswa} Siswa siap masuk.`;
+
+      // Getar di smartphone
+      if (navigator.vibrate) {
+        navigator.vibrate([200, 100, 200, 100, 200]);
+      }
+
+      // Web Push Notification
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(title, {
+          body: body,
+          icon: '../simpul_logo_clean.png',
+          tag: 'class-reminder'
+        });
+      }
+
+      // Pop-up modal otomatis di aplikasi
+      openUrgentModalManually();
+    }
+
+    function openUrgentModalManually() {
+      if (currentUrgentSubject) {
+        document.getElementById('modal-reminder-title').innerText = `${currentUrgentSubject['Nama Mapel']} • ${currentUrgentSubject['Nama Kelas']}`;
+        document.getElementById('modal-reminder-time').innerText = `🕒 ${currentUrgentSubject['Jam Mulai']} - ${currentUrgentSubject['Jam Selesai']} • ${currentUrgentSubject['Ruangan'] || 'Ruang 1'}`;
+        
+        const count = urgentStudentsCache.length;
+        document.getElementById('modal-reminder-roster-count').innerText = `Daftar Siswa Masuk (${count} Siswa):`;
+        document.getElementById('modal-reminder-roster-list').innerHTML = urgentStudentsCache.length > 0 
+          ? urgentStudentsCache.map((s, i) => `${i + 1}. ${s['Nama Siswa']} (${s.NIS})`).join('<br>')
+          : 'Belum ada data siswa terdaftar di kelas ini.';
+      } else {
+        document.getElementById('modal-reminder-title').innerText = 'Belum Ada Jadwal Mendesak';
+        document.getElementById('modal-reminder-time').innerText = 'Jadwal berikutnya belum dimulai dalam 20 menit ke depan.';
+        document.getElementById('modal-reminder-roster-count').innerText = 'Info:';
+        document.getElementById('modal-reminder-roster-list').innerText = 'Sistem memantau tabel Subjects & Students secara otomatis.';
+      }
+      document.getElementById('urgent-modal').classList.add('active');
+    }
+
+    function closeUrgentModal() {
+      document.getElementById('urgent-modal').classList.remove('active');
+    }
+
+    function openAttendanceForUrgentClass() {
+      if (currentUrgentSubject) {
+        navTo('absen');
+        const selClass = document.getElementById('absen-select-class');
+        const selSubj = document.getElementById('absen-select-subject');
+        
+        // Pilih kelas & mapel yang bersangkutan
+        if (selClass) {
+          selClass.value = currentUrgentSubject['ID Kelas'] || currentUrgentSubject['Nama Kelas'];
+          onClassDropdownChange(currentUrgentSubject['ID Mapel']);
+        }
+      } else {
+        navTo('absen');
+      }
+    }
+
+    // ============================================================
+    // RENDER: DAFTAR KELAS
+    // ============================================================
+    function renderClasses(filterKeyword = '') {
+      const container = document.getElementById('class-container');
+      if (!container) return;
+
+      const filtered = dbClasses.filter(c => {
+        return (c['Nama Kelas'] || '').toLowerCase().includes(filterKeyword.toLowerCase()) ||
+               (c['Nama Wali Kelas'] || '').toLowerCase().includes(filterKeyword.toLowerCase());
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state-card">
+            <span>📂</span>
+            <p>Belum ada data kelas di tabel 'Classes'.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(c => {
+        // Hitung siswa di kelas ini dari tabel Students
+        const jmlSiswa = dbStudents.filter(s => s['ID Kelas'] === c['ID Kelas'] || s['Nama Kelas'] === c['Nama Kelas']).length;
+        const iconLetter = (c['Tingkat'] || c['Nama Kelas'] || 'X').split(' ')[0];
+
+        return `
+          <div class="class-item-card" onclick="openClassAttendance('${c['ID Kelas'] || c['Nama Kelas']}')">
+            <div class="class-badge-icon">
+              <span>${iconLetter}</span>
+              <span>${c['Jurusan'] || 'KLS'}</span>
+            </div>
+            <div class="class-info-detail">
+              <div class="class-info-name">${c['Nama Kelas']}</div>
+              <div class="class-info-sub">${jmlSiswa || c['Jumlah Siswa'] || 0} Siswa • Wali: ${c['Nama Wali Kelas'] || '-'}</div>
+            </div>
+            <div style="color:#94a3b8; font-size:18px;">›</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function handleSearchClass(val) {
+      renderClasses(val);
+    }
+
+    function openClassAttendance(classId) {
+      navTo('absen');
+      const selClass = document.getElementById('absen-select-class');
+      if (selClass) {
+        selClass.value = classId;
+        onClassDropdownChange();
+      }
+    }
+
+    // ============================================================
+    // RENDER: JADWAL MENGAJAR
+    // ============================================================
+    let activeDayIndex = new Date().getDay();
+
+    function changeScheduleDay(delta) {
+      activeDayIndex = (activeDayIndex + delta + 7) % 7;
+      renderSchedules();
+    }
+
+    function renderSchedules() {
+      const container = document.getElementById('schedule-container');
+      if (!container) return;
+
+      const namaHari = HARI_INDO[activeDayIndex];
+      const isHariIni = activeDayIndex === (new Date().getDay());
+      document.getElementById('schedule-active-day-label').innerText = `${namaHari} ${isHariIni ? '(Hari Ini)' : ''}`;
+
+      const filtered = dbSubjects.filter(s => {
+        return (s.Hari || '').trim().toLowerCase() === namaHari.toLowerCase();
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state-card">
+            <span>📅</span>
+            <p>Tidak ada jadwal mengajar pada hari <strong>${namaHari}</strong>.</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Hitung status waktu terlaksana / berlangsung / belum mulai
+      const now = new Date();
+      const curMinutes = now.getHours() * 60 + now.getMinutes();
+
+      container.innerHTML = filtered.map(s => {
+        let statusBadge = '<span class="schedule-status-badge status-belum-mulai">Belum Mulai</span>';
+
+        if (isHariIni && s['Jam Mulai']) {
+          const [hM, mM] = s['Jam Mulai'].split(':').map(Number);
+          const [hS, mS] = (s['Jam Selesai'] || '00:00').split(':').map(Number);
+          const startMin = hM * 60 + (mM || 0);
+          const endMin = (hS || 0) * 60 + (mS || 0);
+
+          if (curMinutes >= endMin && endMin > startMin) {
+            statusBadge = '<span class="schedule-status-badge status-terlaksana">Terlaksana</span>';
+          } else if (curMinutes >= startMin && curMinutes < endMin) {
+            statusBadge = '<span class="schedule-status-badge status-berlangsung">▶ Berlangsung</span>';
+          }
+        }
+
+        return `
+          <div class="schedule-card" onclick="openSubjectAttendance('${s['ID Kelas'] || s['Nama Kelas']}', '${s['ID Mapel']}')">
+            <div class="schedule-time-box">📖</div>
+            <div class="schedule-detail">
+              <div class="schedule-time-range">${s['Jam Mulai'] || '-'} - ${s['Jam Selesai'] || '-'}</div>
+              <div class="schedule-title">${s['Nama Kelas']}</div>
+              <div class="schedule-sub">${s['Nama Mapel']} • ${s['Ruangan'] || 'Ruang Kelas'}</div>
+            </div>
+            <div>${statusBadge}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openSubjectAttendance(classId, subjectId) {
+      navTo('absen');
+      const selClass = document.getElementById('absen-select-class');
+      if (selClass) {
+        selClass.value = classId;
+        onClassDropdownChange(subjectId);
+      }
+    }
+
+    // ============================================================
+    // RENDER & AKSI: ABSENSI SISWA (TERHUBUNG KE TABEL ATTENDANCE)
+    // ============================================================
+    function populateAttendanceDropdowns() {
+      const selClass = document.getElementById('absen-select-class');
+      if (!selClass) return;
+
+      const currentVal = selClass.value;
+      selClass.innerHTML = '<option value="">-- Pilih Kelas --</option>' + dbClasses.map(c => `
+        <option value="${c['ID Kelas'] || c['Nama Kelas']}">${c['Nama Kelas']}</option>
+      `).join('');
+
+      if (currentVal) selClass.value = currentVal;
+    }
+
+    async function onClassDropdownChange(preselectSubjectId = null) {
+      const selClass = document.getElementById('absen-select-class');
+      const selSubj = document.getElementById('absen-select-subject');
+      const selectedClassVal = selClass.value;
+
+      if (!selectedClassVal) {
+        renderAttendanceRoster([]);
+        return;
+      }
+
+      // Filter Mapel untuk kelas ini
+      const subjectsInClass = dbSubjects.filter(s => s['ID Kelas'] === selectedClassVal || s['Nama Kelas'] === selectedClassVal);
+      selSubj.innerHTML = '<option value="">-- Pilih Mapel --</option>' + subjectsInClass.map(s => `
+        <option value="${s['ID Mapel']}">${s['Nama Mapel']} (${s.Hari || '-'})</option>
+      `).join('');
+
+      if (preselectSubjectId) selSubj.value = preselectSubjectId;
+      else if (subjectsInClass.length > 0) selSubj.value = subjectsInClass[0]['ID Mapel'];
+
+      // Ambil daftar siswa di kelas ini dari tabel Students
+      const classStudents = dbStudents.filter(s => s['ID Kelas'] === selectedClassVal || s['Nama Kelas'] === selectedClassVal);
+
+      // Cek apakah hari ini sudah ada catatan absensi di tabel Attendance
+      const todayISO = new Date().toISOString().split('T')[0];
+      activeAttendanceRecords = {};
+
+      if (supabaseClient) {
+        try {
+          const { data: existingAtt } = await supabaseClient
+            .from('Attendance')
+            .select('*')
+            .eq('Tanggal', todayISO)
+            .or(`ID Kelas.eq."${selectedClassVal}",Nama Kelas.eq."${selectedClassVal}"`);
+
+          if (existingAtt && existingAtt.length > 0) {
+            existingAtt.forEach(r => {
+              activeAttendanceRecords[r['NIS Siswa']] = {
+                status: r.Status || 'Hadir',
+                idAbsen: r['ID Absen']
+              };
+            });
+          }
+        } catch (e) {
+          console.warn('Gagal memuat absensi eksisting:', e);
+        }
+      }
+
+      renderAttendanceRoster(classStudents);
+    }
+
+    function renderAttendanceRoster(studentsList, filterKeyword = '') {
+      const container = document.getElementById('roster-container');
+      if (!container) return;
+
+      const filtered = studentsList.filter(s => {
+        return (s['Nama Siswa'] || '').toLowerCase().includes(filterKeyword.toLowerCase()) ||
+               (s.NIS || '').includes(filterKeyword);
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state-card">
+            <span>👥</span>
+            <p>Tidak ada siswa di kelas ini.</p>
+          </div>
+        `;
+        updateAttendanceStats(0, 0, 0, 0);
+        return;
+      }
+
+      let countHadir = 0;
+      let countIzin = 0;
+      let countSakit = 0;
+
+      container.innerHTML = filtered.map((st, i) => {
+        // Ambil status tersimpan atau default 'Hadir'
+        const curStatus = activeAttendanceRecords[st.NIS] ? activeAttendanceRecords[st.NIS].status : 'Hadir';
+        if (curStatus === 'Hadir') countHadir++;
+        else if (curStatus === 'Izin') countIzin++;
+        else if (curStatus === 'Sakit') countSakit++;
+
+        const tagClass = curStatus === 'Hadir' ? 'tag-hadir' : (curStatus === 'Izin' ? 'tag-izin' : (curStatus === 'Sakit' ? 'tag-sakit' : 'tag-alpa'));
+
+        return `
+          <div class="roster-card" id="roster-row-${st.NIS}">
+            <div class="roster-info">
+              <div class="roster-avatar">👤</div>
+              <div>
+                <div class="roster-name">${i + 1}. ${st['Nama Siswa']}</div>
+                <div class="roster-nis">NIS: ${st.NIS}</div>
+              </div>
+            </div>
+            <button class="status-tag-toggle ${tagClass}" onclick="cycleStudentStatus('${st.NIS}', this)">
+              ${curStatus}
+            </button>
+          </div>
+        `;
+      }).join('');
+
+      updateAttendanceStats(filtered.length, countHadir, countIzin, countSakit);
+    }
+
+    function cycleStudentStatus(nis, btn) {
+      const current = btn.innerText.trim();
+      let next = 'Hadir';
+      if (current === 'Hadir') next = 'Izin';
+      else if (current === 'Izin') next = 'Sakit';
+      else if (current === 'Sakit') next = 'Alpa';
+      else next = 'Hadir';
+
+      btn.innerText = next;
+      btn.className = 'status-tag-toggle ' + (next === 'Hadir' ? 'tag-hadir' : (next === 'Izin' ? 'tag-izin' : (next === 'Sakit' ? 'tag-sakit' : 'tag-alpa')));
+
+      if (!activeAttendanceRecords[nis]) {
+        activeAttendanceRecords[nis] = { status: next, idAbsen: null };
+      } else {
+        activeAttendanceRecords[nis].status = next;
+      }
+
+      // Hitung ulang statistik
+      recalcStats();
+    }
+
+    function recalcStats() {
+      const btns = document.querySelectorAll('#roster-container .status-tag-toggle');
+      let hadir = 0, izin = 0, sakit = 0;
+      btns.forEach(b => {
+        const txt = b.innerText.trim();
+        if (txt === 'Hadir') hadir++;
+        else if (txt === 'Izin') izin++;
+        else if (txt === 'Sakit') sakit++;
+      });
+      updateAttendanceStats(btns.length, hadir, izin, sakit);
+    }
+
+    function updateAttendanceStats(total, hadir, izin, sakit) {
+      document.getElementById('stat-total').innerText = total;
+      document.getElementById('stat-hadir').innerText = hadir;
+      document.getElementById('stat-izin').innerText = izin;
+      document.getElementById('stat-sakit').innerText = sakit;
+    }
+
+    function handleSearchStudent(val) {
+      const selClass = document.getElementById('absen-select-class');
+      const selectedClassVal = selClass ? selClass.value : '';
+      const classStudents = dbStudents.filter(s => s['ID Kelas'] === selectedClassVal || s['Nama Kelas'] === selectedClassVal);
+      renderAttendanceRoster(classStudents, val);
+    }
+
+    // SIMPAN ABSENSI KE TABEL SUPABASE "Attendance"
+    async function saveAttendanceToSupabase() {
+      const selClass = document.getElementById('absen-select-class');
+      const selSubj = document.getElementById('absen-select-subject');
+      const selectedClassVal = selClass ? selClass.value : '';
+      const selectedSubjVal = selSubj ? selSubj.value : '';
+
+      if (!selectedClassVal) {
+        showToast('Pilih kelas terlebih dahulu!');
+        return;
+      }
+
+      const classObj = dbClasses.find(c => c['ID Kelas'] === selectedClassVal || c['Nama Kelas'] === selectedClassVal) || {};
+      const subjObj = dbSubjects.find(s => s['ID Mapel'] === selectedSubjVal) || {};
+      const classStudents = dbStudents.filter(s => s['ID Kelas'] === selectedClassVal || s['Nama Kelas'] === selectedClassVal);
+
+      if (classStudents.length === 0) {
+        showToast('Tidak ada siswa di kelas ini untuk disimpan.');
+        return;
+      }
+
+      const btn = document.getElementById('btn-save-absen');
+      btn.innerText = '⏳ Menyimpan ke Database...';
+      btn.disabled = true;
+
+      try {
+        const now = new Date();
+        const todayISO = now.toISOString().split('T')[0];
+        const hariIni = HARI_INDO[now.getDay()];
+        const jamSekarang = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+
+        const rowsToInsert = classStudents.map(st => {
+          const statusVal = activeAttendanceRecords[st.NIS] ? activeAttendanceRecords[st.NIS].status : 'Hadir';
+          const newId = 'ABS' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substr(2, 4).toUpperCase();
+
+          return {
+            'ID Absen': newId,
+            'Tanggal': todayISO,
+            'Hari': hariIni,
+            'ID Kelas': classObj['ID Kelas'] || selectedClassVal,
+            'Nama Kelas': classObj['Nama Kelas'] || selectedClassVal,
+            'ID Guru': currentUser.id || '',
+            'Nama Guru': currentUser.name || '',
+            'ID Mapel': subjObj['ID Mapel'] || '',
+            'Nama Mapel': subjObj['Nama Mapel'] || '',
+            'NIS Siswa': st.NIS,
+            'Nama Siswa': st['Nama Siswa'],
+            'Status': statusVal,
+            'Keterangan': '',
+            'Jam Absen': jamSekarang,
+            'Diubah Oleh': currentUser.name || 'Guru',
+            'Waktu Ubah': now.toISOString()
+          };
+        });
+
+        // Hapus presensi hari ini untuk mapel/kelas tersebut jika ada, lalu insert baru agar tidak ganda
+        if (subjObj['ID Mapel']) {
+          await supabaseClient.from('Attendance').delete()
+            .eq('Tanggal', todayISO)
+            .eq('ID Kelas', classObj['ID Kelas'] || selectedClassVal)
+            .eq('ID Mapel', subjObj['ID Mapel']);
+        }
+
+        const { error } = await supabaseClient.from('Attendance').insert(rowsToInsert);
+        if (error) throw error;
+
+        showToast('✅ Berhasil! Data absensi tersimpan ke Supabase.');
+      } catch (err) {
+        console.error('Gagal menyimpan absensi:', err);
+        showToast('Gagal menyimpan: ' + err.message);
+      } finally {
+        btn.innerText = '💾 Simpan Presensi ke Database Supabase';
+        btn.disabled = false;
+      }
+    }
+
+    // ============================================================
+    // RENDER: PENGUMUMAN, UJIAN & NILAI
+    // ============================================================
+    function renderAnnouncements() {
+      const container = document.getElementById('announcement-list-container');
+      if (!container) return;
+
+      if (dbAnnouncements.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state-card">
+            <span>📢</span>
+            <p>Belum ada pengumuman aktif dari sekolah.</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Update widget di Beranda dengan pengumuman terbaru
+      const latest = dbAnnouncements[0];
+      document.getElementById('home-announcement-title').innerText = latest.Judul || 'Pengumuman Sekolah';
+      document.getElementById('home-announcement-sub').innerText = (latest.Konten || '').slice(0, 45) + '...';
+
+      container.innerHTML = dbAnnouncements.map(a => `
+        <div class="class-item-card" style="margin-bottom:10px;">
+          <div style="font-size:24px;">📢</div>
+          <div style="flex:1;">
+            <div style="font-size:13px; font-weight:800; color:#0f172a;">${a.Judul}</div>
+            <div style="font-size:10px; color:#64748b; margin-top:2px;">Kategori: ${a.Kategori || 'Umum'} • Prioritas: ${a.Prioritas || 'Normal'}</div>
+            <div style="font-size:12px; color:#475569; margin-top:6px; line-height:1.4;">${a.Konten || ''}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderExams() {
+      const container = document.getElementById('exams-container');
+      if (!container) return;
+
+      if (dbExams.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state-card">
+            <span>📝</span>
+            <p>Belum ada jadwal ujian di database 'Exams'.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = dbExams.map(ex => `
+        <div class="class-item-card" style="flex-direction:column; align-items:flex-start; margin-bottom:10px;">
+          <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+            <div style="font-size:14px; font-weight:800; color:#0f172a;">${ex['Judul Ujian']}</div>
+            <span style="font-size:11px; background:#dcfce7; color:#15803d; padding:3px 8px; border-radius:8px; font-weight:800;">${ex.Status || 'Active'}</span>
+          </div>
+          <div style="font-size:12px; color:#64748b; margin-top:4px;">
+            ${ex['Nama Mapel'] || '-'} • ${ex['Nama Kelas'] || 'Semua Kelas'}
+          </div>
+          <div style="font-size:11px; color:#0284c7; font-weight:700; margin-top:4px;">
+            🔑 Token CBT: <strong style="letter-spacing:1px; background:#e0f2fe; padding:2px 6px; border-radius:6px;">${ex.Token || '-'}</strong>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderGrades() {
+      const container = document.getElementById('grades-container');
+      if (!container) return;
+
+      if (dbGrades.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state-card">
+            <span>📊</span>
+            <p>Belum ada data nilai di database 'Grades'.</p>
+          </div>
+        `;
+        return;
+      }
+
+      let sum = 0, max = -Infinity, min = Infinity;
+      dbGrades.forEach(g => {
+        const n = Number(g.Nilai || g['Nilai Akhir'] || 0);
+        sum += n;
+        if (n > max) max = n;
+        if (n < min) min = n;
+      });
+
+      const avg = (sum / dbGrades.length).toFixed(1);
+      document.getElementById('grade-avg').innerText = avg;
+      document.getElementById('grade-max').innerText = max === -Infinity ? '-' : max;
+      document.getElementById('grade-min').innerText = min === Infinity ? '-' : min;
+
+      container.innerHTML = dbGrades.slice(0, 10).map(g => `
+        <div style="display:flex; justify-content:space-between; align-items:center; background:white; padding:12px 16px; border-radius:14px; margin-bottom:8px; border:1px solid #f1f5f9; box-shadow:var(--shadow-soft);">
+          <div>
+            <div style="font-size:13px; font-weight:800; color:#0f172a;">${g['Nama Siswa'] || 'Siswa'}</div>
+            <div style="font-size:11px; color:#64748b;">${g['Nama Mapel'] || g['Judul Ujian'] || 'Ujian'}</div>
+          </div>
+          <span style="font-size:15px; font-weight:800; color:#0284c7;">${g.Nilai || g['Nilai Akhir'] || '-'}</span>
+        </div>
+      `).join('');
+    }
+
+    // ============================================================
+    // NAVIGASI & CLOCK
+    // ============================================================
+    function navTo(screenName) {
+      document.querySelectorAll('.app-screen').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+      const targetScreen = document.getElementById(`screen-${screenName}`);
+      if (targetScreen) targetScreen.classList.add('active');
+
+      const activeBtn = document.getElementById(`nav-btn-${screenName}`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      window.scrollTo(0, 0);
+    }
+
+    function updateClock() {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('system-clock').innerText = `${h}:${m}`;
+      
+      const tanggalFormat = `${HARI_INDO[now.getDay()]}, ${now.getDate()} ${BULAN_INDO[now.getMonth()]} ${now.getFullYear()}`;
+      const tLabel = document.getElementById('absen-today-str');
+      if (tLabel) tLabel.innerText = tanggalFormat;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Inisialisasi awal saat halaman selesai dimuat
+    window.addEventListener('DOMContentLoaded', () => {
+      initSupabase();
+
+      // Cek apakah ada sesi login tersimpan
+      const savedUser = localStorage.getItem('smandum_active_user');
+      if (savedUser) {
+        try {
+          currentUser = JSON.parse(savedUser);
+          currentRole = currentUser.role || 'guru';
+          loginSuccess();
+        } catch (e) {
+          localStorage.removeItem('smandum_active_user');
+        }
+      }
+    });
+  </script>
+</body>
+</html>

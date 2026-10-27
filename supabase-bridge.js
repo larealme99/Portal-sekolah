@@ -59,6 +59,10 @@
     },
 
     // --- AUTHENTICATION & USERS ---
+    async login(username, password) {
+      return this.loginUser(username, password);
+    },
+
     async loginUser(username, password) {
       try {
         const sb = getClient();
@@ -198,13 +202,89 @@
       return await this.rejectUser(id);
     },
 
+    async _loadGuruMeta() {
+      let metaMap = {};
+      try {
+        if (typeof localStorage !== 'undefined') {
+          const local = localStorage.getItem('portal_guru_extra_metadata');
+          if (local) metaMap = JSON.parse(local) || {};
+        }
+      } catch (e) { }
+
+      const sb = getClient();
+      if (sb) {
+        try {
+          const { data, error } = await sb.from('Settings').select('Value').eq('Key', 'guru_extra_metadata').maybeSingle();
+          if (!error && data && data.Value) {
+            const parsed = JSON.parse(data.Value);
+            if (parsed && typeof parsed === 'object') {
+              metaMap = Object.assign({}, metaMap, parsed);
+              try {
+                if (typeof localStorage !== 'undefined') {
+                  localStorage.setItem('portal_guru_extra_metadata', JSON.stringify(metaMap));
+                }
+              } catch (e) { }
+            }
+          }
+        } catch (e) { }
+      }
+      return metaMap;
+    },
+
+    async _saveGuruMeta(userId, newMeta) {
+      if (!userId) return;
+      try {
+        const metaMap = await this._loadGuruMeta();
+        metaMap[userId] = Object.assign({}, metaMap[userId] || {}, newMeta);
+        try {
+          if (typeof localStorage !== 'undefined') {
+            localStorage.setItem('portal_guru_extra_metadata', JSON.stringify(metaMap));
+          }
+        } catch (e) { }
+        const sb = getClient();
+        if (sb) {
+          await sb.from('Settings').upsert([{
+            'Key': 'guru_extra_metadata',
+            'Value': JSON.stringify(metaMap),
+            'Label': 'Metadata Guru',
+            'Keterangan': 'Jenis Kelamin & Jenis PTK Guru',
+            'Diupdate': new Date().toISOString()
+          }], { onConflict: 'Key' });
+        }
+      } catch (e) {
+        console.warn('Gagal sinkron guru_extra_metadata:', e);
+      }
+    },
+
     async getUsers() {
       try {
         const sb = getClient();
         if (!sb) return { success: false, message: 'Supabase client belum siap.', data: [] };
         const { data, error } = await sb.from('Users').select('*').order('Nama Lengkap', { ascending: true });
         if (error) throw error;
-        const filtered = (data || []).filter(u => u.Role !== 'admin');
+        const metaMap = await this._loadGuruMeta();
+        const filtered = (data || []).filter(u => (u.Role || '').toLowerCase() !== 'admin').map(u => {
+          const meta = metaMap[u.ID] || metaMap[u.Username] || {};
+          const fullObj = Object.assign({}, u, {
+            id: u.ID,
+            ID: u.ID,
+            username: u.Username,
+            Username: u.Username,
+            namaLengkap: u['Nama Lengkap'] || u.Username,
+            'Nama Lengkap': u['Nama Lengkap'] || u.Username,
+            role: (u.Role || 'guru').toLowerCase(),
+            Role: u.Role || 'guru',
+            nip: u.NIP || '',
+            NIP: u.NIP || '',
+            telepon: u.Telepon || '',
+            Telepon: u.Telepon || '',
+            email: u.Email || '',
+            Email: u.Email || '',
+            'Jenis Kelamin': u['Jenis Kelamin'] || meta['Jenis Kelamin'] || '',
+            'Jenis PTK': u['Jenis PTK'] || meta['Jenis PTK'] || 'Pendidik'
+          });
+          return fullObj;
+        });
         return { success: true, data: filtered };
       } catch (e) {
         console.error('[getUsers error]:', e);
@@ -218,7 +298,29 @@
         if (!sb) return { success: false, message: 'Supabase client belum siap.', data: [] };
         const { data, error } = await sb.from('Users').select('*');
         if (error) throw error;
-        return { success: true, data: data || [] };
+        const metaMap = await this._loadGuruMeta();
+        const merged = (data || []).map(u => {
+          const meta = metaMap[u.ID] || metaMap[u.Username] || {};
+          return Object.assign({}, u, {
+            id: u.ID,
+            ID: u.ID,
+            username: u.Username,
+            Username: u.Username,
+            namaLengkap: u['Nama Lengkap'] || u.Username,
+            'Nama Lengkap': u['Nama Lengkap'] || u.Username,
+            role: (u.Role || 'guru').toLowerCase(),
+            Role: u.Role || 'guru',
+            nip: u.NIP || '',
+            NIP: u.NIP || '',
+            telepon: u.Telepon || '',
+            Telepon: u.Telepon || '',
+            email: u.Email || '',
+            Email: u.Email || '',
+            'Jenis Kelamin': u['Jenis Kelamin'] || meta['Jenis Kelamin'] || '',
+            'Jenis PTK': u['Jenis PTK'] || meta['Jenis PTK'] || 'Pendidik'
+          });
+        });
+        return { success: true, data: merged };
       } catch (e) {
         console.error('[getAllUsers error]:', e);
         return { success: false, message: e.message || 'Gagal memuat data pengguna.', data: [] };
@@ -231,7 +333,16 @@
         if (!sb) return { success: false, message: 'Supabase client belum siap.' };
         const { data, error } = await sb.from('Users').select('*').eq('ID', userId);
         if (error) throw error;
-        if (data && data.length > 0) return { success: true, data: data[0], user: data[0] };
+        if (data && data.length > 0) {
+          const u = data[0];
+          const metaMap = await this._loadGuruMeta();
+          const meta = metaMap[u.ID] || metaMap[u.Username] || {};
+          const result = Object.assign({}, u, {
+            'Jenis Kelamin': u['Jenis Kelamin'] || meta['Jenis Kelamin'] || '',
+            'Jenis PTK': u['Jenis PTK'] || meta['Jenis PTK'] || 'Pendidik'
+          });
+          return { success: true, data: result, user: result };
+        }
         return { success: false, message: 'User tidak ditemukan.' };
       } catch (e) {
         return { success: false, message: e.message };
@@ -250,7 +361,10 @@
 
         const newId = generateId('USR');
         const now = new Date().toISOString();
-        const { error } = await sb.from('Users').insert([{
+        const jk = data.jenisKelamin || data['Jenis Kelamin'] || '';
+        const ptk = data.jenisPtk || data['Jenis PTK'] || 'Pendidik';
+
+        const row = {
           'ID': newId,
           'Username': data.username,
           'Password': data.password,
@@ -258,39 +372,122 @@
           'Email': data.email || '',
           'Role': data.role || 'guru',
           'Status': data.status || 'active',
-          'Foto Profil URL': data.fotoProfil || '',
+          'Foto Profil URL': data.fotoProfilUrl || data.fotoProfil || data.foto || '',
           'Tanggal Daftar': now,
           'Tanggal Approve': now,
           'NIP': data.nip || '',
           'Telepon': data.telepon || '',
           'Alamat': data.alamat || ''
-        }]);
-        if (error) throw error;
+        };
+
+        const fullRow = Object.assign({}, row, {
+          'Jenis Kelamin': jk,
+          'Jenis PTK': ptk
+        });
+
+        let insertError = null;
+        try {
+          const { error } = await sb.from('Users').insert([fullRow]);
+          if (error) insertError = error;
+        } catch (e) {
+          insertError = e;
+        }
+
+        if (insertError) {
+          const errMsg = String(insertError.message || insertError.details || '');
+          if (errMsg.includes('Jenis Kelamin') || errMsg.includes('Jenis PTK') || errMsg.includes('schema cache') || errMsg.includes('PGRST204') || insertError.code === 'PGRST204') {
+            const { error: retryError } = await sb.from('Users').insert([row]);
+            if (retryError) throw retryError;
+          } else {
+            throw insertError;
+          }
+        }
+
+        if (jk || ptk) {
+          await this._saveGuruMeta(newId, {
+            'Jenis Kelamin': jk,
+            'Jenis PTK': ptk
+          });
+          if (data.username) {
+            await this._saveGuruMeta(data.username, {
+              'Jenis Kelamin': jk,
+              'Jenis PTK': ptk
+            });
+          }
+        }
+
         return { success: true, message: 'Guru berhasil ditambahkan.' };
       } catch (e) {
         console.error('[adminCreateUser error]:', e);
-        return { success: false, message: e.message };
+        return { success: false, message: e.message || 'Gagal menambahkan guru.' };
       }
     },
 
     async adminUpdateUser(userId, updateData) {
       try {
         const sb = getClient();
+        if (!sb) return { success: false, message: 'Supabase client belum siap.' };
+
         const updateFields = {};
         if (updateData.namaLengkap !== undefined) updateFields['Nama Lengkap'] = updateData.namaLengkap;
+        if (updateData.username !== undefined) updateFields['Username'] = updateData.username;
         if (updateData.email !== undefined) updateFields['Email'] = updateData.email;
         if (updateData.role !== undefined) updateFields['Role'] = updateData.role;
         if (updateData.status !== undefined) updateFields['Status'] = updateData.status;
         if (updateData.nip !== undefined) updateFields['NIP'] = updateData.nip;
         if (updateData.telepon !== undefined) updateFields['Telepon'] = updateData.telepon;
         if (updateData.alamat !== undefined) updateFields['Alamat'] = updateData.alamat;
+        if (updateData.fotoProfilUrl !== undefined) updateFields['Foto Profil URL'] = updateData.fotoProfilUrl;
+        else if (updateData.fotoProfil !== undefined) updateFields['Foto Profil URL'] = updateData.fotoProfil;
+        else if (updateData.foto !== undefined) updateFields['Foto Profil URL'] = updateData.foto;
+        else if (updateData['Foto Profil URL'] !== undefined) updateFields['Foto Profil URL'] = updateData['Foto Profil URL'];
         if (updateData.password) updateFields['Password'] = updateData.password;
+        if (updateData.newPassword) updateFields['Password'] = updateData.newPassword;
 
-        const { error } = await sb.from('Users').update(updateFields).eq('ID', userId);
-        if (error) throw error;
-        return { success: true, message: 'User berhasil diperbarui.' };
+        // Extra metadata (Jenis Kelamin & Jenis PTK)
+        const extraMeta = {};
+        const jk = updateData.jenisKelamin !== undefined ? updateData.jenisKelamin : updateData['Jenis Kelamin'];
+        if (jk !== undefined) extraMeta['Jenis Kelamin'] = jk;
+        const ptk = updateData.jenisPtk !== undefined ? updateData.jenisPtk : updateData['Jenis PTK'];
+        if (ptk !== undefined) extraMeta['Jenis PTK'] = ptk;
+
+        // Coba simpan langsung ke tabel Users dengan extra fields (jika kolom sudah ada di Supabase)
+        const fullFields = Object.assign({}, updateFields);
+        if (jk !== undefined) fullFields['Jenis Kelamin'] = jk;
+        if (ptk !== undefined) fullFields['Jenis PTK'] = ptk;
+
+        let updateError = null;
+        try {
+          const { error } = await sb.from('Users').update(fullFields).eq('ID', userId);
+          if (error) updateError = error;
+        } catch (e) {
+          updateError = e;
+        }
+
+        // Jika gagal karena kolom belum ada di schema Users (PGRST204 / schema cache error),
+        // update kolom standar dan simpan extraMeta ke Settings
+        if (updateError) {
+          const errMsg = String(updateError.message || updateError.details || '');
+          if (errMsg.includes('Jenis Kelamin') || errMsg.includes('Jenis PTK') || errMsg.includes('schema cache') || errMsg.includes('PGRST204') || updateError.code === 'PGRST204') {
+            const { error: retryError } = await sb.from('Users').update(updateFields).eq('ID', userId);
+            if (retryError) throw retryError;
+          } else {
+            throw updateError;
+          }
+        }
+
+        // Selalu simpan metadata extra ke Settings agar sinkron dan persisten
+        if (Object.keys(extraMeta).length > 0) {
+          await this._saveGuruMeta(userId, extraMeta);
+          if (updateData.username) {
+            await this._saveGuruMeta(updateData.username, extraMeta);
+          }
+        }
+
+        return { success: true, message: 'Data guru berhasil diperbarui.' };
       } catch (e) {
-        return { success: false, message: e.message };
+        console.error('[adminUpdateUser error]:', e);
+        return { success: false, message: e.message || 'Gagal memperbarui data guru.' };
       }
     },
 
@@ -345,16 +542,44 @@
     },
 
     // --- SETTINGS (PENGATURAN SEKOLAH) ---
+    getDefaultSettings() {
+      return {
+        school_name: 'SMAN 12 Muna Barat',
+        school_address: 'Jl. Poros Lagadi-Tondasi, Muna Barat',
+        school_npsn: '69989028',
+        school_phone: '081234567890',
+        school_email: 'info@sman12munabarat.sch.id',
+        school_accreditation: 'A',
+        academic_year: '2024/2025',
+        semester: 'Ganjil',
+        principal_name: 'Drs. H. Kepala Sekolah, M.Pd',
+        principal_nip: '196001011980031001',
+        spmb_active: 'true',
+        spmb_disabled_notice: '',
+        footer_text: '© 2024 SMAN 12 Muna Barat. Hak Cipta Dilindungi.',
+        school_logo_url: 'logo-transparent.png',
+        school_background_url: 'landing-bg.jpg'
+      };
+    },
+
     async getSettings() {
       try {
         const sb = getClient();
-        const { data, error } = await sb.from('Settings').select('*');
+        if (!sb) {
+          return { success: true, data: this.getDefaultSettings() };
+        }
+        // Optimasi: Jangan download blob data SPMB (7MB) atau materi (500KB) di startup!
+        const { data, error } = await sb.from('Settings')
+          .select('Key, Value')
+          .not('Key', 'in', '("app_spmb_registrations","app_learnings_data","app_learning_discussions_data","app_learning_attendees_data")');
+        
         if (error) throw error;
-        const settings = {};
+        const settings = this.getDefaultSettings();
         (data || []).forEach(row => { settings[row.Key] = row.Value; });
         return { success: true, data: settings };
       } catch (e) {
-        return { success: false, message: e.message };
+        console.warn('[getSettings] Error, using local defaults:', e);
+        return { success: true, data: this.getDefaultSettings() };
       }
     },
 
@@ -513,12 +738,22 @@
       return { success: !error, data: data || [] };
     },
 
-    async getSubjectsByGuru(guruId) {
+    async getSubjectsByGuru(guruId, guruNama) {
       const sb = getClient();
       let query = sb.from('Subjects').select('*');
-      if (guruId) query = query.eq('ID Guru', guruId);
       const { data, error } = await query;
-      return { success: !error, data: data || [] };
+      if (error) return { success: false, data: [] };
+      let list = data || [];
+      if (guruId || guruNama) {
+        const gId = String(guruId || '').trim().toLowerCase();
+        const gName = String(guruNama || '').trim().toLowerCase();
+        list = list.filter(s => {
+          const sId = String(s['ID Guru'] || '').trim().toLowerCase();
+          const sName = String(s['Nama Guru'] || '').trim().toLowerCase();
+          return (gId && sId === gId) || (gName && (sName === gName || sName.includes(gName) || gName.includes(sName)));
+        });
+      }
+      return { success: true, data: list };
     },
 
     async createSubject(data) {
@@ -833,7 +1068,7 @@
         let exam = exams.find(e => {
           const id = (e['ID Ujian'] || '').toString().trim().toUpperCase();
           const idNorm = id.replace(/[\s\-_]/g, '');
-          const tok = (e['Token'] || '').toString().trim().toUpperCase();
+          const tok = (e['Token'] || e.token || '').toString().trim().toUpperCase();
           const tokNorm = tok.replace(/[\s\-_]/g, '');
           const jud = (e['Judul Ujian'] || '').toString().trim().toUpperCase();
           return id === tokenClean || idNorm === tokenNorm || (tok && (tok === tokenClean || tokNorm === tokenNorm)) || (jud && jud === tokenClean);
@@ -920,44 +1155,81 @@
 
         const nilai = totalPG > 0 ? Math.round((benarPG / totalPG) * 100) : 100;
         const now = new Date().toISOString();
-        const newGradeId = generateId('NLI');
+        const effectiveNis = (nisSiswa || namaSiswa || 'SISWA').trim();
+        const effectiveNama = (namaSiswa || nisSiswa || 'Siswa').trim();
 
-        // Simpan nilai
-        await sb.from('Grades').insert([{
-          'ID Nilai': newGradeId,
+        // 1. Simpan atau perbarui nilai ke tabel Grades
+        const { data: existingGrades } = await sb.from('Grades').select('ID Nilai').eq('ID Ujian', examId);
+        const matchGrade = (existingGrades || []).find(g => {
+          const gNis = (g['NIS Siswa'] || '').trim().toLowerCase();
+          const gNama = (g['Nama Siswa'] || '').trim().toLowerCase();
+          return (effectiveNis && gNis === effectiveNis.toLowerCase()) || (effectiveNama && gNama === effectiveNama.toLowerCase());
+        });
+
+        const gradePayload = {
           'ID Ujian': examId,
           'Judul Ujian': exam['Judul Ujian'] || '',
           'ID Mapel': exam['ID Mapel'] || '',
           'Nama Mapel': exam['Nama Mapel'] || '',
           'ID Kelas': exam['ID Kelas'] || '',
           'Nama Kelas': exam['Nama Kelas'] || '',
-          'NIS Siswa': nisSiswa || namaSiswa,
-          'Nama Siswa': namaSiswa,
+          'NIS Siswa': effectiveNis,
+          'Nama Siswa': effectiveNama,
           'Nilai': nilai,
           'Jumlah Benar': benarPG,
           'Jumlah Salah': totalPG - benarPG,
           'Total Soal': totalSoal,
-          'Waktu Mulai': now,
           'Waktu Selesai': now,
-          'Durasi Mengerjakan': '',
           'ID Guru': exam['ID Guru'] || '',
           'Nama Guru': exam['Nama Guru'] || '',
-          'Catatan Guru': '',
           'Nilai Akhir': nilai,
-          'Tanggal Input': now,
           'Status': statusOverride || 'selesai'
-        }]);
+        };
 
-        // Update sesi ujian
-        await sb.from('ExamSessions').update({
-          'Status Sesi': statusOverride || 'completed',
-          'Waktu Selesai': now,
-          'Jawaban JSON': JSON.stringify(answersMap || {})
-        }).eq('ID Ujian', examId).eq('NIS Siswa', nisSiswa || namaSiswa);
+        if (matchGrade) {
+          await sb.from('Grades').update(gradePayload).eq('ID Nilai', matchGrade['ID Nilai']);
+        } else {
+          gradePayload['ID Nilai'] = generateId('NLI');
+          gradePayload['Waktu Mulai'] = now;
+          gradePayload['Tanggal Input'] = now;
+          await sb.from('Grades').insert([gradePayload]);
+        }
+
+        // 2. Simpan atau perbarui sesi ujian & lembar jawaban (Jawaban JSON) di ExamSessions
+        const { data: existingSessions } = await sb.from('ExamSessions').select('ID Sesi, NIS Siswa, Nama Siswa').eq('ID Ujian', examId);
+        const matchSess = (existingSessions || []).find(s => {
+          const sNis = (s['NIS Siswa'] || '').trim().toLowerCase();
+          const sNama = (s['Nama Siswa'] || '').trim().toLowerCase();
+          return (effectiveNis && sNis === effectiveNis.toLowerCase()) || (effectiveNama && sNama === effectiveNama.toLowerCase());
+        });
+
+        const jsonAnswers = JSON.stringify(answersMap || {});
+        if (matchSess) {
+          await sb.from('ExamSessions').update({
+            'Status Sesi': statusOverride || 'finished',
+            'Waktu Selesai': now,
+            'Jawaban JSON': jsonAnswers
+          }).eq('ID Sesi', matchSess['ID Sesi']);
+        } else {
+          const newSessId = generateId('SES');
+          await sb.from('ExamSessions').insert([{
+            'ID Sesi': newSessId,
+            'ID Ujian': examId,
+            'Judul Ujian': exam['Judul Ujian'] || '',
+            'ID Kelas': exam['ID Kelas'] || '',
+            'Nama Kelas': exam['Nama Kelas'] || '',
+            'NIS Siswa': effectiveNis,
+            'Nama Siswa': effectiveNama,
+            'Status Sesi': statusOverride || 'finished',
+            'Waktu Mulai': now,
+            'Waktu Selesai': now,
+            'Jawaban JSON': jsonAnswers
+          }]);
+        }
 
         return {
           success: true,
-          message: 'Jawaban ujian berhasil dikumpulkan!',
+          message: 'Jawaban ujian berhasil dikumpulkan dan tersimpan rapi!',
           nilai: nilai,
           benar: benarPG,
           total: totalSoal
@@ -1019,21 +1291,76 @@
 
         const sessions = sessRes.data || [];
         const grades = gradeRes.data || [];
+        const results = [];
+        const processedKeys = new Set();
 
-        const results = sessions.map(s => {
-          const sNis = (s['NIS Siswa'] || '').toLowerCase();
-          const sNama = (s['Nama Siswa'] || '').toLowerCase();
+        // 1. Gabungkan dari ExamSessions
+        sessions.forEach(s => {
+          const sNis = (s['NIS Siswa'] || '').trim();
+          const sNama = (s['Nama Siswa'] || '').trim();
+          const key = (sNis || sNama).toLowerCase();
+          processedKeys.add(key);
+
           const g = grades.find(item => {
-            const gNis = (item['NIS Siswa'] || '').toLowerCase();
-            const gNama = (item['Nama Siswa'] || '').toLowerCase();
-            return (sNis && gNis === sNis) || (sNama && gNama === sNama);
+            const gNis = (item['NIS Siswa'] || '').trim().toLowerCase();
+            const gNama = (item['Nama Siswa'] || '').trim().toLowerCase();
+            return (sNis && gNis === sNis.toLowerCase()) || (sNama && gNama === sNama.toLowerCase());
           });
-          return {
-            ...s,
+
+          const nilaiVal = g ? (g['Nilai'] !== undefined ? g['Nilai'] : '-') : '-';
+          const nilaiAkhirVal = g ? (g['Nilai Akhir'] !== undefined && g['Nilai Akhir'] !== '' ? g['Nilai Akhir'] : nilaiVal) : nilaiVal;
+          const statusNilaiVal = g ? ((g['Status'] === 'final' || g['Status'] === 'selesai') ? 'final' : 'draft') : 'draft';
+          const catatanVal = g ? (g['Catatan Guru'] || '') : '';
+
+          results.push({
+            idSesi: s['ID Sesi'] || '',
+            nisSiswa: sNis,
+            namaSiswa: sNama,
+            nilai: nilaiVal,
+            nilaiAkhir: nilaiAkhirVal,
+            statusSesi: s['Status Sesi'] || 'finished',
+            statusNilai: statusNilaiVal,
+            catatanGuru: catatanVal,
+            'ID Sesi': s['ID Sesi'] || '',
+            'NIS Siswa': sNis,
+            'Nama Siswa': sNama,
+            'Status Sesi': s['Status Sesi'] || 'finished',
             gradeData: g || null,
-            nilai: g ? g['Nilai'] : '-'
-          };
+            ...s
+          });
         });
+
+        // 2. Tambahkan siswa yang ada di Grades tapi belum ada di ExamSessions
+        grades.forEach(g => {
+          const gNis = (g['NIS Siswa'] || '').trim();
+          const gNama = (g['Nama Siswa'] || '').trim();
+          const key = (gNis || gNama).toLowerCase();
+          if (!processedKeys.has(key)) {
+            processedKeys.add(key);
+            const nilaiVal = g['Nilai'] !== undefined ? g['Nilai'] : '-';
+            const nilaiAkhirVal = g['Nilai Akhir'] !== undefined && g['Nilai Akhir'] !== '' ? g['Nilai Akhir'] : nilaiVal;
+            const statusNilaiVal = (g['Status'] === 'final' || g['Status'] === 'selesai') ? 'final' : 'draft';
+
+            results.push({
+              idSesi: '',
+              nisSiswa: gNis,
+              namaSiswa: gNama,
+              nilai: nilaiVal,
+              nilaiAkhir: nilaiAkhirVal,
+              statusSesi: 'finished',
+              statusNilai: statusNilaiVal,
+              catatanGuru: g['Catatan Guru'] || '',
+              'ID Sesi': '',
+              'NIS Siswa': gNis,
+              'Nama Siswa': gNama,
+              'Status Sesi': 'finished',
+              gradeData: g
+            });
+          }
+        });
+
+        // Urutkan berdasarkan nama siswa
+        results.sort((a, b) => (a.namaSiswa || '').localeCompare(b.namaSiswa || ''));
 
         return { success: true, data: results };
       } catch (e) {
@@ -1044,14 +1371,30 @@
     async getStudentAnswerSheet(examId, nisSiswa, namaSiswa, idSesi) {
       try {
         const sb = getClient();
-        let query = sb.from('ExamSessions').select('*').eq('ID Ujian', examId);
-        if (idSesi) query = query.eq('ID Sesi', idSesi);
-        const { data: sessList } = await query;
+        const { data: allSessions } = await sb.from('ExamSessions').select('*').eq('ID Ujian', examId);
+        const sessions = allSessions || [];
 
-        const session = sessList && sessList[0] ? sessList[0] : null;
+        let session = null;
+        if (idSesi) {
+          session = sessions.find(s => s['ID Sesi'] === idSesi);
+        }
+        if (!session && nisSiswa) {
+          const targetNis = String(nisSiswa).trim().toLowerCase();
+          session = sessions.find(s => (s['NIS Siswa'] || '').trim().toLowerCase() === targetNis);
+        }
+        if (!session && namaSiswa) {
+          const targetNama = String(namaSiswa).trim().toLowerCase();
+          session = sessions.find(s => (s['Nama Siswa'] || '').trim().toLowerCase() === targetNama);
+        }
+        if (!session && sessions.length > 0) {
+          session = sessions[0];
+        }
+
         let answersMap = {};
         if (session && session['Jawaban JSON']) {
-          try { answersMap = JSON.parse(session['Jawaban JSON']); } catch (e) { }
+          try {
+            answersMap = typeof session['Jawaban JSON'] === 'string' ? JSON.parse(session['Jawaban JSON']) : session['Jawaban JSON'];
+          } catch (e) { answersMap = {}; }
         }
 
         const { data: questions } = await sb.from('Questions').select('*').eq('ID Ujian', examId).order('Nomor Soal', { ascending: true });
@@ -1059,7 +1402,7 @@
           success: true,
           session: session,
           questions: questions || [],
-          answers: answersMap
+          answers: answersMap || {}
         };
       } catch (e) {
         return { success: false, message: e.message };
@@ -1072,8 +1415,9 @@
         if (idSesi) await sb.from('ExamSessions').delete().eq('ID Sesi', idSesi);
         if (examId && nisSiswa) {
           await sb.from('Grades').delete().eq('ID Ujian', examId).eq('NIS Siswa', nisSiswa);
+          await sb.from('ExamSessions').delete().eq('ID Ujian', examId).eq('NIS Siswa', nisSiswa);
         }
-        return { success: true, message: 'Submisi siswa berhasil direset.' };
+        return { success: true, message: 'Submisi siswa berhasil direset dan dihapus.' };
       } catch (e) {
         return { success: false, message: e.message };
       }
@@ -1151,11 +1495,61 @@
       }
     },
 
-    async setGradeStatusFinish(id) {
+    async setGradeStatusFinish(examIdOrGradeId, nisSiswa, valNilaiAkhir, valCatatan, namaSiswa) {
       try {
         const sb = getClient();
-        await sb.from('Grades').update({ 'Status': 'selesai' }).eq('ID Nilai', id);
-        return { success: true, message: 'Status nilai berhasil diubah menjadi selesai.' };
+        if (nisSiswa !== undefined && nisSiswa !== null) {
+          const examId = examIdOrGradeId;
+          const { data: grades } = await sb.from('Grades').select('*').eq('ID Ujian', examId);
+          const targetNis = String(nisSiswa || '').trim().toLowerCase();
+          const targetNama = String(namaSiswa || '').trim().toLowerCase();
+
+          const match = (grades || []).find(g => {
+            const gNis = (g['NIS Siswa'] || '').trim().toLowerCase();
+            const gNama = (g['Nama Siswa'] || '').trim().toLowerCase();
+            return (targetNis && gNis === targetNis) || (targetNama && gNama === targetNama);
+          });
+
+          const updateData = {
+            'Status': 'final',
+            'Catatan Guru': valCatatan || ''
+          };
+          if (valNilaiAkhir !== '' && valNilaiAkhir !== undefined && valNilaiAkhir !== '-') {
+            updateData['Nilai Akhir'] = Number(valNilaiAkhir);
+          }
+
+          if (match) {
+            await sb.from('Grades').update(updateData).eq('ID Nilai', match['ID Nilai']);
+          } else {
+            await sb.from('Grades').insert([{
+              'ID Nilai': generateId('NLI'),
+              'ID Ujian': examId,
+              'NIS Siswa': nisSiswa,
+              'Nama Siswa': namaSiswa || '',
+              'Nilai': valNilaiAkhir || 0,
+              'Nilai Akhir': valNilaiAkhir || 0,
+              'Catatan Guru': valCatatan || '',
+              'Status': 'final',
+              'Tanggal Input': new Date().toISOString()
+            }]);
+          }
+
+          // Update ExamSessions status to finished
+          const { data: sessions } = await sb.from('ExamSessions').select('ID Sesi, NIS Siswa, Nama Siswa').eq('ID Ujian', examId);
+          const matchSess = (sessions || []).find(s => {
+            const sNis = (s['NIS Siswa'] || '').trim().toLowerCase();
+            const sNama = (s['Nama Siswa'] || '').trim().toLowerCase();
+            return (targetNis && sNis === targetNis) || (targetNama && sNama === targetNama);
+          });
+          if (matchSess) {
+            await sb.from('ExamSessions').update({ 'Status Sesi': 'finished' }).eq('ID Sesi', matchSess['ID Sesi']);
+          }
+
+          return { success: true, message: 'Status nilai berhasil diubah menjadi FINISH & disimpan rapi!' };
+        } else {
+          await sb.from('Grades').update({ 'Status': 'final' }).eq('ID Nilai', examIdOrGradeId);
+          return { success: true, message: 'Status nilai berhasil diubah menjadi FINISH.' };
+        }
       } catch (e) {
         return { success: false, message: e.message };
       }
@@ -1232,11 +1626,38 @@
     },
 
     // --- ATTENDANCE (ABSENSI) ---
+    // --- ATTENDANCE (ABSENSI) ---
     async saveAttendance(attendanceList) {
       try {
         const sb = getClient();
         const now = new Date();
         const jamAbsen = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+        if (!attendanceList || !attendanceList.length) return { success: false, message: 'Daftar absensi kosong.' };
+
+        function normStatus(s) {
+          const l = String(s || '').trim().toLowerCase();
+          if (l === 'sakit') return 'Sakit';
+          if (l === 'izin') return 'Izin';
+          if (l === 'alpha' || l === 'alpa') return 'Alpa';
+          return 'Hadir';
+        }
+
+        const first = attendanceList[0];
+        const saveDate = first.tanggal;
+        const targetClass = first.idKelas;
+        const targetSubj = first.idMapel;
+
+        // Hapus presensi lama jika menginput ulang tanggal, kelas, dan mapel yang sama agar tidak duplikat
+        if (sb && saveDate && targetClass) {
+          try {
+            let delQuery = sb.from('Attendance').delete().eq('Tanggal', saveDate).eq('ID Kelas', targetClass);
+            if (targetSubj) delQuery = delQuery.eq('ID Mapel', targetSubj);
+            await delQuery;
+          } catch (delErr) {
+            console.warn('[saveAttendance] Note on clearing old rows:', delErr);
+          }
+        }
+
         const rows = (attendanceList || []).map(item => ({
           'ID Absen': generateId('ABS'),
           'Tanggal': item.tanggal,
@@ -1249,44 +1670,149 @@
           'Nama Mapel': item.namaMapel || '',
           'NIS Siswa': item.nisSiswa,
           'Nama Siswa': item.namaSiswa,
-          'Status': item.status,
+          'Status': normStatus(item.status),
           'Keterangan': item.keterangan || '',
           'Jam Absen': jamAbsen,
-          'Diubah Oleh': item.idGuru || '',
+          'Diubah Oleh': item.namaGuru || item.idGuru || 'Guru',
           'Waktu Ubah': now.toISOString()
         }));
 
-        const { error } = await sb.from('Attendance').insert(rows);
+        if (sb) {
+          const { error } = await sb.from('Attendance').insert(rows);
+          if (error) throw error;
+        }
+        return { success: true, message: 'Absensi berhasil disimpan ke database.' };
+      } catch (e) {
+        return { success: false, message: e.message };
+      }
+    },
+
+    async getAttendanceHistory(filter, maybeGuruId, maybeGuruNama) {
+      try {
+        const sb = getClient();
+        if (!sb) return { success: false, message: 'Supabase client belum siap.', data: [] };
+
+        let classId = '';
+        let guruId = '';
+        let guruNama = '';
+        let tanggal = '';
+        if (typeof filter === 'object' && filter !== null) {
+          classId = filter.idKelas || filter.classId || '';
+          guruId = filter.idGuru || filter.guruId || '';
+          guruNama = filter.namaGuru || filter.guruNama || '';
+          tanggal = filter.tanggal || '';
+        } else {
+          classId = filter || '';
+          guruId = maybeGuruId || '';
+          guruNama = maybeGuruNama || '';
+        }
+
+        let query = sb.from('Attendance').select('*');
+        if (tanggal) query = query.eq('Tanggal', tanggal);
+        query = query.order('Tanggal', { ascending: false });
+
+        const { data, error } = await query;
         if (error) throw error;
-        return { success: true, message: 'Absensi berhasil disimpan.' };
+        let rows = data || [];
+
+        if (classId) {
+          const cTarget = String(classId).trim().toLowerCase();
+          rows = rows.filter(r => {
+            const rId = String(r['ID Kelas'] || '').trim().toLowerCase();
+            const rName = String(r['Nama Kelas'] || '').trim().toLowerCase();
+            return rId === cTarget || rName === cTarget;
+          });
+        }
+
+        if (guruId || guruNama) {
+          const gIdTarget = String(guruId || '').trim().toLowerCase();
+          const gNameTarget = String(guruNama || '').trim().toLowerCase();
+          rows = rows.filter(r => {
+            const rId = String(r['ID Guru'] || '').trim().toLowerCase();
+            const rName = String(r['Nama Guru'] || '').trim().toLowerCase();
+            const rBy = String(r['Diubah Oleh'] || '').trim().toLowerCase();
+            const matchId = gIdTarget && (rId === gIdTarget || rBy === gIdTarget);
+            const matchName = gNameTarget && (rName === gNameTarget || rName.includes(gNameTarget) || gNameTarget.includes(rName) || rBy.includes(gNameTarget));
+            const matchCross = (gIdTarget && rName.includes(gIdTarget)) || (gNameTarget && rId === gNameTarget);
+            return matchId || matchName || matchCross;
+          });
+        }
+
+        // Kelompokkan baris berdasarkan sesi presensi (dengan array .siswa)
+        const groupMap = {};
+        rows.forEach(r => {
+          const key = `${r['Tanggal'] || ''}__${r['ID Kelas'] || ''}__${r['ID Mapel'] || ''}__${r['ID Guru'] || ''}`;
+          if (!groupMap[key]) {
+            groupMap[key] = {
+              tanggal: r['Tanggal'],
+              hari: r['Hari'] || getDayName(r['Tanggal']),
+              idKelas: r['ID Kelas'],
+              namaKelas: r['Nama Kelas'],
+              idGuru: r['ID Guru'],
+              namaGuru: r['Nama Guru'],
+              idMapel: r['ID Mapel'],
+              namaMapel: r['Nama Mapel'],
+              siswa: []
+            };
+          }
+          groupMap[key].siswa.push(r);
+        });
+
+        const grouped = Object.values(groupMap);
+        return { success: true, data: grouped };
       } catch (e) {
         return { success: false, message: e.message };
       }
     },
 
-    async getAttendanceHistory(filter) {
+    async getAllAttendanceForPrint(classId, maybeGuruId, maybeGuruNama, startDate, endDate) {
       try {
         const sb = getClient();
-        let query = sb.from('Attendance').select('*');
-        if (filter.idKelas) query = query.eq('ID Kelas', filter.idKelas);
-        if (filter.tanggal) query = query.eq('Tanggal', filter.tanggal);
-        if (filter.idGuru) query = query.eq('ID Guru', filter.idGuru);
-        const { data, error } = await query;
-        return { success: !error, data: data || [] };
-      } catch (e) {
-        return { success: false, message: e.message };
-      }
-    },
+        if (!sb) return { success: false, message: 'Supabase client belum siap.', data: [] };
 
-    async getAllAttendanceForPrint(classId, startDate, endDate) {
-      try {
-        const sb = getClient();
-        let query = sb.from('Attendance').select('*');
-        if (classId) query = query.eq('ID Kelas', classId);
-        if (startDate) query = query.gte('Tanggal', startDate);
-        if (endDate) query = query.lte('Tanggal', endDate);
+        let query = sb.from('Attendance').select('*').order('Tanggal', { ascending: false });
         const { data, error } = await query;
-        return { success: !error, data: data || [] };
+        if (error) throw error;
+        let rows = data || [];
+
+        if (classId) {
+          const cTarget = String(classId).trim().toLowerCase();
+          rows = rows.filter(r => {
+            const rId = String(r['ID Kelas'] || '').trim().toLowerCase();
+            const rName = String(r['Nama Kelas'] || '').trim().toLowerCase();
+            return rId === cTarget || rName === cTarget;
+          });
+        }
+
+        let guruFilter = maybeGuruId || '';
+        let guruNameFilter = maybeGuruNama || '';
+        if (typeof maybeGuruId === 'string' && maybeGuruId.includes('-') && !maybeGuruId.startsWith('USR') && !maybeGuruId.includes(' ')) {
+          startDate = maybeGuruId;
+          guruFilter = '';
+        }
+
+        if (guruFilter || guruNameFilter) {
+          const gIdTarget = String(guruFilter || '').trim().toLowerCase();
+          const gNameTarget = String(guruNameFilter || '').trim().toLowerCase();
+          rows = rows.filter(r => {
+            const rId = String(r['ID Guru'] || '').trim().toLowerCase();
+            const rName = String(r['Nama Guru'] || '').trim().toLowerCase();
+            const rBy = String(r['Diubah Oleh'] || '').trim().toLowerCase();
+            const matchId = gIdTarget && (rId === gIdTarget || rBy === gIdTarget);
+            const matchName = gNameTarget && (rName === gNameTarget || rName.includes(gNameTarget) || gNameTarget.includes(rName) || rBy.includes(gNameTarget));
+            const matchCross = (gIdTarget && rName.includes(gIdTarget)) || (gNameTarget && rId === gNameTarget);
+            return matchId || matchName || matchCross;
+          });
+        }
+
+        if (startDate && startDate.includes('-')) {
+          rows = rows.filter(r => (r['Tanggal'] || '') >= startDate);
+        }
+        if (endDate && endDate.includes('-')) {
+          rows = rows.filter(r => (r['Tanggal'] || '') <= endDate);
+        }
+
+        return { success: true, data: rows };
       } catch (e) {
         return { success: false, message: e.message };
       }
@@ -1296,8 +1822,13 @@
       try {
         const sb = getClient();
         const now = new Date().toISOString();
+        let formattedStatus = updateData.status;
+        if (formattedStatus) {
+          const l = formattedStatus.trim().toLowerCase();
+          formattedStatus = l === 'sakit' ? 'Sakit' : (l === 'izin' ? 'Izin' : (l === 'alpha' || l === 'alpa' ? 'Alpa' : 'Hadir'));
+        }
         const { error } = await sb.from('Attendance').update({
-          'Status': updateData.status,
+          'Status': formattedStatus,
           'Keterangan': updateData.keterangan || '',
           'Waktu Ubah': now
         }).eq('ID Absen', id);
@@ -1313,7 +1844,22 @@
         const sb = getClient();
         const { error } = await sb.from('Attendance').delete().eq('ID Absen', id);
         if (error) throw error;
-        return { success: true, message: 'Absensi berhasil dihapus.' };
+        return { success: true, message: 'Data presensi berhasil dihapus.' };
+      } catch (e) {
+        return { success: false, message: e.message };
+      }
+    },
+
+    async deleteAttendanceSession(tanggal, idKelas, idGuru, idMapel) {
+      try {
+        const sb = getClient();
+        let query = sb.from('Attendance').delete().eq('Tanggal', tanggal);
+        if (idKelas) query = query.eq('ID Kelas', idKelas);
+        if (idGuru) query = query.eq('ID Guru', idGuru);
+        if (idMapel) query = query.eq('ID Mapel', idMapel);
+        const { error } = await query;
+        if (error) throw error;
+        return { success: true, message: 'Sesi riwayat absensi berhasil dihapus.' };
       } catch (e) {
         return { success: false, message: e.message };
       }
@@ -1337,22 +1883,76 @@
       }
       if (!Array.isArray(atts)) atts = [];
 
+      let groups = item.groups || item['Groups'] || [];
+      if (typeof groups === 'string') {
+        try { groups = JSON.parse(groups); } catch (e) { groups = []; }
+      }
+      if (!Array.isArray(groups)) groups = [];
+
+      let rawKelompok = item.pembagianKelompok || item['Pembagian Kelompok'] || item.kelompok || '';
+      if (!rawKelompok && groups.length > 0) {
+        rawKelompok = groups.map(g => `${g.groupName || 'Kelompok'}${g.ketua ? ' (Ketua: ' + g.ketua + ')' : ''}: ${(g.anggota || []).join(', ')}`).join('\n');
+      }
+
+      const hasTask = (item.hasTask === 'yes' || item['Ada Tugas'] === 'yes' || item.adaTugas === 'yes' || !!(item.taskInstructions || item['Instruksi Tugas'] || item.tugas)) ? 'yes' : 'no';
+      const taskInstructions = item.taskInstructions || item['Instruksi Tugas'] || item.tugas || item.instruksiTugas || '';
+
+      const finalId = item.id || item['ID'] || '';
+      const finalJudul = item.judul || item['Judul'] || 'Materi Pembelajaran';
+      const finalIdMapel = item.idMapel || item['ID Mapel'] || '';
+      const finalNamaMapel = item.namaMapel || item['Nama Mapel'] || 'Umum';
+      const finalIdKelas = item.idKelas || item['ID Kelas'] || '';
+      const finalNamaKelas = item.namaKelas || item['Nama Kelas'] || 'Semua Kelas';
+      const finalIdGuru = item.idGuru || item['ID Guru'] || '';
+      const finalNamaGuru = item.namaGuru || item['Nama Guru'] || 'Guru Pengampu';
+      const finalToken = (item.token || item['Token'] || '').trim().toUpperCase();
+      const finalRingkasan = item.ringkasan || item['Ringkasan'] || '';
+      const finalKonten = item.konten || item['Konten'] || '';
+      const finalMediaUrl = item.mediaUrl || item['Media URL'] || item.media_url || '';
+      const finalStatus = (item.status || item['Status'] || 'active').toLowerCase();
+      const finalTanggalBuat = item.tanggalBuat || item['Tanggal Buat'] || item.created_at || new Date().toISOString();
+      const finalTanggalUpdate = item.tanggalUpdate || item['Tanggal Update'] || new Date().toISOString();
+
       return {
-        id: item.id || item['ID'] || '',
-        judul: item.judul || item['Judul'] || 'Materi Pembelajaran',
-        idMapel: item.idMapel || item['ID Mapel'] || '',
-        namaMapel: item.namaMapel || item['Nama Mapel'] || 'Umum',
-        idKelas: item.idKelas || item['ID Kelas'] || '',
-        namaKelas: item.namaKelas || item['Nama Kelas'] || 'Semua Kelas',
-        idGuru: item.idGuru || item['ID Guru'] || '',
-        namaGuru: item.namaGuru || item['Nama Guru'] || 'Guru Pengampu',
-        token: (item.token || item['Token'] || '').trim().toUpperCase(),
-        ringkasan: item.ringkasan || item['Ringkasan'] || '',
-        konten: item.konten || item['Konten'] || '',
-        mediaUrl: item.mediaUrl || item['Media URL'] || item.media_url || '',
+        id: finalId,
+        'ID': finalId,
+        judul: finalJudul,
+        'Judul': finalJudul,
+        idMapel: finalIdMapel,
+        'ID Mapel': finalIdMapel,
+        namaMapel: finalNamaMapel,
+        'Nama Mapel': finalNamaMapel,
+        idKelas: finalIdKelas,
+        'ID Kelas': finalIdKelas,
+        namaKelas: finalNamaKelas,
+        'Nama Kelas': finalNamaKelas,
+        idGuru: finalIdGuru,
+        'ID Guru': finalIdGuru,
+        namaGuru: finalNamaGuru,
+        'Nama Guru': finalNamaGuru,
+        token: finalToken,
+        'Token': finalToken,
+        ringkasan: finalRingkasan,
+        'Ringkasan': finalRingkasan,
+        konten: finalKonten,
+        'Konten': finalKonten,
+        mediaUrl: finalMediaUrl,
+        'Media URL': finalMediaUrl,
         attachments: atts,
-        status: (item.status || item['Status'] || 'active').toLowerCase(),
-        tanggalBuat: item.tanggalBuat || item['Tanggal Buat'] || item.created_at || new Date().toISOString()
+        groups: groups,
+        'Groups': groups,
+        pembagianKelompok: rawKelompok,
+        'Pembagian Kelompok': rawKelompok,
+        hasTask: hasTask,
+        'Ada Tugas': hasTask,
+        taskInstructions: taskInstructions,
+        'Instruksi Tugas': taskInstructions,
+        status: finalStatus,
+        'Status': finalStatus,
+        tanggalBuat: finalTanggalBuat,
+        'Tanggal Buat': finalTanggalBuat,
+        tanggalUpdate: finalTanggalUpdate,
+        'Tanggal Update': finalTanggalUpdate
       };
     },
 
@@ -1360,21 +1960,23 @@
       const sb = getClient();
       if (sb) {
         try {
-          const { data, error } = await sb.from('Learnings').select('*').order('Tanggal Buat', { ascending: false });
-          if (!error && Array.isArray(data) && data.length > 0) {
-            return data.map(it => this._normalizeLearning(it));
-          }
-        } catch (e) { }
-        try {
           const { data, error } = await sb.from('Settings').select('Value').eq('Key', 'app_learnings_data').maybeSingle();
           if (!error && data && data.Value) {
-            const parsed = JSON.parse(data.Value);
+            const parsed = typeof data.Value === 'string' ? JSON.parse(data.Value) : data.Value;
             if (Array.isArray(parsed) && parsed.length > 0) {
               return parsed.map(it => this._normalizeLearning(it));
             }
           }
         } catch (e) { }
+
+        try {
+          const { data, error } = await sb.from('Learnings').select('*').order('Tanggal Buat', { ascending: false });
+          if (!error && Array.isArray(data) && data.length > 0) {
+            return data.map(it => this._normalizeLearning(it));
+          }
+        } catch (e) { }
       }
+
       try {
         const local = localStorage.getItem('portal_learnings_data');
         if (local) {
@@ -1385,30 +1987,8 @@
         }
       } catch (e) { }
 
-      // Default sample learning jika belum ada data sama sekali
-      const defaultList = [
-        {
-          id: 'LRN-BIO-01',
-          judul: 'Konsep Ekosistem & Keanekaragaman Hayati',
-          idMapel: '',
-          namaMapel: 'Biologi',
-          idKelas: '',
-          namaKelas: 'Semua Kelas',
-          idGuru: '',
-          namaGuru: 'Guru Pengampu Biologi',
-          token: 'BIO10',
-          ringkasan: 'Pelajari komponen biotik, abiotik, piramida energi, dan aliran rantai makanan di lingkungan sekitar.',
-          konten: 'Ekosistem tersusun atas komponen biotik (produsen, konsumen, pengurai) dan komponen abiotik (tanah, air, suhu, sinar matahari).\n\n1. Tingkat Trofik 1: Produsen (tanaman hijau)\n2. Tingkat Trofik 2: Konsumen Primer (herbivora)\n3. Tingkat Trofik 3: Konsumen Sekunder (karnivora)\n4. Pengurai: Bakteri dan jamur saprofit\n\nSilakan simak modul di atas, unduh berkas yang dilampirkan, serta sampaikan pertanyaan atau masukan Anda di kolom diskusi di bawah!',
-          mediaUrl: 'https://www.youtube.com/watch?v=kYJv4j52y4M',
-          attachments: [],
-          status: 'active',
-          tanggalBuat: new Date().toISOString()
-        }
-      ];
-      try {
-        localStorage.setItem('portal_learnings_data', JSON.stringify(defaultList));
-      } catch (e) { }
-      return defaultList.map(it => this._normalizeLearning(it));
+      // Tidak ada data dummy bawaan - hanya data asli yang diinput Guru / Admin
+      return [];
     },
 
     async _saveLearningsStore(list) {
@@ -1434,11 +2014,11 @@
       try {
         const list = await this._loadLearningsStore();
         let result = list;
-        if (filterGuruId) {
+        if (filterGuruId && typeof filterGuruId === 'string' && filterGuruId.trim()) {
           const fStr = String(filterGuruId).trim().toLowerCase();
           result = list.filter(item => {
             const matchId = item.idGuru && String(item.idGuru).trim().toLowerCase() === fStr;
-            const matchName = item.namaGuru && String(item.namaGuru).trim().toLowerCase() === fStr;
+            const matchName = item.namaGuru && String(item.namaGuru).trim().toLowerCase().includes(fStr);
             return matchId || matchName;
           });
         }
@@ -1454,7 +2034,19 @@
         const newId = generateId('LRN');
         const token = (data.token || ('LRN' + Math.random().toString(36).substr(2, 4)).toUpperCase()).trim().toUpperCase();
 
-        const newItem = {
+        let groups = data.groups || [];
+        if (typeof groups === 'string') {
+          try { groups = JSON.parse(groups); } catch (e) { groups = []; }
+        }
+        let rawKelompok = data.pembagianKelompok || data['Pembagian Kelompok'] || data.kelompok || '';
+        if (!rawKelompok && groups.length > 0) {
+          rawKelompok = groups.map(g => `${g.groupName || 'Kelompok'}${g.ketua ? ' (Ketua: ' + g.ketua + ')' : ''}: ${(g.anggota || []).join(', ')}`).join('\n');
+        }
+
+        const hasTask = (data.hasTask === 'yes' || data['Ada Tugas'] === 'yes' || !!data.taskInstructions) ? 'yes' : 'no';
+        const taskInst = data.taskInstructions || data['Instruksi Tugas'] || data.tugas || '';
+
+        const newItem = this._normalizeLearning({
           id: newId,
           judul: data.judul || 'Materi Pembelajaran Baru',
           idMapel: data.idMapel || '',
@@ -1468,12 +2060,39 @@
           konten: data.konten || '',
           mediaUrl: data.mediaUrl || '',
           attachments: Array.isArray(data.attachments) ? data.attachments : [],
+          groups: groups,
+          pembagianKelompok: rawKelompok,
+          hasTask: hasTask,
+          taskInstructions: taskInst,
           status: data.status || 'active',
           tanggalBuat: new Date().toISOString()
-        };
+        });
 
         list.unshift(newItem);
         await this._saveLearningsStore(list);
+
+        const sb = getClient();
+        if (sb) {
+          try {
+            await sb.from('Learnings').insert([{
+              'ID': newItem['ID'] || newItem.id,
+              'Judul': newItem['Judul'] || newItem.judul,
+              'ID Mapel': newItem['ID Mapel'] || newItem.idMapel || '',
+              'Nama Mapel': newItem['Nama Mapel'] || newItem.namaMapel || '',
+              'ID Kelas': newItem['ID Kelas'] || newItem.idKelas || '',
+              'Nama Kelas': newItem['Nama Kelas'] || newItem.namaKelas || '',
+              'ID Guru': newItem['ID Guru'] || newItem.idGuru || '',
+              'Nama Guru': newItem['Nama Guru'] || newItem.namaGuru || '',
+              'Token': newItem['Token'] || newItem.token || '',
+              'Ringkasan': newItem['Ringkasan'] || newItem.ringkasan || '',
+              'Konten': newItem['Konten'] || newItem.konten || '',
+              'Media URL': newItem['Media URL'] || newItem.mediaUrl || '',
+              'Status': newItem['Status'] || newItem.status || 'active',
+              'Tanggal Buat': newItem['Tanggal Buat'] || newItem.tanggalBuat || new Date().toISOString()
+            }]);
+          } catch (eTbl) { }
+        }
+
         return { success: true, message: 'Pembelajaran berhasil dipublikasikan!', data: newItem };
       } catch (e) {
         return { success: false, message: e.message };
@@ -1483,27 +2102,67 @@
     async updateLearning(id, data) {
       try {
         const list = await this._loadLearningsStore();
-        const idx = list.findIndex(item => item.id === id);
+        const idx = list.findIndex(item => item.id === id || item.ID === id);
         if (idx === -1) return { success: false, message: 'Data pembelajaran tidak ditemukan.' };
 
-        list[idx] = {
+        let groups = data.groups !== undefined ? data.groups : list[idx].groups;
+        if (typeof groups === 'string') {
+          try { groups = JSON.parse(groups); } catch (e) { groups = []; }
+        }
+        let rawKelompok = data.pembagianKelompok !== undefined ? data.pembagianKelompok : list[idx].pembagianKelompok;
+        if (!rawKelompok && groups && groups.length > 0) {
+          rawKelompok = groups.map(g => `${g.groupName || 'Kelompok'}${g.ketua ? ' (Ketua: ' + g.ketua + ')' : ''}: ${(g.anggota || []).join(', ')}`).join('\n');
+        }
+
+        const hasTask = data.hasTask !== undefined ? data.hasTask : list[idx].hasTask;
+        const taskInst = data.taskInstructions !== undefined ? data.taskInstructions : list[idx].taskInstructions;
+
+        list[idx] = this._normalizeLearning({
           ...list[idx],
           judul: data.judul !== undefined ? data.judul : list[idx].judul,
           idMapel: data.idMapel !== undefined ? data.idMapel : list[idx].idMapel,
           namaMapel: data.namaMapel !== undefined ? data.namaMapel : list[idx].namaMapel,
           idKelas: data.idKelas !== undefined ? data.idKelas : list[idx].idKelas,
           namaKelas: data.namaKelas !== undefined ? data.namaKelas : list[idx].namaKelas,
+          idGuru: data.idGuru !== undefined ? data.idGuru : list[idx].idGuru,
+          namaGuru: data.namaGuru !== undefined ? data.namaGuru : list[idx].namaGuru,
           token: data.token ? data.token.trim().toUpperCase() : list[idx].token,
           ringkasan: data.ringkasan !== undefined ? data.ringkasan : list[idx].ringkasan,
           konten: data.konten !== undefined ? data.konten : list[idx].konten,
           mediaUrl: data.mediaUrl !== undefined ? data.mediaUrl : list[idx].mediaUrl,
           attachments: data.attachments !== undefined ? data.attachments : (list[idx].attachments || []),
+          groups: groups,
+          pembagianKelompok: rawKelompok,
+          hasTask: hasTask,
+          taskInstructions: taskInst,
           status: data.status !== undefined ? data.status : list[idx].status,
           tanggalUpdate: new Date().toISOString()
-        };
+        });
 
         await this._saveLearningsStore(list);
-        return { success: true, message: 'Pembelajaran berhasil diperbarui!' };
+
+        const sb = getClient();
+        if (sb) {
+          try {
+            await sb.from('Learnings').update({
+              'Judul': list[idx]['Judul'] || list[idx].judul,
+              'ID Mapel': list[idx]['ID Mapel'] || list[idx].idMapel || '',
+              'Nama Mapel': list[idx]['Nama Mapel'] || list[idx].namaMapel || '',
+              'ID Kelas': list[idx]['ID Kelas'] || list[idx].idKelas || '',
+              'Nama Kelas': list[idx]['Nama Kelas'] || list[idx].namaKelas || '',
+              'ID Guru': list[idx]['ID Guru'] || list[idx].idGuru || '',
+              'Nama Guru': list[idx]['Nama Guru'] || list[idx].namaGuru || '',
+              'Token': list[idx]['Token'] || list[idx].token || '',
+              'Ringkasan': list[idx]['Ringkasan'] || list[idx].ringkasan || '',
+              'Konten': list[idx]['Konten'] || list[idx].konten || '',
+              'Media URL': list[idx]['Media URL'] || list[idx].mediaUrl || '',
+              'Status': list[idx]['Status'] || list[idx].status || 'active',
+              'Tanggal Update': new Date().toISOString()
+            }).eq('ID', id);
+          } catch (eTbl) { }
+        }
+
+        return { success: true, message: 'Pembelajaran berhasil diperbarui!', data: list[idx] };
       } catch (e) {
         return { success: false, message: e.message };
       }
@@ -1512,8 +2171,16 @@
     async deleteLearning(id) {
       try {
         let list = await this._loadLearningsStore();
-        list = list.filter(item => item.id !== id);
+        list = list.filter(item => item.id !== id && item.ID !== id);
         await this._saveLearningsStore(list);
+
+        const sb = getClient();
+        if (sb) {
+          try {
+            await sb.from('Learnings').delete().eq('ID', id);
+          } catch (eTbl) { }
+        }
+
         return { success: true, message: 'Pembelajaran berhasil dihapus.' };
       } catch (e) {
         return { success: false, message: e.message };
@@ -1607,7 +2274,7 @@
         try {
           const { data, error } = await sb.from('Settings').select('Value').eq('Key', 'app_learning_attendees_data').maybeSingle();
           if (!error && data && data.Value) {
-            const parsed = JSON.parse(data.Value);
+            const parsed = typeof data.Value === 'string' ? JSON.parse(data.Value) : data.Value;
             if (Array.isArray(parsed)) return parsed;
           }
         } catch (e) { }
@@ -1619,30 +2286,8 @@
           if (Array.isArray(parsed) && parsed.length > 0) return parsed;
         }
       } catch (e) { }
-      const defaultAttendees = [
-        {
-          id: 'ATT-DEMO-01',
-          idPembelajaran: 'LRN-BIO-01',
-          judulPembelajaran: 'Konsep Ekosistem & Keanekaragaman Hayati',
-          namaSiswa: 'Ahmad Siswa',
-          waktuMasuk: new Date(Date.now() - 2400000).toISOString(),
-          waktuKeluar: null,
-          status: 'active'
-        },
-        {
-          id: 'ATT-DEMO-02',
-          idPembelajaran: 'LRN-BIO-01',
-          judulPembelajaran: 'Konsep Ekosistem & Keanekaragaman Hayati',
-          namaSiswa: 'Siti Nurhaliza',
-          waktuMasuk: new Date(Date.now() - 5400000).toISOString(),
-          waktuKeluar: new Date(Date.now() - 3600000).toISOString(),
-          status: 'selesai'
-        }
-      ];
-      try {
-        localStorage.setItem('portal_learning_attendees_data', JSON.stringify(defaultAttendees));
-      } catch (e) { }
-      return defaultAttendees;
+      // Tidak ada dummy data
+      return [];
     },
 
     async _saveLearningAttendeesStore(list) {
@@ -1651,7 +2296,7 @@
         try {
           await sb.from('Settings').upsert([{
             'Key': 'app_learning_attendees_data',
-            'Value': JSON.stringify(list),
+            'Value': JSON.stringify(list || []),
             'Label': 'Data Hadir Ruang Belajar',
             'Keterangan': 'Sync riwayat siswa masuk & keluar ruang pembelajaran',
             'Diupdate': new Date().toISOString()
@@ -1659,7 +2304,7 @@
         } catch (e) { }
       }
       try {
-        localStorage.setItem('portal_learning_attendees_data', JSON.stringify(list));
+        localStorage.setItem('portal_learning_attendees_data', JSON.stringify(list || []));
       } catch (e) { }
     },
 
@@ -1667,7 +2312,7 @@
     async getLearningDiscussions(learningId) {
       try {
         const all = await this._loadLearningDiscussionsStore();
-        const filtered = learningId ? all.filter(d => d.idPembelajaran === learningId) : all;
+        const filtered = learningId ? all.filter(d => (d.idPembelajaran === learningId || d['ID Pembelajaran'] === learningId)) : all;
         return { success: true, data: filtered };
       } catch (e) {
         return { success: false, message: e.message, data: [] };
@@ -1680,15 +2325,18 @@
           return { success: false, message: 'Isi pertanyaan atau komentar wajib diisi!' };
         }
         const all = await this._loadLearningDiscussionsStore();
+        const now = new Date().toISOString();
         const newComment = {
           id: generateId('DSC'),
           idPembelajaran: learningId,
           senderName: (commentData.senderName || 'Anonim').trim(),
-          senderRole: commentData.senderRole || 'siswa', // 'siswa' atau 'guru'
-          category: commentData.category || 'pertanyaan', // 'pertanyaan', 'saran', 'diskusi'
+          senderRole: commentData.senderRole || 'siswa', // 'siswa' atau 'guru' atau 'admin'
+          senderId: commentData.senderId || '',
+          category: commentData.category || 'pertanyaan',
           content: commentData.content.trim(),
           parentId: commentData.parentId || null,
-          createdAt: new Date().toISOString()
+          createdAt: now,
+          timestamp: now
         };
         all.push(newComment);
         await this._saveLearningDiscussionsStore(all);
@@ -1715,7 +2363,7 @@
         try {
           const { data, error } = await sb.from('Settings').select('Value').eq('Key', 'app_learning_discussions_data').maybeSingle();
           if (!error && data && data.Value) {
-            const parsed = JSON.parse(data.Value);
+            const parsed = typeof data.Value === 'string' ? JSON.parse(data.Value) : data.Value;
             if (Array.isArray(parsed) && parsed.length > 0) return parsed;
           }
         } catch (e) { }
@@ -1728,42 +2376,142 @@
         }
       } catch (e) { }
 
-      const defaultDiscussions = [
-        {
-          id: 'DSC-001',
-          idPembelajaran: 'LRN-BIO-01',
-          senderName: 'Ahmad Siswa',
-          senderRole: 'siswa',
-          category: 'pertanyaan',
-          content: 'Izin bertanya Bu/Pak Guru, apa perbedaan utama dekomposer dengan detritivor pada ekosistem?',
-          parentId: null,
-          createdAt: new Date(Date.now() - 3600000).toISOString()
-        },
-        {
-          id: 'DSC-002',
-          idPembelajaran: 'LRN-BIO-01',
-          senderName: 'Guru Pengampu Biologi',
-          senderRole: 'guru',
-          category: 'jawaban',
-          content: 'Pertanyaan bagus Ahmad! Dekomposer menguraikan sisa organik secara enzimatik/kimiawi (contoh bakteri & jamur), sedangkan detritivor memakan hancuran materi organik secara fisik (contoh cacing tanah & rayap).',
-          parentId: 'DSC-001',
-          createdAt: new Date(Date.now() - 1800000).toISOString()
-        },
-        {
-          id: 'DSC-003',
-          idPembelajaran: 'LRN-BIO-01',
-          senderName: 'Siti Nurhaliza',
-          senderRole: 'siswa',
-          category: 'saran',
-          content: 'Saran untuk pertemuan berikutnya bisa ditambahkan video simulasi interaktif jaring-jaring makanan laut pak/bu.',
-          parentId: null,
-          createdAt: new Date(Date.now() - 900000).toISOString()
-        }
-      ];
+      // Tidak ada dummy data diskusi
+      return [];
+    },
+
+    async _saveLearningDiscussionsStore(list) {
+      const sb = getClient();
+      if (sb) {
+        try {
+          await sb.from('Settings').upsert([{
+            'Key': 'app_learning_discussions_data',
+            'Value': JSON.stringify(list || []),
+            'Label': 'Data Diskusi Ruang Pembelajaran',
+            'Keterangan': 'Sync forum tanya jawab & saran materi pembelajaran',
+            'Diupdate': new Date().toISOString()
+          }]);
+        } catch (e) { }
+      }
       try {
-        localStorage.setItem('portal_learning_discussions_data', JSON.stringify(defaultDiscussions));
+        localStorage.setItem('portal_learning_discussions_data', JSON.stringify(list || []));
       } catch (e) { }
-      return defaultDiscussions;
+    },
+
+    // ── PENGUMPULAN TUGAS SISWA ──
+    async _loadLearningTasksStore() {
+      const sb = getClient();
+      if (sb) {
+        try {
+          const { data, error } = await sb.from('Settings').select('Value').eq('Key', 'app_learning_tasks_data').maybeSingle();
+          if (!error && data && data.Value) {
+            const parsed = typeof data.Value === 'string' ? JSON.parse(data.Value) : data.Value;
+            if (Array.isArray(parsed)) return parsed;
+          }
+        } catch (e) { }
+      }
+      try {
+        const local = localStorage.getItem('portal_learning_tasks_data');
+        if (local) {
+          const parsed = JSON.parse(local);
+          if (Array.isArray(parsed)) return parsed;
+        }
+      } catch (e) { }
+      return [];
+    },
+
+    async _saveLearningTasksStore(list) {
+      const sb = getClient();
+      if (sb) {
+        try {
+          await sb.from('Settings').upsert([{
+            'Key': 'app_learning_tasks_data',
+            'Value': JSON.stringify(list || []),
+            'Label': 'Data Tugas Ruang Pembelajaran',
+            'Keterangan': 'Sync lembar tugas siswa terintegrasi',
+            'Diupdate': new Date().toISOString()
+          }]);
+        } catch (e) { }
+      }
+      try {
+        localStorage.setItem('portal_learning_tasks_data', JSON.stringify(list || []));
+      } catch (e) { }
+    },
+
+    async getLearningTasks(learningId) {
+      try {
+        const all = await this._loadLearningTasksStore();
+        // Gabungkan juga dari app_learning_attendees_data jika ada siswa yang mengunggah tugas di sana
+        const attendees = await this._loadLearningAttendeesStore();
+        attendees.forEach(att => {
+          if (att.tugasFile || att.tugasCatatan || att.status === 'tugas_dikumpulkan') {
+            const attLrnId = att.idPembelajaran || att.learningId;
+            const exists = all.some(t => (t.learningId === attLrnId) && ((t.studentNis && t.studentNis === att.nisSiswa) || (t.studentName && t.studentName === att.namaSiswa)));
+            if (!exists) {
+              all.push({
+                id: att.id || ('TSK-' + Math.random().toString(36).substr(2, 6)),
+                learningId: attLrnId,
+                judul: att.judulPembelajaran || att.judul || '',
+                studentName: att.namaSiswa || att.studentName || '',
+                studentNis: att.nisSiswa || att.studentNis || '',
+                className: att.namaKelas || att.className || '',
+                taskNote: att.tugasCatatan || att.taskNote || '',
+                taskFile: att.tugasFile || att.taskFile || '',
+                taskFileName: att.tugasFileName || att.taskFileName || '',
+                submittedAt: att.tugasWaktu || att.waktuMasuk || new Date().toISOString()
+              });
+            }
+          }
+        });
+        const filtered = learningId ? all.filter(t => t.learningId === learningId || t.idPembelajaran === learningId) : all;
+        return { success: true, data: filtered };
+      } catch (e) {
+        return { success: false, message: e.message, data: [] };
+      }
+    },
+
+    async submitLearningTask(taskData) {
+      try {
+        const all = await this._loadLearningTasksStore();
+        const finalId = taskData.id || generateId('TSK');
+        const now = new Date().toISOString();
+        const newRecord = {
+          id: finalId,
+          learningId: taskData.learningId,
+          judul: taskData.judul || '',
+          studentName: taskData.studentName || '',
+          studentNis: taskData.studentNis || '',
+          className: taskData.className || '',
+          taskNote: taskData.taskNote || '',
+          taskFile: taskData.taskFile || '',
+          taskFileName: taskData.taskFileName || '',
+          submittedAt: now
+        };
+
+        const idx = all.findIndex(t => (t.learningId === taskData.learningId) && (t.studentNis && t.studentNis === taskData.studentNis));
+        if (idx !== -1) all[idx] = newRecord;
+        else all.unshift(newRecord);
+
+        await this._saveLearningTasksStore(all);
+
+        // Update juga ke attendees store jika attendee sudah ada
+        try {
+          const attendees = await this._loadLearningAttendeesStore();
+          const attIdx = attendees.findIndex(a => (a.idPembelajaran === taskData.learningId) && (a.nisSiswa === taskData.studentNis || a.namaSiswa === taskData.studentName));
+          if (attIdx !== -1) {
+            attendees[attIdx].status = 'tugas_dikumpulkan';
+            attendees[attIdx].tugasCatatan = taskData.taskNote || '';
+            attendees[attIdx].tugasFile = taskData.taskFile || '';
+            attendees[attIdx].tugasFileName = taskData.taskFileName || '';
+            attendees[attIdx].tugasWaktu = now;
+            await this._saveLearningAttendeesStore(attendees);
+          }
+        } catch (eAtt) { }
+
+        return { success: true, message: 'Tugas berhasil dikumpulkan!', data: newRecord };
+      } catch (e) {
+        return { success: false, message: e.message };
+      }
     },
 
     async _saveLearningDiscussionsStore(list) {
@@ -1880,12 +2628,24 @@
             'Label': 'Data SPMB Pendaftar Baru',
             'Keterangan': 'Sync data pendaftaran penerimaan murid baru online',
             'Diupdate': new Date().toISOString()
-          }]);
+          }], { onConflict: 'Key' });
         } catch (e) { }
       }
       try {
         localStorage.setItem('portal_spmb_registrations', JSON.stringify(list));
       } catch (e) { }
+    },
+
+    async getSpmbRegistrations(filterStatus, filterJalur) {
+      return this.getSpmbList(filterStatus, filterJalur);
+    },
+
+    async registerSpmb(data) {
+      return this.submitSpmbRegistration(data);
+    },
+
+    async getSpmbStatus(nisnOrNoReg) {
+      return this.checkSpmbStatus(nisnOrNoReg);
     },
 
     async getSpmbList(filterStatus, filterJalur) {
@@ -2097,13 +2857,18 @@
           const uObj = userObj;
 
           try {
-            let result;
-            if (typeof Handlers[prop] === 'function') {
-              result = await Handlers[prop](...args);
-            } else {
-              console.warn(`[Supabase Bridge] Handler "${prop}" belum terdaftar, mencoba fallback getAllData.`);
-              result = await Handlers.getAllData(prop);
-            }
+            const execPromise = (typeof Handlers[prop] === 'function')
+              ? Handlers[prop](...args)
+              : (console.warn(`[Supabase Bridge] Handler "${prop}" belum terdaftar, mencoba fallback getAllData.`), Handlers.getAllData(prop));
+
+            // Timeout fleksibel: 35s untuk query biasa, 60s untuk upload berkas/foto
+            const isUpload = (prop && (prop.toLowerCase().includes('upload') || prop.toLowerCase().includes('photo') || prop.toLowerCase().includes('doc') || prop.toLowerCase().includes('file')));
+            const timeoutMs = isUpload ? 60000 : 35000;
+            const timeoutPromise = new Promise((_, reject) => 
+              setTimeout(() => reject(new Error('Waktu tunggu koneksi habis. Silakan periksa koneksi internet Anda.')), timeoutMs)
+            );
+
+            const result = await Promise.race([execPromise, timeoutPromise]);
 
             if (successCb) {
               try {
