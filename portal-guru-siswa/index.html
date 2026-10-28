@@ -74,6 +74,8 @@
       display: flex;
       flex-direction: column;
       padding-bottom: 74px; /* Clearance for fixed bottom nav */
+      overflow-x: hidden;
+      box-sizing: border-box;
     }
 
     /* Top Status Bar Mockup (Hidden as requested) */
@@ -419,6 +421,9 @@
     .app-screen {
       flex: 1;
       overflow-y: auto;
+      overflow-x: hidden;
+      width: 100%;
+      box-sizing: border-box;
       padding-bottom: 30px;
       display: none;
     }
@@ -4112,69 +4117,99 @@
     // ============================================================
     // SISTEM CACHE OFFLINE LOKAL (INSTAN 0MS TANPA LOADING SPINNER)
     // ============================================================
+    // DATA DEFAULT AWAL RESMI DARI PORTAL SEKOLAH (Mencegah tampilan kosong sebelum server merespons)
+    const INITIAL_FALLBACK_CLASSES = [
+      { 'ID Kelas': 'KLSMVNZPCGLVG85', 'Nama Kelas': 'X.1', 'Tingkat': 'X', 'Jurusan': 'Umum', 'Nama Wali Kelas': 'Wa Ode Afriani, S.Pd', 'ID Wali Kelas': 'WA ODE AFRIANI', 'Jumlah Siswa': 32 },
+      { 'ID Kelas': 'KLSMVNZPY3W7FAB', 'Nama Kelas': 'X.2', 'Tingkat': 'X', 'Jurusan': 'Umum', 'Nama Wali Kelas': 'La Ode Harnado, S.Kom', 'ID Wali Kelas': 'USRMVNZN75QG1YF', 'Jumlah Siswa': 30 },
+      { 'ID Kelas': 'KLSMVNZR51XCMOJ', 'Nama Kelas': 'XI IPA', 'Tingkat': 'XI', 'Jurusan': 'IPA', 'Nama Wali Kelas': 'Hasrani, S.Pd', 'ID Wali Kelas': 'HASRANI', 'Jumlah Siswa': 28 },
+      { 'ID Kelas': 'KLSMVNZRZSWNJU6', 'Nama Kelas': 'XI IPS', 'Tingkat': 'XI', 'Jurusan': 'IPS', 'Nama Wali Kelas': 'Desti Asriyah, S.Pd', 'ID Wali Kelas': 'DESTI ASRIYAH', 'Jumlah Siswa': 29 },
+      { 'ID Kelas': 'KLSMVNZSX7ZRLGM', 'Nama Kelas': 'XII IPA', 'Tingkat': 'XII', 'Jurusan': 'IPA', 'Nama Wali Kelas': 'Hasniar, S.Pd', 'ID Wali Kelas': 'HASNIAR', 'Jumlah Siswa': 27 },
+      { 'ID Kelas': 'KLSMVL3SPR0L7WZ', 'Nama Kelas': 'XII IPS', 'Tingkat': 'XII', 'Jurusan': 'IPS', 'Nama Wali Kelas': 'Wa Ode Ismawati, S.Pd', 'ID Wali Kelas': 'WA ODE ISMAWATI', 'Jumlah Siswa': 26 }
+    ];
+
+    const INITIAL_FALLBACK_SUBJECTS = [
+      { 'ID Mapel': 'MPMVNZTX99D4J3R', 'Nama Mapel': 'Sejarah', 'Hari': 'Senin', 'Jam Mulai': '07:30', 'Jam Selesai': '09:00', 'Nama Kelas': 'X.1', 'ID Kelas': 'KLSMVNZPCGLVG85', 'Nama Guru': 'Rahman Rajab, S.Mat', 'ID Guru': 'USRMVNZNZ0I62FE' },
+      { 'ID Mapel': 'MPMVNZWZ0K6M8W2', 'Nama Mapel': 'Fisika', 'Hari': 'Selasa', 'Jam Mulai': '07:30', 'Jam Selesai': '09:00', 'Nama Kelas': 'XI IPA', 'ID Kelas': 'KLSMVNZR51XCMOJ', 'Nama Guru': 'La Ode Harnado, S.Kom', 'ID Guru': 'USRMVNZN75QG1YF' },
+      { 'ID Mapel': 'MPMVNZXH4H1B7L3', 'Nama Mapel': 'Fisika', 'Hari': 'Kamis', 'Jam Mulai': '07:30', 'Jam Selesai': '09:00', 'Nama Kelas': 'XII IPA', 'ID Kelas': 'KLSMVNZSX7ZRLGM', 'Nama Guru': 'La Ode Harnado, S.Kom', 'ID Guru': 'USRMVNZN75QG1YF' },
+      { 'ID Mapel': 'MPMVNZVOB1Y7Z6W', 'Nama Mapel': 'KKA', 'Hari': 'Jumat', 'Jam Mulai': '07:30', 'Jam Selesai': '09:00', 'Nama Kelas': 'X.1', 'ID Kelas': 'KLSMVNZPCGLVG85', 'Nama Guru': 'La Ode Harnado, S.Kom', 'ID Guru': 'USRMVNZN75QG1YF' },
+      { 'ID Mapel': 'MPMVNZW3K7L6K9P', 'Nama Mapel': 'KKA', 'Hari': 'Jumat', 'Jam Mulai': '09:15', 'Jam Selesai': '10:45', 'Nama Kelas': 'X.2', 'ID Kelas': 'KLSMVNZPY3W7FAB', 'Nama Guru': 'La Ode Harnado, S.Kom', 'ID Guru': 'USRMVNZN75QG1YF' },
+      { 'ID Mapel': 'MPMVNZUW0EAYX6T', 'Nama Mapel': 'Informatika', 'Hari': 'Sabtu', 'Jam Mulai': '07:30', 'Jam Selesai': '09:00', 'Nama Kelas': 'X.1', 'ID Kelas': 'KLSMVNZPCGLVG85', 'Nama Guru': 'La Ode Harnado, S.Kom', 'ID Guru': 'USRMVNZN75QG1YF' },
+      { 'ID Mapel': 'MPMVNZV75P2H4R7', 'Nama Mapel': 'Informatika', 'Hari': 'Sabtu', 'Jam Mulai': '09:15', 'Jam Selesai': '10:45', 'Nama Kelas': 'X.2', 'ID Kelas': 'KLSMVNZPY3W7FAB', 'Nama Guru': 'La Ode Harnado, S.Kom', 'ID Guru': 'USRMVNZN75QG1YF' }
+    ];
+
     function initOfflineCacheInstant() {
       try {
         // 1. Pengaturan Sekolah & Background
         const cachedSettings = localStorage.getItem('portal_app_settings');
         if (cachedSettings) {
-          dbSettings = JSON.parse(cachedSettings);
-          if (dbSettings.school_name) {
-            const el = document.getElementById('school-name-text');
-            if (el) el.innerText = dbSettings.school_name;
-          }
-          if (dbSettings.academic_year) {
-            const elYear = document.getElementById('school-academic-year');
-            if (elYear) elYear.innerText = `Tahun Ajaran ${dbSettings.academic_year} • Semester ${dbSettings.semester || 'Ganjil'}`;
-          }
+          try {
+            dbSettings = JSON.parse(cachedSettings);
+            if (dbSettings.school_name) {
+              const el = document.getElementById('school-name-text');
+              if (el) el.innerText = dbSettings.school_name;
+            }
+            if (dbSettings.academic_year) {
+              const elYear = document.getElementById('school-academic-year');
+              if (elYear) elYear.innerText = `Tahun Ajaran ${dbSettings.academic_year} • Semester ${dbSettings.semester || 'Ganjil'}`;
+            }
+          } catch (eSet) {}
         }
         applySchoolBackground();
 
-        // 2. Kelas
+        // 2. Kelas (Inisialisasi seketika tanpa delay)
         const cachedClasses = localStorage.getItem('portal_classes_data');
         if (cachedClasses) {
-          dbClasses = JSON.parse(cachedClasses);
-          renderClasses();
+          try {
+            const parsed = JSON.parse(cachedClasses);
+            if (Array.isArray(parsed) && parsed.length > 0) dbClasses = parsed;
+          } catch (eCls) {}
         }
+        if (!dbClasses || dbClasses.length === 0) {
+          dbClasses = [...INITIAL_FALLBACK_CLASSES];
+        }
+        renderClasses();
 
         // 3. Siswa
         const cachedStudents = localStorage.getItem('portal_students_data');
         if (cachedStudents) {
-          dbStudents = JSON.parse(cachedStudents);
+          try { dbStudents = JSON.parse(cachedStudents); } catch (eStd) {}
         }
 
         // 4. Jadwal Mapel
         const cachedSubjects = localStorage.getItem('portal_subjects_data');
         if (cachedSubjects) {
-          dbSubjects = JSON.parse(cachedSubjects);
-          renderSchedules();
+          try {
+            const parsedSub = JSON.parse(cachedSubjects);
+            if (Array.isArray(parsedSub) && parsedSub.length > 0) dbSubjects = parsedSub;
+          } catch (eSub) {}
         }
+        if (!dbSubjects || dbSubjects.length === 0) {
+          dbSubjects = [...INITIAL_FALLBACK_SUBJECTS];
+        }
+        renderSchedules();
 
         // 5. Pengumuman
         const cachedAnn = localStorage.getItem('portal_announcements_data');
         if (cachedAnn) {
-          dbAnnouncements = JSON.parse(cachedAnn);
-          renderAnnouncements();
+          try { dbAnnouncements = JSON.parse(cachedAnn); renderAnnouncements(); } catch (eAnn) {}
         }
 
         // 6. Ruang Pembelajaran (Learnings)
         const cachedLearnings = localStorage.getItem('portal_learnings_data');
         if (cachedLearnings) {
-          dbLearnings = JSON.parse(cachedLearnings);
-          renderRooms();
+          try { dbLearnings = JSON.parse(cachedLearnings); renderRooms(); } catch (eLrn) {}
         }
 
         // 7. Ulangan/Ujian (Exams)
         const cachedExams = localStorage.getItem('portal_exams_data');
         if (cachedExams) {
-          dbExams = JSON.parse(cachedExams);
-          renderExams();
+          try { dbExams = JSON.parse(cachedExams); renderExams(); } catch (eExm) {}
         }
 
         // 8. Nilai
         const cachedGrades = localStorage.getItem('portal_grades_data');
         if (cachedGrades) {
-          dbGrades = JSON.parse(cachedGrades);
-          renderGrades();
+          try { dbGrades = JSON.parse(cachedGrades); renderGrades(); } catch (eGrd) {}
         }
 
         populateAttendanceDropdowns();
@@ -4194,14 +4229,18 @@
         return;
       }
 
-      try {
-        setSyncStatus(true, 'Sinkron Data...');
+      setSyncStatus(true, 'Sinkron Data...');
 
-        // 1. Ambil Pengaturan Sekolah
+      // 1. Ambil Pengaturan Sekolah (Aman dari QuotaExceededError dengan mengabaikan base64 raksasa)
+      try {
         const { data: settings } = await supabaseClient.from('Settings').select('Key, Value');
-        if (settings) {
-          settings.forEach(row => { dbSettings[row.Key] = row.Value; });
-          localStorage.setItem('portal_app_settings', JSON.stringify(dbSettings));
+        if (settings && Array.isArray(settings)) {
+          settings.forEach(row => {
+            // Hindari data base64 >50KB masuk ke localStorage (karena batas kuota browser 5MB)
+            if (row.Value && typeof row.Value === 'string' && row.Value.startsWith('data:image') && row.Value.length > 50000) return;
+            dbSettings[row.Key] = row.Value;
+          });
+          try { localStorage.setItem('portal_app_settings', JSON.stringify(dbSettings)); } catch (e) {}
           if (dbSettings.school_name) {
             const el = document.getElementById('school-name-text');
             if (el) el.innerText = dbSettings.school_name;
@@ -4211,89 +4250,119 @@
             if (elYear) elYear.innerText = `Tahun Ajaran ${dbSettings.academic_year} • Semester ${dbSettings.semester || 'Ganjil'}`;
           }
           if (dbSettings.school_background_url) {
-            localStorage.setItem('portal_school_background_url', dbSettings.school_background_url);
+            try { localStorage.setItem('portal_school_background_url', dbSettings.school_background_url); } catch (e) {}
           }
           applySchoolBackground();
         }
+      } catch (eSettings) {
+        console.warn('Sync settings note:', eSettings);
+      }
 
-        // 2. Ambil Kelas
-        const { data: classes } = await supabaseClient.from('Classes').select('*').order('Nama Kelas', { ascending: true });
-        if (classes) {
+      // 2. Ambil Kelas
+      try {
+        const { data: classes, error: errClasses } = await supabaseClient.from('Classes').select('*').order('Nama Kelas', { ascending: true });
+        if (!errClasses && Array.isArray(classes) && classes.length > 0) {
           dbClasses = classes;
-          localStorage.setItem('portal_classes_data', JSON.stringify(dbClasses));
-          renderClasses();
+          try { localStorage.setItem('portal_classes_data', JSON.stringify(dbClasses)); } catch (e) {}
+          renderClasses(document.getElementById('input-search-class')?.value || '');
         }
+      } catch (eClasses) {
+        console.warn('Sync classes note:', eClasses);
+      }
 
-        // 3. Ambil Siswa
-        const { data: students } = await supabaseClient.from('Students').select('*').order('Nama Siswa', { ascending: true });
-        if (students) {
+      // 3. Ambil Siswa
+      try {
+        const { data: students, error: errStudents } = await supabaseClient.from('Students').select('*').order('Nama Siswa', { ascending: true });
+        if (!errStudents && Array.isArray(students) && students.length > 0) {
           dbStudents = students;
-          localStorage.setItem('portal_students_data', JSON.stringify(dbStudents));
-          // Sinkronkan status siswa aktif/tidak aktif secara real-time
+          try { localStorage.setItem('portal_students_data', JSON.stringify(dbStudents)); } catch (e) {}
           if (currentUser && currentUser.role === 'siswa') {
             const freshMe = students.find(s => String(s.NIS) === String(currentUser.nis) || s['ID Siswa'] === currentUser.id);
             if (freshMe && freshMe.Status) {
               currentUser.status = freshMe.Status;
-              localStorage.setItem('smandum_active_user', JSON.stringify(currentUser));
+              try { localStorage.setItem('smandum_active_user', JSON.stringify(currentUser)); } catch (e) {}
               renderProfileScreen();
             }
           }
         }
+      } catch (eStudents) {
+        console.warn('Sync students note:', eStudents);
+      }
 
-        // 4. Ambil Jadwal Mata Pelajaran resmi yang ditetapkan Admin di Web Portal Sekolah
-        const { data: subjects } = await supabaseClient.from('Subjects').select('*').order('Jam Mulai', { ascending: true });
-        if (subjects) {
+      // 4. Ambil Jadwal Mata Pelajaran resmi dari Web Portal Sekolah
+      try {
+        const { data: subjects, error: errSubjects } = await supabaseClient.from('Subjects').select('*').order('Jam Mulai', { ascending: true });
+        if (!errSubjects && Array.isArray(subjects) && subjects.length > 0) {
           dbSubjects = subjects;
-          localStorage.setItem('portal_subjects_data', JSON.stringify(dbSubjects));
+          try { localStorage.setItem('portal_subjects_data', JSON.stringify(dbSubjects)); } catch (e) {}
           renderSchedules();
-          renderClasses(); // Perbarui kelas penugasan setelah jadwal & guru pengampu siap
+          renderClasses(document.getElementById('input-search-class')?.value || '');
         }
+      } catch (eSubjects) {
+        console.warn('Sync subjects note:', eSubjects);
+      }
 
-        // 5. Ambil Pengumuman
-        const { data: announcements } = await supabaseClient.from('Announcements').select('*').eq('Status', 'active').order('Tanggal Buat', { ascending: false });
-        if (announcements) {
+      // 5. Ambil Pengumuman
+      try {
+        const { data: announcements, error: errAnn } = await supabaseClient.from('Announcements').select('*').eq('Status', 'active').order('Tanggal Buat', { ascending: false });
+        if (!errAnn && Array.isArray(announcements)) {
           dbAnnouncements = announcements;
-          localStorage.setItem('portal_announcements_data', JSON.stringify(dbAnnouncements));
+          try { localStorage.setItem('portal_announcements_data', JSON.stringify(dbAnnouncements)); } catch (e) {}
           renderAnnouncements();
         }
+      } catch (eAnn) {
+        console.warn('Sync announcements note:', eAnn);
+      }
 
-        // 6. Ambil Ruang Pembelajaran (Learnings)
+      // 6. Ruang Pembelajaran (Learnings)
+      try {
         await loadLearningsData();
+      } catch (eLearn) {
+        console.warn('Sync learnings note:', eLearn);
+      }
 
-        // 7. Ambil Ulangan/Ujian (Exams)
+      // 7. Ulangan/Ujian (Exams)
+      try {
         await loadExamsData();
+      } catch (eExam) {
+        console.warn('Sync exams note:', eExam);
+      }
 
-        // 8. Ambil Nilai
+      // 8. Nilai
+      try {
         let gradeQuery = supabaseClient.from('Grades').select('*');
         if (currentUser && currentUser.role === 'siswa') {
           gradeQuery = gradeQuery.eq('NIS Siswa', currentUser.nis);
         }
         const { data: grades } = await gradeQuery;
-        if (grades) {
+        if (grades && Array.isArray(grades)) {
           dbGrades = grades;
-          localStorage.setItem('portal_grades_data', JSON.stringify(dbGrades));
+          try { localStorage.setItem('portal_grades_data', JSON.stringify(dbGrades)); } catch (e) {}
           renderGrades();
         }
+      } catch (eGrades) {
+        console.warn('Sync grades note:', eGrades);
+      }
 
-        // 9. Dropdown Absensi, Select Form & Refresh Tampilan
+      // 9. Dropdown Absensi, Select Form & Refresh Tampilan Keseluruhan
+      try {
         populateAttendanceDropdowns();
         populateSubjectAndClassSelects();
-        renderClasses();
+        renderClasses(document.getElementById('input-search-class')?.value || '');
         renderSchedules();
-
-        // 10. Periksa jadwal mendesak 20 menit (Khusus Guru)
-        if (currentUser && currentUser.role !== 'siswa') {
-          checkUpcomingClassReminder();
-        }
-
-        // 11. Perbarui angka statistik profil
-        updateProfileStats();
-
-        setSyncStatus(true, 'Supabase Live');
-      } catch (err) {
-        console.error('Gagal sinkron data Supabase:', err);
-        setSyncStatus(false, 'Mode Offline (Tersimpan Lokal)');
+      } catch (eUI) {
+        console.warn('Sync UI refresh note:', eUI);
       }
+
+      // 10. Periksa jadwal mendesak 20 menit (Khusus Guru)
+      if (currentUser && currentUser.role !== 'siswa') {
+        try { checkUpcomingClassReminder(); } catch (eRem) {}
+      }
+
+      // 11. Perbarui statistik profil
+      try { updateProfileStats(); } catch (eProf) {}
+
+      setSyncStatus(true, 'Supabase Live');
     }
 
     // ============================================================
@@ -8916,9 +8985,10 @@
 
       if (filtered.length === 0) {
         container.innerHTML = `
-          <div class="empty-state-card" style="padding:24px 16px;">
+          <div class="empty-state-card" style="padding:24px 16px; max-width:100%; box-sizing:border-box;">
             <span style="font-size:32px;">📂</span>
-            <p style="font-size:12px; color:#64748b; margin-top:8px;">${activeKelasTab === 'mine' ? 'Anda belum memiliki kelas penugasan (sebagai Wali Kelas maupun Guru Mapel).' : 'Belum ada data kelas yang cocok dengan pencarian.'}</p>
+            <p style="font-size:12px; color:#64748b; margin-top:6px; word-break:break-word;">${activeKelasTab === 'mine' ? 'Belum ada kelas penugasan' : 'Kelas tidak ditemukan'}</p>
+            ${activeKelasTab === 'mine' && dbClasses.length > 0 ? `<button type="button" onclick="switchKelasTab('all')" style="margin-top:10px; padding:6px 14px; background:#e0f2fe; color:#0284c7; border:none; border-radius:10px; font-size:11.5px; font-weight:700; cursor:pointer;">Lihat Semua Kelas (${dbClasses.length})</button>` : ''}
           </div>
         `;
         return;
@@ -9003,8 +9073,7 @@
     }
 
     // Hari aktif: 1=Senin, 2=Selasa, 3=Rabu, 4=Kamis, 5=Jumat, 6=Sabtu, 0=Minggu, -1=Semua Hari
-    let activeDayIndex = new Date().getDay();
-    if (activeDayIndex === 0) activeDayIndex = 1;
+    let activeDayIndex = -1; // Default ke -1 (Semua) agar seluruh jadwal langsung tampil tanpa tersembunyi
 
     function changeScheduleDay(delta) {
       if (activeDayIndex === -1) {
@@ -9120,10 +9189,10 @@
         }
         
         container.innerHTML = `
-          <div class="empty-state-card" style="padding:26px 16px;">
+          <div class="empty-state-card" style="padding:24px 16px; max-width:100%; box-sizing:border-box;">
             <span style="font-size:32px;">📅</span>
-            <p style="margin-top:8px; font-size:12px; color:#475569;">Tidak ada jadwal mengajar pada <strong>${hariNama}</strong> ${activeJadwalTab === 'mine' && isGuru ? '(Jadwal Anda di hari ini tidak ada)' : ''}.</p>
-            ${tipMsg}
+            <p style="margin-top:6px; font-size:12px; color:#475569; word-break:break-word;">Tidak ada jadwal pada <strong>${hariNama}</strong></p>
+            ${activeJadwalTab === 'mine' && isGuru && myAllSubjects.length === 0 ? `<button type="button" onclick="switchJadwalTab('all')" style="margin-top:10px; padding:6px 14px; background:#e0f2fe; color:#0284c7; border:none; border-radius:10px; font-size:11.5px; font-weight:700; cursor:pointer;">Lihat Semua Jadwal Sekolah (${dbSubjects.length})</button>` : tipMsg}
           </div>
         `;
         return;
@@ -10153,6 +10222,14 @@
             if (schoolCard) schoolCard.style.display = 'flex';
           }
         }
+      }
+
+      if (screenName === 'kelas') {
+        renderClasses(document.getElementById('input-search-class')?.value || '');
+      }
+
+      if (screenName === 'jadwal') {
+        renderSchedules();
       }
 
       if (screenName === 'absen') {
