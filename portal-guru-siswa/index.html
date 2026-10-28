@@ -483,7 +483,7 @@
     .login-hero-header {
       position: relative;
       background-color: #0c4a6e;
-      padding: 18px 16px 0;
+      padding: 0; /* Tanpa padding horizontal agar animasi ombak menyentuh garis tepi layar handphone */
       color: #ffffff;
       overflow: hidden;
       box-shadow: 0 4px 20px rgba(0,0,0,0.15);
@@ -515,12 +515,14 @@
       50% { transform: scale(1.14) translate(-1%, 1.5%); }
       100% { transform: scale(1.06) translate(1%, -1%); }
     }
-    /* ── PEMBATAS GRADASI LAUT (4 LAPIS GELOMBANG BERGERAK) ── */
+    /* ── PEMBATAS GRADASI LAUT (MENCAPAI GARIS TEPI LAYAR HANDPHONE PENUH) ── */
     .lp-sea-divider {
       position: relative;
       width: 100%;
-      height: 78px;
+      height: 82px;
       margin-top: 10px;
+      margin-left: 0;
+      margin-right: 0;
       z-index: 2;
       pointer-events: none;
       overflow: hidden;
@@ -538,23 +540,23 @@
       will-change: transform;
     }
     .lp-sea-wave.w1 {
-      height: 78px;
+      height: 82px;
       animation-duration: 24s;
       opacity: 0.6;
     }
     .lp-sea-wave.w2 {
-      height: 62px;
+      height: 66px;
       animation-duration: 16s;
       animation-direction: reverse;
       opacity: 0.75;
     }
     .lp-sea-wave.w3 {
-      height: 48px;
+      height: 50px;
       animation-duration: 11s;
       opacity: 0.92;
     }
     .lp-sea-wave.w4 {
-      height: 34px;
+      height: 36px;
       animation-duration: 8s;
       animation-direction: reverse;
     }
@@ -562,40 +564,56 @@
       from { transform: translate3d(0, 0, 0); }
       to { transform: translate3d(-50%, 0, 0); }
     }
+    /* Badge Logo Simpul Smandum: Kompak, Tulisan Tersusun, Hijau & Biru Laut */
     .login-top-simpul-badge {
       position: absolute;
-      top: 16px;
-      left: 16px;
+      top: 14px;
+      left: 14px;
       z-index: 10;
       display: inline-flex;
       align-items: center;
-      gap: 7px;
-      background: rgba(15, 23, 42, 0.55);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      padding: 5px 12px;
-      border-radius: 20px;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      padding: 4px 10px 4px 6px;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+      max-width: 140px;
     }
     .login-top-simpul-badge img {
-      width: 22px;
-      height: 22px;
+      width: 26px;
+      height: 26px;
       object-fit: contain;
       background: #ffffff;
       border-radius: 6px;
-      padding: 1.5px;
+      padding: 2px;
+      flex-shrink: 0;
     }
-    .login-top-simpul-text {
+    .login-top-simpul-text-col {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+      text-align: left;
+    }
+    .login-top-simpul-text-col .txt-simpul {
       font-size: 11px;
-      font-weight: 800;
-      color: #ffffff;
-      letter-spacing: 0.6px;
+      font-weight: 900;
+      color: #10b981; /* Tulisan SIMPUL warna hijau */
+      letter-spacing: 0.8px;
+    }
+    .login-top-simpul-text-col .txt-smandum {
+      font-size: 9.5px;
+      font-weight: 900;
+      color: #38bdf8; /* Tulisan SMANDUM warna biru laut */
+      letter-spacing: 0.8px;
     }
     .login-brand {
       position: relative;
       z-index: 3;
       text-align: center;
-      padding: 24px 0 6px;
+      padding: 56px 16px 8px; /* Ruang vertikal lapang agar logo SMAN 12 Muna Barat tidak tertimpa badge saat di hp */
     }
     .login-brand-icon {
       width: 72px;
@@ -614,12 +632,49 @@
       object-fit: contain;
     }
     .login-brand h1 {
-      font-size: 20px;
+      font-size: 19px;
       font-weight: 900;
       color: #ffffff;
       letter-spacing: 0.5px;
       margin: 0;
       text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+    /* Day pill bar selector untuk Jadwal & Filter Kelas */
+    .day-pill-bar {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 0 20px 10px;
+      scrollbar-width: none;
+    }
+    .day-pill-bar::-webkit-scrollbar {
+      display: none;
+    }
+    .day-pill-btn {
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: #475569;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .day-pill-btn.active {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #0284c7;
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3);
+    }
+    @keyframes spin360 {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .spin {
+      display: inline-block;
+      animation: spin360 0.8s linear infinite;
     }
     .simpul-tagline-text {
       font-size: 11px;
@@ -2045,10 +2100,13 @@
         <div id="lpHeroBackdrop" class="lp-hero-backdrop" aria-hidden="true"></div>
         <div class="login-hero-overlay" aria-hidden="true"></div>
 
-        <!-- LOGO SIMPUL SMANDUM DI POJOK KIRI ATAS -->
+        <!-- LOGO SIMPUL SMANDUM DI POJOK KIRI ATAS (SIMPUL HIJAU & SMANDUM BIRU LAUT TERSUSUN) -->
         <div class="login-top-simpul-badge">
           <img src="simpul_symbol_clean.png" onerror="this.src='../simpul_symbol_clean.png'" alt="Logo Simpul Smandum">
-          <span class="login-top-simpul-text">SIMPUL SMANDUM</span>
+          <div class="login-top-simpul-text-col">
+            <span class="txt-simpul">SIMPUL</span>
+            <span class="txt-smandum">SMANDUM</span>
+          </div>
         </div>
 
         <!-- LOGO SMAN 12 MUNA BARAT DI TENGAH -->
@@ -2276,11 +2334,21 @@
         <span style="font-size:18px;">📋</span>
       </div>
 
-      <div style="padding:12px 20px;">
+      <div style="padding:12px 20px 6px;">
         <div class="search-input-box">
           <span>🔍</span>
-          <input type="text" id="input-search-class" placeholder="Cari nama kelas..." oninput="handleSearchClass(this.value)">
+          <input type="text" id="input-search-class" placeholder="Cari nama kelas / wali kelas..." oninput="handleSearchClass(this.value)">
         </div>
+      </div>
+
+      <!-- Filter Tab untuk Kelas: Semua Kelas vs Penugasan Anda -->
+      <div class="filter-tab-bar" id="kelas-filter-tabs" style="margin:0 20px 12px; display:flex;">
+        <button class="filter-tab-btn active" id="tab-kelas-all" onclick="switchKelasTab('all')">
+          🌐 Semua Kelas (<span id="count-kelas-all">0</span>)
+        </button>
+        <button class="filter-tab-btn" id="tab-kelas-mine" onclick="switchKelasTab('mine')">
+          ⭐ Penugasan Anda (<span id="count-kelas-mine">0</span>)
+        </button>
       </div>
 
       <div style="padding:0 20px 20px; display:flex; flex-direction:column; gap:10px;" id="class-container">
@@ -2302,12 +2370,12 @@
       <div style="margin:0 20px 10px; background:#eff6ff; border:1px solid #bfdbfe; border-radius:12px; padding:10px 14px; display:flex; align-items:center; gap:10px;">
         <span style="font-size:20px;">ℹ️</span>
         <div style="font-size:11.5px; color:#1e40af; line-height:1.4;">
-          <strong>Jadwal Mengajar Resmi</strong> ditetapkan oleh Administrator di Web Portal Sekolah. Guru dapat melihat jadwal yang diampu dan langsung membuka <strong>Presensi Kelas</strong>.
+          <strong>Jadwal Mengajar Resmi</strong> terintegrasi langsung dengan database Administrator di Web Portal Sekolah.
         </div>
       </div>
 
       <!-- Filter Tab untuk Jadwal: Jadwal Mengajar Saya vs Semua Jadwal -->
-      <div class="filter-tab-bar" id="jadwal-filter-tabs" style="margin:0 20px 12px; display:flex;">
+      <div class="filter-tab-bar" id="jadwal-filter-tabs" style="margin:0 20px 10px; display:flex;">
         <button class="filter-tab-btn active" id="tab-jadwal-mine" onclick="switchJadwalTab('mine')">
           📋 Jadwal Saya (<span id="count-jadwal-mine">0</span>)
         </button>
@@ -2316,7 +2384,10 @@
         </button>
       </div>
 
-      <div class="schedule-date-filter">
+      <!-- Selector Pill Hari (Senin - Sabtu + Semua Hari) -->
+      <div class="day-pill-bar" id="schedule-day-pills"></div>
+
+      <div class="schedule-date-filter" style="margin-top:0;">
         <button onclick="changeScheduleDay(-1)" style="border:none; background:none; font-size:16px; font-weight:800; cursor:pointer;">‹</button>
         <span id="schedule-active-day-label">Hari Ini</span>
         <button onclick="changeScheduleDay(1)" style="border:none; background:none; font-size:16px; font-weight:800; cursor:pointer;">›</button>
@@ -2490,14 +2561,14 @@
           </div>
         </div>
 
-        <!-- Fitur Pancing Ujian via Token (Khusus Siswa) -->
+        <!-- Fitur Masuk Ujian via Token (Khusus Siswa) -->
         <div id="student-token-search-box" style="margin-bottom:14px; background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius:18px; padding:14px 16px; border:1px solid #334155; box-shadow:0 8px 24px rgba(0,0,0,0.12); display:none;">
           <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
             <div style="display:flex; align-items:center; gap:8px;">
               <span style="font-size:20px;">🔑</span>
               <div>
-                <div style="font-size:13px; font-weight:800; color:#f8fafc;">Pancing Soal Ujian Baru</div>
-                <div style="font-size:10.5px; color:#94a3b8;">Ketik Token dari Guru agar soal yang baru dibuat langsung muncul</div>
+                <div style="font-size:13px; font-weight:800; color:#f8fafc;">Masuk Sesi Ujian Baru</div>
+                <div style="font-size:10.5px; color:#94a3b8;">Ketik Token dari Guru untuk langsung masuk ke sesi ujian</div>
               </div>
             </div>
             <button onclick="refreshStudentExams()" title="Segarkan Daftar Ujian" style="background:#334155; border:none; border-radius:8px; color:#38bdf8; padding:6px 10px; font-size:11px; font-weight:700; cursor:pointer;">
@@ -2507,7 +2578,7 @@
           <div style="display:flex; gap:8px; margin-top:8px;">
             <input type="text" id="quick-exam-token-input" placeholder="Ketik Token (misal: CBT892)..." maxlength="12" style="flex:1; background:#0f172a; border:1.5px solid #475569; border-radius:12px; padding:10px 14px; font-size:13px; font-weight:800; color:#38bdf8; letter-spacing:1.5px; text-transform:uppercase; outline:none;" onkeyup="if(event.key==='Enter') fetchExamByToken()">
             <button type="button" onclick="fetchExamByToken()" id="btn-fetch-token" style="background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:#ffffff; font-weight:800; font-size:12px; border:none; border-radius:12px; padding:0 16px; cursor:pointer; display:flex; align-items:center; gap:6px; box-shadow:0 4px 14px rgba(2,132,199,0.35); white-space:nowrap;">
-              <span>🚀</span> Pancing
+              <span>🚀</span> Masuk
             </button>
           </div>
         </div>
@@ -2715,9 +2786,7 @@
         <h3 style="font-size:17px; font-weight:800; color:#0f172a; text-align:center; margin-bottom:6px;">
           Pengingat Jadwal Mengajar!
         </h3>
-        <p style="font-size:12px; color:#64748b; text-align:center; margin-bottom:14px;" id="modal-reminder-countdown">
-          Anda dijadwalkan masuk mengajar <strong style="color:#d97706;">20 Menit Lagi</strong>.
-        </p>
+        <p style="font-size:12px; color:#64748b; text-align:center; margin-bottom:14px; display:none;" id="modal-reminder-countdown"></p>
 
         <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:12px; margin-bottom:14px;">
           <div style="font-size:13px; font-weight:800; color:#0284c7;" id="modal-reminder-title">Memuat...</div>
@@ -4177,6 +4246,7 @@
           dbSubjects = subjects;
           localStorage.setItem('portal_subjects_data', JSON.stringify(dbSubjects));
           renderSchedules();
+          renderClasses(); // Perbarui kelas penugasan setelah jadwal & guru pengampu siap
         }
 
         // 5. Ambil Pengumuman
@@ -4205,9 +4275,11 @@
           renderGrades();
         }
 
-        // 9. Dropdown Absensi & Select Form
+        // 9. Dropdown Absensi, Select Form & Refresh Tampilan
         populateAttendanceDropdowns();
         populateSubjectAndClassSelects();
+        renderClasses();
+        renderSchedules();
 
         // 10. Periksa jadwal mendesak 20 menit (Khusus Guru)
         if (currentUser && currentUser.role !== 'siswa') {
@@ -6041,7 +6113,7 @@
       }
     }
 
-    // Pancing soal ujian baru via token (Khusus Siswa)
+    // Masuk ke sesi ujian baru via token (Khusus Siswa)
     async function fetchExamByToken() {
       const inputEl = document.getElementById('quick-exam-token-input');
       if (!inputEl) return;
@@ -6054,7 +6126,7 @@
       const btn = document.getElementById('btn-fetch-token');
       if (btn) {
         btn.disabled = true;
-        btn.innerHTML = '<span>⏳</span> Memancing...';
+        btn.innerHTML = '<span>⏳</span> Memproses...';
       }
 
       try {
@@ -6075,7 +6147,7 @@
               foundExam = data[0];
             }
           } catch (sbErr) {
-            console.warn('Gagal memancing ujian dari Supabase:', sbErr);
+            console.warn('Gagal memuat ujian dari Supabase:', sbErr);
           }
         }
 
@@ -6095,17 +6167,17 @@
           inputEl.value = '';
           renderExams();
 
-          await appAlert(`Soal ujian "${foundExam['Judul Ujian'] || 'Ulangan'}" berhasil dipancing! Membuka sesi ujian...`, 'Soal Ditemukan', '🎉');
+          await appAlert(`Soal ujian "${foundExam['Judul Ujian'] || 'Ulangan'}" berhasil ditemukan! Membuka sesi ujian...`, 'Sesi Ujian Siap', '🎉');
           openTakeExamModal(examId);
         } else {
           await appAlert(`Ujian dengan Token "${tokenVal}" tidak ditemukan. Pastikan token yang Anda masukkan sesuai dengan yang dibagikan oleh Guru.`, 'Token Tidak Sesuai', '🔍');
         }
       } catch (err) {
-        await appAlert('Terjadi kesalahan saat memancing soal: ' + (err.message || 'Koneksi error'), 'Kesalahan', '⚠️');
+        await appAlert('Terjadi kesalahan saat memuat soal ujian: ' + (err.message || 'Koneksi error'), 'Kesalahan', '⚠️');
       } finally {
         if (btn) {
           btn.disabled = false;
-          btn.innerHTML = '<span>🚀</span> Pancing';
+          btn.innerHTML = '<span>🚀</span> Masuk';
         }
       }
     }
@@ -8692,7 +8764,12 @@
     }
 
     function openUrgentModalManually() {
+      const countdownEl = document.getElementById('modal-reminder-countdown');
       if (currentUrgentSubject) {
+        if (countdownEl) {
+          countdownEl.style.display = 'block';
+          countdownEl.innerHTML = `Jadwal mengajar dimulai dalam <strong style="color:#d97706;">${currentUrgentSubject.diffMinutes || 20} Menit Lagi</strong>.`;
+        }
         document.getElementById('modal-reminder-title').innerText = `${currentUrgentSubject['Nama Mapel']} • ${currentUrgentSubject['Nama Kelas']}`;
         document.getElementById('modal-reminder-time').innerText = `🕒 ${currentUrgentSubject['Jam Mulai']} - ${currentUrgentSubject['Jam Selesai']} • ${currentUrgentSubject['Ruangan'] || 'Ruang 1'}`;
         
@@ -8702,10 +8779,14 @@
           ? urgentStudentsCache.map((s, i) => `${i + 1}. ${s['Nama Siswa']} (${s.NIS})`).join('<br>')
           : 'Belum ada data siswa terdaftar di kelas ini.';
       } else {
-        document.getElementById('modal-reminder-title').innerText = 'Belum Ada Jadwal Mendesak';
-        document.getElementById('modal-reminder-time').innerText = 'Jadwal mengajar berikutnya belum dimulai dalam 20 menit ke depan.';
-        document.getElementById('modal-reminder-roster-count').innerText = 'Info:';
-        document.getElementById('modal-reminder-roster-list').innerText = 'Sistem memantau tabel Subjects & Students secara otomatis.';
+        if (countdownEl) {
+          countdownEl.style.display = 'none'; // Hapus default countdown
+          countdownEl.innerHTML = '';
+        }
+        document.getElementById('modal-reminder-title').innerText = 'Tidak Ada Jadwal Mendesak Saat Ini';
+        document.getElementById('modal-reminder-time').innerText = 'Tidak ada jadwal mengajar dalam 20 menit ke depan.';
+        document.getElementById('modal-reminder-roster-count').innerText = 'Status Pemantauan:';
+        document.getElementById('modal-reminder-roster-list').innerText = 'Sistem memantau jadwal mengajar Anda secara otomatis dari database Portal Sekolah.';
       }
       document.getElementById('urgent-modal').classList.add('active');
     }
@@ -8730,32 +8811,157 @@
     // ============================================================
     // RENDER: DAFTAR KELAS & JADWAL & ABSENSI
     // ============================================================
+    // RENDER: DAFTAR KELAS & JADWAL & ABSENSI (TERINTEGRASI PORTAL SEKOLAH)
+    // ============================================================
+    let activeKelasTab = 'all';
+
+    function switchKelasTab(tab) {
+      activeKelasTab = tab;
+      const tabAll = document.getElementById('tab-kelas-all');
+      const tabMine = document.getElementById('tab-kelas-mine');
+      if (tabAll) tabAll.classList.toggle('active', tab === 'all');
+      if (tabMine) tabMine.classList.toggle('active', tab === 'mine');
+      renderClasses(document.getElementById('input-search-class')?.value || '');
+    }
+
+    function matchesTeacherSchedule(s, u) {
+      if (!s || !u) return false;
+      const sId = String(s['ID Guru'] || s.idGuru || '').trim();
+      const sName = String(s['Nama Guru'] || s.namaGuru || '').trim().toLowerCase();
+      const uId = String(u.id || u.ID || '').trim();
+      const uUsername = String(u.username || u.Username || '').trim().toLowerCase();
+      const uNip = String(u.nip || u.NIP || '').trim();
+      const uName = String(u.name || u.namaLengkap || u['Nama Lengkap'] || '').trim().toLowerCase();
+
+      // 1. Direct ID / Username / NIP match
+      if (sId && (sId === uId || sId.toLowerCase() === uUsername || (uNip && uNip !== '-' && sId === uNip))) {
+        return true;
+      }
+
+      // 2. Name match (exact or substring or title-stripped)
+      if (sName && (uName || uUsername)) {
+        if (sName === uName || sName === uUsername) return true;
+        if (uName && (sName.includes(uName) || uName.includes(sName))) return true;
+        if (uUsername && (sName.includes(uUsername) || uUsername.includes(sName))) return true;
+        
+        // Remove academic titles for robust matching with Web Portal Sekolah
+        const stripTitles = str => str.replace(/\b(drs|dra|dr|ir|prof|h|hj|s\.pd|m\.pd|s\.mat|s\.sos|m\.sos|s\.si|m\.si|s\.kom|m\.kom|s\.t|m\.t|s\.e|m\.m|s\.ag|m\.ag|ph\.d|gr)\b/gi, '').replace(/[.,]/g, '').trim();
+        const cleanS = stripTitles(sName);
+        const cleanU = stripTitles(uName || uUsername);
+        if (cleanS && cleanU && (cleanS.includes(cleanU) || cleanU.includes(cleanS))) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function getTeacherAssignedClasses(user = currentUser) {
+      if (!user) return [];
+      if (user.role === 'admin') return dbClasses;
+      
+      const mySubjects = dbSubjects.filter(s => matchesTeacherSchedule(s, user));
+      const uId = String(user.id || user.ID || '').trim();
+      const uNip = String(user.nip || user.NIP || '').trim();
+      
+      return dbClasses.filter(c => {
+        // Cek Wali Kelas
+        const cWaliId = String(c['ID Wali Kelas'] || '').trim();
+        const isWali = (cWaliId && (cWaliId === uId || (uNip && uNip !== '-' && cWaliId === uNip))) ||
+                       (c['Nama Wali Kelas'] && matchesTeacherSchedule({ 'Nama Guru': c['Nama Wali Kelas'], 'ID Guru': c['ID Wali Kelas'] }, user));
+        if (isWali) return true;
+
+        // Cek Guru Pengampu Mapel di kelas
+        const cId = String(c['ID Kelas'] || '').trim().toLowerCase();
+        const cName = String(c['Nama Kelas'] || '').trim().toLowerCase();
+        return mySubjects.some(s => {
+          const sCId = String(s['ID Kelas'] || '').trim().toLowerCase();
+          const sCName = String(s['Nama Kelas'] || '').trim().toLowerCase();
+          return (sCId && sCId === cId) || (sCName && (sCName === cName || sCName.includes(cName) || cName.includes(sCName)));
+        });
+      });
+    }
+
+    function isClassAssignedToTeacher(c, user = currentUser) {
+      if (!c || !user) return false;
+      if (user.role === 'admin') return true;
+      const targetId = typeof c === 'string' ? c.trim().toLowerCase() : String(c['ID Kelas'] || c['Nama Kelas'] || '').trim().toLowerCase();
+      const assigned = getTeacherAssignedClasses(user);
+      return assigned.some(cls => {
+        const clsId = String(cls['ID Kelas'] || '').trim().toLowerCase();
+        const clsName = String(cls['Nama Kelas'] || '').trim().toLowerCase();
+        return clsId === targetId || clsName === targetId || (typeof c === 'object' && clsId === String(c['ID Kelas'] || '').trim().toLowerCase());
+      });
+    }
+
     function renderClasses(filterKeyword = '') {
       const container = document.getElementById('class-container');
       if (!container) return;
 
       const isGuru = currentUser && currentUser.role === 'guru';
-      const mySubjects = isGuru ? dbSubjects.filter(s => matchesTeacherSchedule(s, currentUser)) : [];
+      const myAssignedClasses = isGuru ? getTeacherAssignedClasses(currentUser) : dbClasses;
+      
+      const countAll = document.getElementById('count-kelas-all');
+      const countMine = document.getElementById('count-kelas-mine');
+      if (countAll) countAll.innerText = dbClasses.length;
+      if (countMine) countMine.innerText = myAssignedClasses.length;
 
-      const filtered = dbClasses.filter(c => {
-        return (c['Nama Kelas'] || '').toLowerCase().includes(filterKeyword.toLowerCase()) ||
-               (c['Nama Wali Kelas'] || '').toLowerCase().includes(filterKeyword.toLowerCase());
+      let listToFilter = (isGuru && activeKelasTab === 'mine') ? myAssignedClasses : dbClasses;
+
+      const filtered = listToFilter.filter(c => {
+        const q = filterKeyword.toLowerCase().trim();
+        return (c['Nama Kelas'] || '').toLowerCase().includes(q) ||
+               (c['Nama Wali Kelas'] || '').toLowerCase().includes(q) ||
+               (c['Jurusan'] || '').toLowerCase().includes(q);
       });
 
       if (filtered.length === 0) {
         container.innerHTML = `
-          <div class="empty-state-card">
-            <span>📂</span>
-            <p>Belum ada data kelas di tabel 'Classes'.</p>
+          <div class="empty-state-card" style="padding:24px 16px;">
+            <span style="font-size:32px;">📂</span>
+            <p style="font-size:12px; color:#64748b; margin-top:8px;">${activeKelasTab === 'mine' ? 'Anda belum memiliki kelas penugasan (sebagai Wali Kelas maupun Guru Mapel).' : 'Belum ada data kelas yang cocok dengan pencarian.'}</p>
           </div>
         `;
         return;
       }
 
       container.innerHTML = filtered.map(c => {
-        const jmlSiswa = dbStudents.filter(s => s['ID Kelas'] === c['ID Kelas'] || s['Nama Kelas'] === c['Nama Kelas']).length;
+        const cId = String(c['ID Kelas'] || '').trim().toLowerCase();
+        const cName = String(c['Nama Kelas'] || '').trim().toLowerCase();
+        const jmlSiswa = dbStudents.filter(s => {
+          const sCId = String(s['ID Kelas'] || '').trim().toLowerCase();
+          const sCName = String(s['Nama Kelas'] || '').trim().toLowerCase();
+          return (sCId && sCId === cId) || (sCName && (sCName === cName || sCName.includes(cName) || cName.includes(sCName)));
+        }).length;
+        
         const iconLetter = (c['Tingkat'] || c['Nama Kelas'] || 'X').split(' ')[0];
-        const isMyClass = isGuru && mySubjects.some(s => (s['ID Kelas'] && s['ID Kelas'] === c['ID Kelas']) || (s['Nama Kelas'] && s['Nama Kelas'] === c['Nama Kelas']));
+        
+        // Cek penugasan guru
+        const cWaliId = String(c['ID Wali Kelas'] || '').trim();
+        const uId = String(currentUser?.id || currentUser?.ID || '').trim();
+        const uNip = String(currentUser?.nip || currentUser?.NIP || '').trim();
+        const isWali = isGuru && ((cWaliId && (cWaliId === uId || (uNip && uNip !== '-' && cWaliId === uNip))) ||
+                       (c['Nama Wali Kelas'] && matchesTeacherSchedule({ 'Nama Guru': c['Nama Wali Kelas'], 'ID Guru': c['ID Wali Kelas'] }, currentUser)));
+
+        const mySubjectsInClass = dbSubjects.filter(s => {
+          const matchSubj = matchesTeacherSchedule(s, currentUser);
+          const sCId = String(s['ID Kelas'] || '').trim().toLowerCase();
+          const sCName = String(s['Nama Kelas'] || '').trim().toLowerCase();
+          return matchSubj && ((sCId && sCId === cId) || (sCName && (sCName === cName || sCName.includes(cName) || cName.includes(sCName))));
+        });
+
+        const isMapelTeacher = mySubjectsInClass.length > 0;
+        const isMyClass = isGuru && (isWali || isMapelTeacher);
+
+        let badgeHtml = '';
+        if (isMyClass) {
+          if (isWali && isMapelTeacher) {
+            badgeHtml = `<span style="font-size:10px; background:#fef3c7; color:#b45309; padding:2px 7px; border-radius:6px; font-weight:800;">👑 Wali Kelas</span> <span style="font-size:10px; background:#e0f2fe; color:#0284c7; padding:2px 7px; border-radius:6px; font-weight:800;">📚 ${mySubjectsInClass.map(s => s['Nama Mapel']).join(', ')}</span>`;
+          } else if (isWali) {
+            badgeHtml = `<span style="font-size:10px; background:#fef3c7; color:#b45309; padding:2px 7px; border-radius:6px; font-weight:800;">👑 Wali Kelas</span>`;
+          } else {
+            badgeHtml = `<span style="font-size:10px; background:#e0f2fe; color:#0284c7; padding:2px 7px; border-radius:6px; font-weight:800;">📚 Mapel: ${mySubjectsInClass.map(s => s['Nama Mapel']).join(', ')}</span>`;
+          }
+        }
 
         return `
           <div class="class-item-card" onclick="openClassAttendance('${c['ID Kelas'] || c['Nama Kelas']}')" style="${isMyClass ? 'border-left:4px solid #0284c7;' : ''}">
@@ -8764,11 +8970,11 @@
               <span>${c['Jurusan'] || 'KLS'}</span>
             </div>
             <div class="class-info-detail">
-              <div class="class-info-name" style="display:flex;align-items:center;gap:6px">
-                ${c['Nama Kelas']}
-                ${isMyClass ? '<span style="font-size:10px;background:#e0f2fe;color:#0284c7;padding:1px 6px;border-radius:4px;font-weight:700">Penugasan Anda</span>' : ''}
+              <div class="class-info-name" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                <span>${c['Nama Kelas']}</span>
+                ${badgeHtml}
               </div>
-              <div class="class-info-sub">${jmlSiswa || c['Jumlah Siswa'] || 0} Siswa • Wali: ${c['Nama Wali Kelas'] || '-'}</div>
+              <div class="class-info-sub">${jmlSiswa || c['Jumlah Siswa'] || 0} Siswa • Wali: <strong>${c['Nama Wali Kelas'] || '-'}</strong></div>
             </div>
             <div style="color:#94a3b8; font-size:18px;">›</div>
           </div>
@@ -8782,10 +8988,9 @@
 
     async function openClassAttendance(classId) {
       if (currentUser && currentUser.role === 'guru') {
-        const mySubjects = dbSubjects.filter(s => matchesTeacherSchedule(s, currentUser));
-        const hasAssignment = mySubjects.some(s => s['ID Kelas'] === classId || s['Nama Kelas'] === classId);
+        const hasAssignment = isClassAssignedToTeacher(classId, currentUser);
         if (!hasAssignment) {
-          await appAlert('Anda tidak memiliki jadwal/penugasan mengajar di kelas ini.', 'Bukan Kelas Penugasan', '⚠️');
+          await appAlert('Anda tidak memiliki jadwal atau penugasan (sebagai Wali Kelas maupun Guru Mapel) di kelas ini.', 'Bukan Kelas Penugasan', '⚠️');
           return;
         }
       }
@@ -8797,41 +9002,23 @@
       }
     }
 
+    // Hari aktif: 1=Senin, 2=Selasa, 3=Rabu, 4=Kamis, 5=Jumat, 6=Sabtu, 0=Minggu, -1=Semua Hari
     let activeDayIndex = new Date().getDay();
+    if (activeDayIndex === 0) activeDayIndex = 1;
 
     function changeScheduleDay(delta) {
-      activeDayIndex = (activeDayIndex + delta + 7) % 7;
+      if (activeDayIndex === -1) {
+        activeDayIndex = new Date().getDay() || 1;
+      } else {
+        activeDayIndex = (activeDayIndex + delta + 7) % 7;
+        if (activeDayIndex === 0) activeDayIndex = delta > 0 ? 1 : 6;
+      }
       renderSchedules();
     }
 
-    function matchesTeacherSchedule(s, u) {
-      if (!s || !u) return false;
-      const sId = String(s['ID Guru'] || s.idGuru || '').trim();
-      const sName = String(s['Nama Guru'] || s.namaGuru || '').trim().toLowerCase();
-      const uId = String(u.id || '').trim();
-      const uUsername = String(u.username || '').trim().toLowerCase();
-      const uNip = String(u.nip || '').trim();
-      const uName = String(u.name || u.namaLengkap || '').trim().toLowerCase();
-
-      // 1. Direct ID / Username / NIP match
-      if (sId && (sId === uId || sId.toLowerCase() === uUsername || (uNip && uNip !== '-' && sId === uNip))) {
-        return true;
-      }
-
-      // 2. Name match (exact or substring or title-stripped)
-      if (sName && uName) {
-        if (sName === uName) return true;
-        if (sName.includes(uName) || uName.includes(sName)) return true;
-        
-        // Remove academic titles for robust matching with Web Portal Sekolah
-        const stripTitles = str => str.replace(/\b(drs|dra|dr|ir|prof|h|hj|s\.pd|m\.pd|s\.kom|m\.kom|s\.t|m\.t|s\.e|m\.m|s\.si|m\.si|s\.sos|m\.sos|s\.ag|m\.ag|ph\.d|gr)\b/gi, '').replace(/[.,]/g, '').trim();
-        const cleanS = stripTitles(sName);
-        const cleanU = stripTitles(uName);
-        if (cleanS && cleanU && (cleanS.includes(cleanU) || cleanU.includes(cleanS))) {
-          return true;
-        }
-      }
-      return false;
+    function selectScheduleDay(idx) {
+      activeDayIndex = idx;
+      renderSchedules();
     }
 
     function switchJadwalTab(tabName) {
@@ -8847,51 +9034,96 @@
       const container = document.getElementById('schedule-container');
       if (!container) return;
 
-      // Jika hari aktif (misal Minggu) tidak memiliki jadwal, otomatis cari hari yang memiliki jadwal
-      const namaHariIni = HARI_INDO[activeDayIndex];
-      const hasAnyScheduleToday = dbSubjects.some(s => (s.Hari || '').trim().toLowerCase() === namaHariIni.toLowerCase());
-      if (!hasAnyScheduleToday && activeDayIndex === 0) {
-        // Hari Minggu biasanya libur, otomatis alihkan ke Senin agar guru langsung melihat jadwal
-        activeDayIndex = 1;
+      const isGuru = currentUser && currentUser.role !== 'siswa';
+      const myAllSubjects = isGuru ? dbSubjects.filter(s => matchesTeacherSchedule(s, currentUser)) : [];
+
+      // Update counters tab
+      const cntMine = document.getElementById('count-jadwal-mine');
+      const cntAll = document.getElementById('count-jadwal-all');
+      if (cntMine) cntMine.innerText = `${myAllSubjects.length} Jadwal`;
+      if (cntAll) cntAll.innerText = `${dbSubjects.length} Jadwal`;
+
+      // Render Day Pill Selector bar
+      const pillBar = document.getElementById('schedule-day-pills');
+      if (pillBar) {
+        const days = [
+          { name: 'Semua', idx: -1 },
+          { name: 'Senin', idx: 1 },
+          { name: 'Selasa', idx: 2 },
+          { name: 'Rabu', idx: 3 },
+          { name: 'Kamis', idx: 4 },
+          { name: 'Jumat', idx: 5 },
+          { name: 'Sabtu', idx: 6 }
+        ];
+
+        pillBar.innerHTML = days.map(d => {
+          let count = 0;
+          if (d.idx === -1) {
+            count = (isGuru && activeJadwalTab === 'mine') ? myAllSubjects.length : dbSubjects.length;
+          } else {
+            const hName = HARI_INDO[d.idx].toLowerCase();
+            const pool = (isGuru && activeJadwalTab === 'mine') ? myAllSubjects : dbSubjects;
+            count = pool.filter(s => (s.Hari || '').trim().toLowerCase() === hName).length;
+          }
+          const isActive = activeDayIndex === d.idx;
+          return `
+            <button type="button" class="day-pill-btn ${isActive ? 'active' : ''}" onclick="selectScheduleDay(${d.idx})">
+              ${d.name} (${count})
+            </button>
+          `;
+        }).join('');
       }
 
-      const namaHari = HARI_INDO[activeDayIndex];
-      const isHariIni = activeDayIndex === (new Date().getDay());
+      // Tentukan hari aktif dan label
       const dayLabel = document.getElementById('schedule-active-day-label');
-      if (dayLabel) dayLabel.innerText = `${namaHari} ${isHariIni ? '(Hari Ini)' : ''}`;
+      let displayedSubjects = [];
 
-      // Urutkan jadwal berdasarkan jam mulai
-      let daySubjects = dbSubjects.filter(s => {
-        return (s.Hari || '').trim().toLowerCase() === namaHari.toLowerCase();
-      }).sort((a, b) => (a['Jam Mulai'] || '00:00').localeCompare(b['Jam Mulai'] || '00:00'));
+      if (activeDayIndex === -1) {
+        if (dayLabel) dayLabel.innerText = 'Semua Hari (Pekan Ini)';
+        displayedSubjects = (isGuru && activeJadwalTab === 'mine') ? myAllSubjects : dbSubjects;
+      } else {
+        const namaHari = HARI_INDO[activeDayIndex];
+        const isHariIni = activeDayIndex === (new Date().getDay());
+        if (dayLabel) dayLabel.innerText = `${namaHari} ${isHariIni ? '(Hari Ini)' : ''}`;
 
-      // Update counters tab guru
-      if (currentUser && currentUser.role !== 'siswa') {
-        const myAll = dbSubjects.filter(s => matchesTeacherSchedule(s, currentUser));
-        const cntMine = document.getElementById('count-jadwal-mine');
-        const cntAll = document.getElementById('count-jadwal-all');
-        if (cntMine) cntMine.innerText = `${myAll.length} Jadwal`;
-        if (cntAll) cntAll.innerText = `${dbSubjects.length} Jadwal`;
+        let daySubjects = dbSubjects.filter(s => (s.Hari || '').trim().toLowerCase() === namaHari.toLowerCase());
+        
+        if (isGuru && activeJadwalTab === 'mine') {
+          displayedSubjects = daySubjects.filter(s => matchesTeacherSchedule(s, currentUser));
+        } else if (currentUser && currentUser.role === 'siswa' && currentUser.className) {
+          const myClass = currentUser.className.toLowerCase().trim();
+          displayedSubjects = daySubjects.filter(s => {
+            const cName = (s['Nama Kelas'] || '').toLowerCase().trim();
+            return cName === myClass || cName.includes(myClass) || myClass.includes(cName) || cName === 'semua kelas';
+          });
+        } else {
+          displayedSubjects = daySubjects;
+        }
       }
 
-      // Filter jadwal berdasarkan tab aktif jika guru
-      let displayedSubjects = daySubjects;
-      if (currentUser && currentUser.role !== 'siswa' && activeJadwalTab === 'mine') {
-        displayedSubjects = daySubjects.filter(s => matchesTeacherSchedule(s, currentUser));
-      } else if (currentUser && currentUser.role === 'siswa' && currentUser.className) {
-        // Jika siswa, filter sesuai kelas siswa
-        const myClass = currentUser.className.toLowerCase().trim();
-        displayedSubjects = daySubjects.filter(s => {
-          const cName = (s['Nama Kelas'] || '').toLowerCase().trim();
-          return cName === myClass || cName.includes(myClass) || myClass.includes(cName) || cName === 'semua kelas';
-        });
-      }
+      // Urutkan berdasarkan hari & jam
+      displayedSubjects.sort((a, b) => {
+        const orderHari = { 'senin': 1, 'selasa': 2, 'rabu': 3, 'kamis': 4, 'jumat': 5, 'sabtu': 6, 'minggu': 7 };
+        const hA = orderHari[(a.Hari || '').trim().toLowerCase()] || 99;
+        const hB = orderHari[(b.Hari || '').trim().toLowerCase()] || 99;
+        if (hA !== hB) return hA - hB;
+        return (a['Jam Mulai'] || '00:00').localeCompare(b['Jam Mulai'] || '00:00');
+      });
 
       if (displayedSubjects.length === 0) {
+        const hariNama = activeDayIndex === -1 ? 'Pekan Ini' : HARI_INDO[activeDayIndex];
+        let tipMsg = '';
+        if (activeJadwalTab === 'mine' && isGuru && myAllSubjects.length === 0) {
+          tipMsg = `<p style="margin-top:6px; font-size:11px; color:#0284c7;">Tips: Klik tab <strong>"Semua Jadwal"</strong> untuk melihat seluruh jadwal mata pelajaran sekolah.</p>`;
+        } else if (activeDayIndex >= 0) {
+          tipMsg = `<p style="margin-top:6px; font-size:11px; color:#64748b;">Pilih hari lain pada tombol di atas atau pilih <strong>Semua</strong> untuk melihat seluruh jadwal mengajar.</p>`;
+        }
+        
         container.innerHTML = `
-          <div class="empty-state-card">
-            <span>📅</span>
-            <p>Tidak ada jadwal mengajar pada hari <strong>${namaHari}</strong> ${activeJadwalTab === 'mine' && currentUser?.role !== 'siswa' ? '(Tidak ada jam mengajar Anda di hari ini)' : ''}.</p>
+          <div class="empty-state-card" style="padding:26px 16px;">
+            <span style="font-size:32px;">📅</span>
+            <p style="margin-top:8px; font-size:12px; color:#475569;">Tidak ada jadwal mengajar pada <strong>${hariNama}</strong> ${activeJadwalTab === 'mine' && isGuru ? '(Jadwal Anda di hari ini tidak ada)' : ''}.</p>
+            ${tipMsg}
           </div>
         `;
         return;
@@ -8899,11 +9131,13 @@
 
       const now = new Date();
       const curMinutes = now.getHours() * 60 + now.getMinutes();
+      const todayHari = HARI_INDO[now.getDay()].toLowerCase();
 
       container.innerHTML = displayedSubjects.map((s, idx) => {
         let statusBadge = '<span class="schedule-status-badge status-belum-mulai">Belum Mulai</span>';
+        const isTodaySubject = (s.Hari || '').trim().toLowerCase() === todayHari;
 
-        if (isHariIni && s['Jam Mulai']) {
+        if (isTodaySubject && s['Jam Mulai']) {
           const [hM, mM] = s['Jam Mulai'].split(':').map(Number);
           const [hS, mS] = (s['Jam Selesai'] || '00:00').split(':').map(Number);
           const startMin = hM * 60 + (mM || 0);
@@ -8923,29 +9157,29 @@
             <div style="display:flex; align-items:center; gap:12px;">
               <div class="schedule-time-box">📖</div>
               <div class="schedule-detail" style="flex:1;">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                  <div class="schedule-time-range">${s['Jam Mulai'] || '-'} - ${s['Jam Selesai'] || '-'}</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:4px;">
+                  <div class="schedule-time-range">📅 ${s.Hari || 'Hari'} • ${s['Jam Mulai'] || '-'} - ${s['Jam Selesai'] || '-'}</div>
                   <div>${statusBadge}</div>
                 </div>
-                <div class="schedule-title">${s['Nama Kelas']}</div>
-                <div class="schedule-sub">${s['Nama Mapel']} • ${s['Ruangan'] || 'Ruang Kelas'} ${s['Semester'] ? '• Sem. ' + s['Semester'] : ''}</div>
-                <div style="font-size:11px; color:#64748b; margin-top:2px;">
+                <div class="schedule-title" style="margin-top:2px;">${s['Nama Kelas']} • <span style="color:#0284c7;">${s['Nama Mapel']}</span></div>
+                <div class="schedule-sub">${s['Ruangan'] || 'Ruang Kelas'} ${s['Semester'] ? '• Sem. ' + s['Semester'] : ''}</div>
+                <div style="font-size:11px; color:#64748b; margin-top:3px;">
                   👨‍🏫 Guru Pengampu: <strong>${s['Nama Guru'] || '-'}</strong>
-                  ${isMine ? '<span style="margin-left:6px; background:#e0f2fe; color:#0369a1; padding:2px 6px; border-radius:6px; font-weight:800; font-size:10px;">Jadwal Anda</span>' : ''}
+                  ${isMine ? '<span style="margin-left:6px; background:#e0f2fe; color:#0369a1; padding:2px 7px; border-radius:6px; font-weight:800; font-size:10px;">Jadwal Anda</span>' : ''}
                 </div>
               </div>
             </div>
 
-            <!-- Action buttons for Schedule (Hanya Presensi Kelas, Jadwal Ditetapkan Admin Portal Sekolah) -->
+            <!-- Action buttons for Schedule (Buka Presensi) -->
             <div style="display:flex; gap:8px; border-top:1px dashed #e2e8f0; padding-top:8px; justify-content:flex-end; align-items:center;">
               ${currentUser && currentUser.role !== 'siswa' ? (
-                isMine ? `
+                isMine || isClassAssignedToTeacher(s['ID Kelas'] || s['Nama Kelas'], currentUser) ? `
                   <button type="button" onclick="openSubjectAttendance('${s['ID Kelas'] || s['Nama Kelas']}', '${s['ID Mapel']}')" style="background:linear-gradient(135deg, #0284c7 0%, #2563eb 100%); color:white; border:none; border-radius:10px; padding:7px 14px; font-size:11.5px; font-weight:800; cursor:pointer; box-shadow:0 4px 12px rgba(2,132,199,0.25);">
                     ✏️ Buka Presensi Kelas ➔
                   </button>
                 ` : `
                   <span style="font-size:11px; color:#64748b; background:#f8fafc; padding:5px 10px; border-radius:8px; border:1px solid #e2e8f0; display:inline-flex; align-items:center; gap:5px;">
-                    🔒 Presensi khusus Guru Pengampu (${escapeHtml(s['Nama Guru'] || '-')})
+                    🔒 Presensi Guru Pengampu (${escapeHtml(s['Nama Guru'] || '-')})
                   </span>
                 `
               ) : ''}
@@ -8979,10 +9213,7 @@
       if (!selClass) return;
 
       const isGuru = currentUser && currentUser.role === 'guru';
-      const mySubjects = isGuru ? dbSubjects.filter(s => matchesTeacherSchedule(s, currentUser)) : dbSubjects;
-      const classesToShow = isGuru
-        ? dbClasses.filter(c => mySubjects.some(s => (s['ID Kelas'] && s['ID Kelas'] === c['ID Kelas']) || (s['Nama Kelas'] && s['Nama Kelas'] === c['Nama Kelas'])))
-        : dbClasses;
+      const classesToShow = isGuru ? getTeacherAssignedClasses(currentUser) : dbClasses;
 
       const currentVal = selClass.value;
       if (isGuru && classesToShow.length === 0) {
@@ -9188,9 +9419,33 @@
         (s['Nama Kelas'] && s['Nama Kelas'].trim().toLowerCase() === targetClassName.trim().toLowerCase())
       );
 
-      // JIKA GURU: HANYA TAMPILKAN MAPEL PENUGASAN GURU TERSEBUT DI KELAS INI
+      // JIKA GURU: CEK APAKAH GURU ADALAH WALI KELAS ATAU PENUGASAN MAPEL
       if (isGuru) {
-        subjectsInClass = subjectsInClass.filter(s => matchesTeacherSchedule(s, currentUser));
+        const uId = String(currentUser?.id || currentUser?.ID || '').trim();
+        const uNip = String(currentUser?.nip || currentUser?.NIP || '').trim();
+        const cWaliId = selectedClassObj ? String(selectedClassObj['ID Wali Kelas'] || '').trim() : '';
+        const isWali = (cWaliId && (cWaliId === uId || (uNip && uNip !== '-' && cWaliId === uNip))) ||
+                       (selectedClassObj && selectedClassObj['Nama Wali Kelas'] && matchesTeacherSchedule({ 'Nama Guru': selectedClassObj['Nama Wali Kelas'], 'ID Guru': selectedClassObj['ID Wali Kelas'] }, currentUser));
+
+        const mySubjects = subjectsInClass.filter(s => matchesTeacherSchedule(s, currentUser));
+
+        if (mySubjects.length > 0) {
+          subjectsInClass = mySubjects;
+        } else if (isWali) {
+          // Wali Kelas dapat mengisi presensi harian meskipun belum ada mapel spesifik
+          let optionsHtml = '<option value="PRESENSI_WALI_KELAS">📋 Presensi Harian (Wali Kelas)</option>';
+          if (subjectsInClass.length > 0) {
+            optionsHtml += subjectsInClass.map(s => `
+              <option value="${s['ID Mapel'] || s['Nama Mapel']}">${s['Nama Mapel']} (${s['Nama Guru'] || 'Mapel Kelas'})</option>
+            `).join('');
+          }
+          selSubj.innerHTML = optionsHtml;
+          selSubj.value = preselectSubjectId || 'PRESENSI_WALI_KELAS';
+        } else {
+          selSubj.innerHTML = '<option value="">-- Tidak ada mapel penugasan Anda di kelas ini --</option>';
+          renderAttendanceRoster([]);
+          return;
+        }
       } else if (subjectsInClass.length === 0 && dbSubjects.length > 0) {
         const seenNames = new Set();
         subjectsInClass = dbSubjects.filter(s => {
@@ -9201,20 +9456,16 @@
         });
       }
 
-      if (isGuru && subjectsInClass.length === 0) {
-        selSubj.innerHTML = '<option value="">-- Tidak ada mapel penugasan Anda di kelas ini --</option>';
-        renderAttendanceRoster([]);
-        return;
-      }
+      if (!selSubj.innerHTML.includes('PRESENSI_WALI_KELAS')) {
+        selSubj.innerHTML = '<option value="">-- Pilih Mapel --</option>' + subjectsInClass.map(s => `
+          <option value="${s['ID Mapel'] || s['Nama Mapel']}">${s['Nama Mapel']}${s.Hari ? ' (' + s.Hari + ')' : ''}</option>
+        `).join('');
 
-      selSubj.innerHTML = '<option value="">-- Pilih Mapel --</option>' + subjectsInClass.map(s => `
-        <option value="${s['ID Mapel'] || s['Nama Mapel']}">${s['Nama Mapel']}${s.Hari ? ' (' + s.Hari + ')' : ''}</option>
-      `).join('');
-
-      if (preselectSubjectId) {
-        selSubj.value = preselectSubjectId;
-      } else if (subjectsInClass.length > 0) {
-        selSubj.value = subjectsInClass[0]['ID Mapel'] || subjectsInClass[0]['Nama Mapel'];
+        if (preselectSubjectId) {
+          selSubj.value = preselectSubjectId;
+        } else if (subjectsInClass.length > 0) {
+          selSubj.value = subjectsInClass[0]['ID Mapel'] || subjectsInClass[0]['Nama Mapel'];
+        }
       }
 
       // Siswa di kelas terpilih (cocokkan ID Kelas atau Nama Kelas)
@@ -9385,10 +9636,16 @@
       const classStudents = dbStudents.filter(s => s['ID Kelas'] === selectedClassVal || s['Nama Kelas'] === selectedClassVal);
 
       if (currentUser && currentUser.role === 'guru') {
+        const uId = String(currentUser?.id || currentUser?.ID || '').trim();
+        const uNip = String(currentUser?.nip || currentUser?.NIP || '').trim();
+        const cWaliId = classObj ? String(classObj['ID Wali Kelas'] || '').trim() : '';
+        const isWali = (cWaliId && (cWaliId === uId || (uNip && uNip !== '-' && cWaliId === uNip))) ||
+                       (classObj && classObj['Nama Wali Kelas'] && matchesTeacherSchedule({ 'Nama Guru': classObj['Nama Wali Kelas'], 'ID Guru': classObj['ID Wali Kelas'] }, currentUser));
+        
         const mySubjects = dbSubjects.filter(s => matchesTeacherSchedule(s, currentUser));
-        const isAllowed = mySubjects.some(s => 
+        const isAllowed = isWali || mySubjects.some(s => 
           (s['ID Kelas'] === selectedClassVal || s['Nama Kelas'] === selectedClassVal || (s['Nama Kelas'] && classObj['Nama Kelas'] && s['Nama Kelas'].trim().toLowerCase() === classObj['Nama Kelas'].trim().toLowerCase())) &&
-          (!selectedSubjVal || s['ID Mapel'] === selectedSubjVal || s['Nama Mapel'] === selectedSubjVal)
+          (!selectedSubjVal || selectedSubjVal === 'PRESENSI_WALI_KELAS' || s['ID Mapel'] === selectedSubjVal || s['Nama Mapel'] === selectedSubjVal)
         );
         if (!isAllowed) {
           appAlert(`Anda hanya dapat menyimpan presensi untuk kelas dan mata pelajaran penugasan Anda sendiri (${currentUser.name}).`, 'Presensi Ditolak', '⚠️');
@@ -9412,6 +9669,10 @@
         const hariIni = !isNaN(dateObj.getTime()) ? HARI_INDO[dateObj.getDay()] : HARI_INDO[now.getDay()];
         const jamSekarang = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
 
+        const mapelLabel = selectedSubjVal === 'PRESENSI_WALI_KELAS' 
+          ? 'Presensi Harian (Wali Kelas)' 
+          : (subjObj['Nama Mapel'] || selectedSubjVal || 'Mapel Umum');
+
         const rowsToInsert = classStudents.map(st => {
           const statusVal = activeAttendanceRecords[st.NIS] ? activeAttendanceRecords[st.NIS].status : 'Hadir';
           const newId = generateUniqueId('ABS');
@@ -9424,8 +9685,8 @@
             'Nama Kelas': classObj['Nama Kelas'] || selectedClassVal,
             'ID Guru': currentUser ? currentUser.id : '',
             'Nama Guru': currentUser ? currentUser.name : '',
-            'ID Mapel': subjObj['ID Mapel'] || '',
-            'Nama Mapel': subjObj['Nama Mapel'] || '',
+            'ID Mapel': selectedSubjVal === 'PRESENSI_WALI_KELAS' ? 'WALI_KELAS' : (subjObj['ID Mapel'] || selectedSubjVal || ''),
+            'Nama Mapel': mapelLabel,
             'NIS Siswa': st.NIS,
             'Nama Siswa': st['Nama Siswa'],
             'Status': statusVal,
@@ -9917,8 +10178,10 @@
       if (isSyncingData) return;
       isSyncingData = true;
 
-      const icon = document.getElementById('sync-top-icon');
+      const icon = document.getElementById('sync-spin-icon') || document.getElementById('sync-top-icon');
       if (icon) icon.classList.add('spin');
+      const label = document.getElementById('sync-top-label');
+      if (label) label.innerText = 'Menyinkron...';
 
       showToast('🔄 Memulai sinkronisasi data dengan server...');
 
@@ -9931,6 +10194,7 @@
       } finally {
         isSyncingData = false;
         if (icon) icon.classList.remove('spin');
+        if (label) label.innerText = 'Sinkron';
       }
     }
 
