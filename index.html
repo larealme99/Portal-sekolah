@@ -1146,7 +1146,7 @@
             text-align: center;
         }
 
-        /* ── TAGLINE: — Terhubung • Bersama • Menuju Tujuan — ── */
+        /* ── TAGLINE: — One Step • One Goal • One Spirit — ── */
         .simpul-tagline {
             display: inline-flex;
             align-items: center;
@@ -1595,6 +1595,8 @@
             min-width: 100%;
             height: 100%;
             position: relative;
+            cursor: zoom-in;
+            overflow: hidden;
         }
 
         .lp-gallery-slide img {
@@ -1602,6 +1604,14 @@
             height: 100%;
             object-fit: cover;
             display: block;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            transition: transform 0.4s ease, filter 0.3s ease;
+        }
+
+        .lp-gallery-slide:hover img {
+            transform: scale(1.025);
+            filter: brightness(1.04);
         }
 
         .lp-gallery-caption {
@@ -6315,7 +6325,7 @@
             </button>
         </div>
 
-        <div class="ham-panel-foot"><span>One step &bull; one goal &bull; One spirit</span></div>
+        <div class="ham-panel-foot"><span>One Step &bull; One Goal &bull; One Spirit</span></div>
         <div class="ham-panel-sea"></div>
     </div>
 
@@ -6458,7 +6468,7 @@
         <section class="lp-intro">
             <div class="simpul-tagline">
                 <span class="simpul-tagline-dash"></span>
-                <span>One Step &bull; One goal &bull; One Spirit</span>
+                <span>One Step &bull; One Goal &bull; One Spirit</span>
                 <span class="simpul-tagline-dash right"></span>
             </div>
             <p class="simpul-description-p">
@@ -6687,9 +6697,9 @@
                 <!-- Carousel Footer: Autoplay Indicator & Dots -->
                 <div class="lp-teacher-carousel-footer">
                     <button type="button" class="lp-teacher-autoplay-badge" id="lpTeacherAutoplayBadge"
-                        onclick="toggleTeacherAutoplay()" title="Klik untuk menjeda/melanjutkan rotasi otomatis">
-                        <span class="autoplay-pulse-dot" id="lpTeacherAutoplayDot"></span>
-                        <span id="lpTeacherAutoplayTxt">Foto Berganti Otomatis (3.5s)</span>
+                        onclick="toggleTeacherAutoplay()" title="Klik untuk mengaktifkan rotasi otomatis">
+                        <span class="autoplay-pulse-dot" id="lpTeacherAutoplayDot" style="background:#94a3b8"></span>
+                        <span id="lpTeacherAutoplayTxt">Mode Stabil (Geser Manual)</span>
                     </button>
                     <div class="lp-teacher-dots" id="lpTeacherDots"></div>
                 </div>
@@ -8661,16 +8671,16 @@
         // GALERI BERGERAK DI TENGAH LANDING PAGE (ADMIN BISA GANTI)
         // ═══════════════════════════════════════════════════
         var DEFAULT_GALLERY_IMAGES = [
-            { url: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=800&q=80', caption: 'Gedung dan Lingkungan SMAN 12 Muna Barat yang Asri dan Nyaman' },
-            { url: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=800&q=80', caption: 'Proses Pembelajaran Interaktif Siswa di Ruang Kelas' },
-            { url: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=800&q=80', caption: 'Praktikum Eksperimen Laboratorium Sains dan Biologi' },
-            { url: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=80', caption: 'Pembinaan Belajar Terstruktur oleh Dewan Guru Berdedikasi' },
-            { url: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80', caption: 'Kegiatan Kolaborasi dan Diskusi Kelompok Belajar Siswa' },
-            { url: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=800&q=80', caption: 'Pemanfaatan Fasilitas Perpustakaan Digital & Buku Referensi' },
-            { url: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80', caption: 'Pelaksanaan Ujian Berbasis Komputer & Mobile (CBT Online)' },
-            { url: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=800&q=80', caption: 'Upacara Bendera dan Pembinaan Karakter Kebangsaan' },
-            { url: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=800&q=80', caption: 'Pengembangan Bakat dan Prestasi Olahraga Siswa' },
-            { url: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=800&q=80', caption: 'Pelepasan & Wisuda Siswa-Siswi Angkatan Berprestasi' }
+            { url: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1200&q=85', caption: 'Gedung dan Lingkungan SMAN 12 Muna Barat yang Asri dan Nyaman' },
+            { url: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&q=85', caption: 'Proses Pembelajaran Interaktif Siswa di Ruang Kelas' },
+            { url: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=1200&q=85', caption: 'Praktikum Eksperimen Laboratorium Sains dan Biologi' },
+            { url: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1200&q=85', caption: 'Pembinaan Belajar Terstruktur oleh Dewan Guru Berdedikasi' },
+            { url: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=85', caption: 'Kegiatan Kolaborasi dan Diskusi Kelompok Belajar Siswa' },
+            { url: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1200&q=85', caption: 'Pemanfaatan Fasilitas Perpustakaan Digital & Buku Referensi' },
+            { url: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=85', caption: 'Pelaksanaan Ujian Berbasis Komputer & Mobile (CBT Online)' },
+            { url: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1200&q=85', caption: 'Upacara Bendera dan Pembinaan Karakter Kebangsaan' },
+            { url: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1200&q=85', caption: 'Pengembangan Bakat dan Prestasi Olahraga Siswa' },
+            { url: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=85', caption: 'Pelepasan & Wisuda Siswa-Siswi Angkatan Berprestasi' }
         ];
 
         var currentGalleryIndex = 0;
@@ -8715,9 +8725,12 @@
             // Gunakan photos yang dikirim langsung (paling akurat), atau baca dari cache
             var photos = photosOverride || getActiveGalleryPhotos();
             track.innerHTML = photos.map(function (item, idx) {
-                return '<div class="lp-gallery-slide" id="slide-' + idx + '">' +
-                    '<img src="' + item.url + '" alt="' + esc(item.caption || 'Foto Sekolah') + '" onerror="this.src=\'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=800&q=80\'"/>' +
-                    '<div class="lp-gallery-caption">' + esc(item.caption || 'Dokumentasi Sekolah') + '</div>' +
+                return '<div class="lp-gallery-slide" id="slide-' + idx + '" onclick="openGalleryPhotoLightbox(' + idx + ')" title="Klik untuk melihat foto resolusi penuh">' +
+                    '<img src="' + item.url + '" alt="' + esc(item.caption || 'Foto Sekolah') + '" loading="lazy" onerror="this.src=\'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1200&q=85\'"/>' +
+                    '<div class="lp-gallery-caption">' +
+                    '<span>' + esc(item.caption || 'Dokumentasi Sekolah') + '</span>' +
+                    '<span style="font-size:11.5px;color:rgba(255,255,255,0.9);margin-left:8px;font-weight:600;display:inline-flex;align-items:center;gap:4px;background:rgba(0,0,0,0.35);padding:2px 8px;border-radius:12px;border:1px solid rgba(255,255,255,0.25)"><i class="fas fa-search-plus"></i> Klik Perbesar HD</span>' +
+                    '</div>' +
                     '</div>';
             }).join('');
 
@@ -8729,6 +8742,49 @@
             updateGalleryPosition();
             startGalleryAutoplay();
             setupGalleryTouchSwipe();
+
+            // Pause autoplay saat mouse berada di atas galeri agar tidak berpindah sendiri saat dilihat
+            var container = document.getElementById('lpGalleryContainer');
+            if (container && !container._hoverBound) {
+                container._hoverBound = true;
+                container.addEventListener('mouseenter', function () {
+                    if (galleryAutoTimer) {
+                        clearInterval(galleryAutoTimer);
+                        galleryAutoTimer = null;
+                    }
+                });
+                container.addEventListener('mouseleave', function () {
+                    startGalleryAutoplay();
+                });
+            }
+        }
+
+        function openGalleryPhotoLightbox(idx) {
+            var photos = getActiveGalleryPhotos();
+            var item = photos[idx];
+            if (!item) return;
+
+            var modalTitle = document.getElementById('generalModalTitle');
+            var modalBox = document.getElementById('generalModalBox');
+            var modalBody = document.getElementById('generalModalBody');
+
+            if (modalTitle) modalTitle.innerHTML = '<i class="fas fa-image" style="color:#0ea5e9"></i> ' + esc(item.caption || 'Galeri Foto Sekolah');
+            if (modalBox) modalBox.style.maxWidth = '940px';
+            if (modalBody) {
+                modalBody.innerHTML =
+                    '<div style="text-align:center;background:#090d16;border-radius:14px;overflow:hidden;max-height:75vh;display:flex;align-items:center;justify-content:center;padding:12px;box-shadow:inset 0 0 50px rgba(0,0,0,0.6)">' +
+                    '<img src="' + item.url + '" alt="' + esc(item.caption || '') + '" style="max-width:100%;max-height:68vh;object-fit:contain;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.5);image-rendering:-webkit-optimize-contrast"/>' +
+                    '</div>' +
+                    '<div style="margin-top:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">' +
+                    '<div style="font-size:14px;font-weight:700;color:var(--text);flex:1;line-height:1.4">' + esc(item.caption || 'Dokumentasi Sekolah') + '<br/><small style="font-size:11.5px;color:var(--text2);font-weight:500">Slide ' + (idx + 1) + ' dari ' + photos.length + ' foto</small></div>' +
+                    '<div style="display:flex;align-items:center;gap:8px">' +
+                    (idx > 0 ? '<button type="button" class="btn btn-outline btn-sm" onclick="openGalleryPhotoLightbox(' + (idx - 1) + ')"><i class="fas fa-chevron-left"></i> Sebelumnya</button>' : '') +
+                    (idx < photos.length - 1 ? '<button type="button" class="btn btn-outline btn-sm" onclick="openGalleryPhotoLightbox(' + (idx + 1) + ')">Berikutnya <i class="fas fa-chevron-right"></i></button>' : '') +
+                    '<a href="' + item.url + '" download="foto_sekolah_' + (idx + 1) + '.jpg" target="_blank" class="btn btn-primary btn-sm"><i class="fas fa-download"></i> Unduh Foto HD</a>' +
+                    '</div>' +
+                    '</div>';
+            }
+            openModal('generalModal');
         }
 
         function updateGalleryPosition() {
@@ -8748,28 +8804,24 @@
         function nextGallerySlide() {
             currentGalleryIndex++;
             updateGalleryPosition();
-            startGalleryAutoplay();
         }
 
         function prevGallerySlide() {
             currentGalleryIndex--;
             updateGalleryPosition();
-            startGalleryAutoplay();
         }
 
         function goToGallerySlide(idx) {
             currentGalleryIndex = idx;
             updateGalleryPosition();
-            startGalleryAutoplay();
         }
 
         function startGalleryAutoplay() {
-            if (galleryAutoTimer) clearInterval(galleryAutoTimer);
-            galleryAutoTimer = setInterval(function () {
-                var photos = getActiveGalleryPhotos();
-                currentGalleryIndex = (currentGalleryIndex + 1) % photos.length;
-                updateGalleryPosition();
-            }, 3500);
+            // Dinonaktifkan: Galeri foto tetap tenang dan stabil tanpa pergeseran atau refresh otomatis yang mengganggu
+            if (galleryAutoTimer) {
+                clearInterval(galleryAutoTimer);
+                galleryAutoTimer = null;
+            }
         }
 
         function setupGalleryTouchSwipe() {
@@ -9670,20 +9722,28 @@
         // MONITOR SISWA MASUK & KELUAR RUANG BELAJAR
         // ═══════════════════════════════════════════════════
         window.CURRENT_MONITOR_LEARNING_ID = null;
+        window._learningMonitorTimer = null;
 
         function openLearningMonitor(learningId, learningTitle) {
             window.CURRENT_MONITOR_LEARNING_ID = learningId;
             var sub = document.getElementById('learningMonitorSubtitle');
             if (sub) sub.textContent = 'Materi: ' + (learningTitle || 'Ruang Pembelajaran');
             openModal('learningMonitorModal');
-            refreshLearningMonitor();
+            if (window._learningMonitorTimer) {
+                clearInterval(window._learningMonitorTimer);
+                window._learningMonitorTimer = null;
+            }
+            // Muat data kehadiran sekali saat modal dibuka (polling otomatis dihilangkan)
+            refreshLearningMonitor(false);
         }
 
-        function refreshLearningMonitor() {
+        function refreshLearningMonitor(isAuto) {
             var learningId = window.CURRENT_MONITOR_LEARNING_ID;
             if (!learningId) return;
             var tbody = document.getElementById('learningMonitorTbody');
-            if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px"><i class="fas fa-spinner fa-spin"></i> Memuat data kehadiran siswa...</td></tr>';
+            if (!isAuto && tbody) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px"><i class="fas fa-spinner fa-spin"></i> Memuat data kehadiran siswa...</td></tr>';
+            }
 
             google.script.run.withSuccessHandler(function (res) {
                 var attendees = (res && res.data) ? res.data : [];
@@ -9738,7 +9798,7 @@
 
                 tbody.innerHTML = rows;
             }).withFailureHandler(function (e) {
-                if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#ef4444;padding:20px">Gagal memuat data kehadiran: ' + esc(e.message || '') + '</td></tr>';
+                if (!isAuto && tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#ef4444;padding:20px">Gagal memuat data kehadiran: ' + esc(e.message || '') + '</td></tr>';
             }).getLearningAttendees(learningId);
         }
 
@@ -10264,14 +10324,21 @@
             // Validasi hak penugasan guru: guru hanya boleh publikasikan di kelas dan mapel penugasannya
             if (role === 'guru') {
                 var mySubs = window._TEACHER_LEARNING_SUBJECTS || [];
-                var isAllowed = mySubs.some(function (s) {
-                    var matchSubj = !idMapel || s['ID Mapel'] === idMapel || s['Nama Mapel'] === namaMapel;
-                    var matchKelas = !idKelas || s['ID Kelas'] === idKelas || s['Nama Kelas'] === namaKelas;
-                    return matchSubj && matchKelas;
-                });
-                if (!isAllowed) {
-                    showToast('Anda hanya dapat mempublikasikan pembelajaran di kelas dan mata pelajaran penugasan Anda!', 'error');
-                    return;
+                if (mySubs.length > 0) {
+                    var isAllowed = mySubs.some(function (s) {
+                        var matchSubj = !idMapel || s['ID Mapel'] === idMapel || (s['Nama Mapel'] && s['Nama Mapel'].toLowerCase().includes(namaMapel.toLowerCase())) || (namaMapel && namaMapel.toLowerCase().includes((s['Nama Mapel'] || '').toLowerCase()));
+                        var matchKelas = !idKelas || s['ID Kelas'] === idKelas || s['Nama Kelas'] === namaKelas || !namaKelas || namaKelas === 'Semua Kelas';
+                        return matchSubj && matchKelas;
+                    });
+                    if (!isAllowed) {
+                        var matchAnySubj = mySubs.some(function (s) {
+                            return !idMapel || s['ID Mapel'] === idMapel || (s['Nama Mapel'] && s['Nama Mapel'].toLowerCase().includes(namaMapel.toLowerCase()));
+                        });
+                        if (!matchAnySubj) {
+                            showToast('Pilih mata pelajaran penugasan Anda untuk mempublikasikan pembelajaran!', 'warning');
+                            return;
+                        }
+                    }
                 }
             }
 
@@ -13379,22 +13446,25 @@
 
         // ── MONITOR EXAM ─────────────────────────────────────────────
         function monitorExam(examId, examTitle) {
-            document.getElementById('generalModalTitle').innerHTML = '<i class="fas fa-chart-line" style="color:var(--success)"></i> Monitor Ujian: ' + esc(examTitle);
-            document.getElementById('generalModalBox').style.maxWidth = '850px';
-            document.getElementById('generalModalBody').innerHTML = '<div style="text-align:center;padding:40px"><div class="loader-ring"></div></div>';
+            document.getElementById('generalModalTitle').innerHTML = '<i class="fas fa-chart-line" style="color:var(--success)"></i> Live Monitor Ujian: ' + esc(examTitle) + ' <button type="button" class="btn btn-outline btn-xs" style="margin-left:10px" onclick="loadMonitorData(\'' + examId + '\', \'' + esc(examTitle).replace(/'/g, "\\'") + '\')"><i class="fas fa-sync-alt"></i> Segarkan</button>';
+            document.getElementById('generalModalBox').style.maxWidth = '880px';
+            document.getElementById('generalModalBody').innerHTML = '<div style="text-align:center;padding:40px"><div class="loader-ring"></div><div style="margin-top:10px;font-size:12px;color:var(--text2)">Mengambil data pengerjaan ujian...</div></div>';
             openModal('generalModal');
+            if (APP.violationPolling) {
+                clearInterval(APP.violationPolling);
+                APP.violationPolling = null;
+            }
+            // Muat data pengerjaan ujian sekali saat modal dibuka (polling otomatis dihilangkan)
             loadMonitorData(examId, examTitle);
-            if (APP.violationPolling) clearInterval(APP.violationPolling);
-            APP.violationPolling = setInterval(function () { loadMonitorData(examId, examTitle); }, 1000);
         }
 
-        function loadMonitorData(examId, examTitle) {
+        function loadMonitorData(examId, examTitle, isAuto) {
             google.script.run.withSuccessHandler(function (sessRes) {
                 google.script.run.withSuccessHandler(function (vioRes) {
-                    var sessions = sessRes.data || [];
-                    var violations = vioRes.data || [];
+                    var sessions = Array.isArray(sessRes) ? sessRes : ((sessRes && sessRes.data) ? sessRes.data : []);
+                    var violations = Array.isArray(vioRes) ? vioRes : ((vioRes && vioRes.data) ? vioRes.data : []);
                     var active = sessions.filter(function (s) { return s['Status Sesi'] === 'active'; });
-                    var finished = sessions.filter(function (s) { return s['Status Sesi'] === 'finished'; });
+                    var finished = sessions.filter(function (s) { return s['Status Sesi'] === 'finished' || s['Status Sesi'] === 'selesai'; });
                     var disqualified = sessions.filter(function (s) { return s['Status Sesi'] === 'disqualified'; });
 
                     var vioMap = {};
@@ -13413,7 +13483,7 @@
                         (sessions.length ? sessions.map(function (s) {
                             var vioCount = vioMap[s['NIS Siswa']] || 0;
                             var statusBadge = s['Status Sesi'] === 'active' ? '<span class="badge badge-success">Sedang Ujian</span>'
-                                : s['Status Sesi'] === 'finished' ? '<span class="badge badge-info">Selesai</span>'
+                                : (s['Status Sesi'] === 'finished' || s['Status Sesi'] === 'selesai') ? '<span class="badge badge-info">Selesai</span>'
                                     : s['Status Sesi'] === 'disqualified' ? '<span class="badge badge-danger">Diskualifikasi</span>'
                                         : '<span class="badge badge-warning">' + esc(s['Status Sesi']) + '</span>';
                             var cleanWaktu = formatCleanDate(s['Waktu Masuk']);
@@ -13424,7 +13494,10 @@
                                 '<td>' + (s['Status Sesi'] === 'active' ? '<button class="btn btn-danger btn-sm" onclick="disqualifyStudentFromMonitor(\'' + examId + '\',\'' + esc(s['NIS Siswa']) + '\',\'' + esc(s['Nama Siswa']) + '\')"><i class="fas fa-ban"></i> Hentikan Ujian</button>' : '<span style="color:var(--text2);font-size:12px">Terkunci</span>') + '</td></tr>';
                         }).join('') : '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text2)">Belum ada siswa yang masuk</td></tr>') +
                         '</tbody></table></div>' +
-                        '<p style="text-align:right;font-size:11px;color:var(--text2);margin-top:8px">Auto-refresh setiap 15 detik</p>';
+                        '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-size:11.5px;color:var(--text2)">' +
+                        '<span><i class="fas fa-shield-alt" style="color:var(--primary);margin-right:4px"></i> Mode Stabil • Data termuat</span>' +
+                        '<button class="btn btn-outline btn-xs" onclick="loadMonitorData(\'' + examId + '\',\'' + esc(examTitle).replace(/'/g, "\\'") + '\')"><i class="fas fa-sync-alt"></i> Perbarui Sekarang</button>' +
+                        '</div>';
                 }).getViolations(examId);
             }).getExamSessions(examId);
         }
@@ -15168,21 +15241,45 @@
         function handleGalleryPhotoUpload(input) {
             if (input.files && input.files[0]) {
                 var file = input.files[0];
-                showWaiting('Memproses Gambar...', 'Mengompres foto untuk galeri');
-                // Kompres lebih kecil (480px, 0.72 quality) agar setiap foto muat dalam satu sel Sheets
-                // Menghasilkan base64 ~15-30KB per foto - aman untuk disimpan antar device
-                compressImage(file, 480, 0.72, function (dataUrl) {
-                    hideWaiting();
-                    var hiddenInput = document.getElementById('galModalHiddenData');
-                    if (hiddenInput) hiddenInput.value = dataUrl;
-                    var urlInput = document.getElementById('galModalUrl');
-                    if (urlInput) urlInput.value = '';
-                    var fnSpan = document.getElementById('galUploadFileName');
-                    if (fnSpan) fnSpan.textContent = file.name + ' (siap disimpan)';
-                    var pBox = document.getElementById('galPreviewBox');
-                    if (pBox) pBox.innerHTML = '<img src="' + dataUrl + '" style="width:100%;height:100%;object-fit:cover"/>';
-                    showToast('Foto berhasil dimuat. Lengkapi caption lalu simpan.', 'success');
-                });
+                showWaiting('Memproses Gambar...', 'Memuat foto kualitas asli untuk galeri');
+
+                // Jika ukuran file foto wajar (di bawah 2MB), gunakan 100% resolusi dan kualitas asli tanpa kompresi
+                if (file.size <= 2 * 1024 * 1024) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        hideWaiting();
+                        var dataUrl = e.target.result;
+                        var hiddenInput = document.getElementById('galModalHiddenData');
+                        if (hiddenInput) hiddenInput.value = dataUrl;
+                        var urlInput = document.getElementById('galModalUrl');
+                        if (urlInput) urlInput.value = '';
+                        var fnSpan = document.getElementById('galUploadFileName');
+                        if (fnSpan) fnSpan.textContent = file.name + ' (Kualitas Asli HD)';
+                        var pBox = document.getElementById('galPreviewBox');
+                        if (pBox) pBox.innerHTML = '<img src="' + dataUrl + '" style="width:100%;height:100%;object-fit:cover"/>';
+                        showToast('Foto kualitas asli berhasil dimuat. Lengkapi caption lalu simpan.', 'success');
+                    };
+                    reader.onerror = function () {
+                        hideWaiting();
+                        showToast('Gagal memuat berkas foto.', 'error');
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    // Jika file kamera HP sangat besar (> 2MB), kompres dengan resolusi Full HD (1920px) dan kualitas tinggi 0.92
+                    // sehingga kejernihan, ketajaman, dan warna foto tetap terjaga maksimal
+                    compressImage(file, 1920, 0.92, function (dataUrl) {
+                        hideWaiting();
+                        var hiddenInput = document.getElementById('galModalHiddenData');
+                        if (hiddenInput) hiddenInput.value = dataUrl;
+                        var urlInput = document.getElementById('galModalUrl');
+                        if (urlInput) urlInput.value = '';
+                        var fnSpan = document.getElementById('galUploadFileName');
+                        if (fnSpan) fnSpan.textContent = file.name + ' (Resolusi Full HD 1080p)';
+                        var pBox = document.getElementById('galPreviewBox');
+                        if (pBox) pBox.innerHTML = '<img src="' + dataUrl + '" style="width:100%;height:100%;object-fit:cover"/>';
+                        showToast('Foto resolusi tinggi Full HD berhasil dimuat. Lengkapi caption lalu simpan.', 'success');
+                    });
+                }
             }
         }
 
@@ -18812,7 +18909,7 @@
         /* ── CAROUSEL & DISPLAY STATE FOR LANDING TEACHERS ── */
         var _currentTeacherSlideIndex = 0;
         var _teacherAutoTimer = null;
-        var _teacherAutoplayActive = true;
+        var _teacherAutoplayActive = false;
         var _teacherViewMode = 'carousel'; // 'carousel' | 'grid'
 
         function getTeacherCardsPerView() {
@@ -18933,11 +19030,12 @@
                 }).join('');
             }
 
-            // 4. Initialize Carousel Dots & Autoplay
+            // 4. Initialize Carousel Dots & Display State (Mode Stabil)
             renderTeacherDots();
             _currentTeacherSlideIndex = 0;
             updateTeacherCarouselPosition();
-            startTeacherAutoplay();
+            stopTeacherAutoplay();
+            updateAutoplayUI(false);
             setupTeacherCarouselHoverAndTouch();
         }
 
@@ -19046,7 +19144,7 @@
             var dot = document.getElementById('lpTeacherAutoplayDot');
             var txt = document.getElementById('lpTeacherAutoplayTxt');
             if (dot) dot.style.background = active ? '#10b981' : '#94a3b8';
-            if (txt) txt.textContent = active ? 'Foto Berganti Otomatis (3.5s)' : 'Otomatis Dijeda (Klik Play)';
+            if (txt) txt.textContent = active ? 'Foto Berganti Otomatis (3.5s)' : 'Mode Stabil (Geser Manual)';
         }
 
         function setTeacherViewMode(mode) {

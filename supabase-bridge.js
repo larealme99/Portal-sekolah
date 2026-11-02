@@ -1276,9 +1276,16 @@
     },
 
     async getExamSessions(examId) {
-      const sb = getClient();
-      const { data } = await sb.from('ExamSessions').select('*').eq('ID Ujian', examId);
-      return data || [];
+      try {
+        const sb = getClient();
+        let query = sb.from('ExamSessions').select('*');
+        if (examId) query = query.eq('ID Ujian', examId);
+        const { data, error } = await query;
+        const list = (!error && data) ? data : [];
+        return { success: !error, data: list };
+      } catch (e) {
+        return { success: false, data: [], message: e.message };
+      }
     },
 
     async getExamSubmissionsForTeacher(examId) {
@@ -1958,13 +1965,23 @@
 
     async _loadLearningsStore() {
       const sb = getClient();
+      let merged = [];
+      const seenIds = new Set();
+
       if (sb) {
         try {
           const { data, error } = await sb.from('Settings').select('Value').eq('Key', 'app_learnings_data').maybeSingle();
           if (!error && data && data.Value) {
             const parsed = typeof data.Value === 'string' ? JSON.parse(data.Value) : data.Value;
             if (Array.isArray(parsed) && parsed.length > 0) {
-              return parsed.map(it => this._normalizeLearning(it));
+              parsed.forEach(it => {
+                const norm = this._normalizeLearning(it);
+                const id = norm.id || norm.ID;
+                if (id && !seenIds.has(id)) {
+                  seenIds.add(id);
+                  merged.push(norm);
+                }
+              });
             }
           }
         } catch (e) { }
@@ -1972,23 +1989,38 @@
         try {
           const { data, error } = await sb.from('Learnings').select('*').order('Tanggal Buat', { ascending: false });
           if (!error && Array.isArray(data) && data.length > 0) {
-            return data.map(it => this._normalizeLearning(it));
+            data.forEach(it => {
+              const norm = this._normalizeLearning(it);
+              const id = norm.id || norm.ID;
+              if (id && !seenIds.has(id)) {
+                seenIds.add(id);
+                merged.push(norm);
+              }
+            });
           }
         } catch (e) { }
       }
 
-      try {
-        const local = localStorage.getItem('portal_learnings_data');
-        if (local) {
-          const parsed = JSON.parse(local);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            return parsed.map(it => this._normalizeLearning(it));
+      if (merged.length === 0) {
+        try {
+          const local = localStorage.getItem('portal_learnings_data');
+          if (local) {
+            const parsed = JSON.parse(local);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              parsed.forEach(it => {
+                const norm = this._normalizeLearning(it);
+                const id = norm.id || norm.ID;
+                if (id && !seenIds.has(id)) {
+                  seenIds.add(id);
+                  merged.push(norm);
+                }
+              });
+            }
           }
-        }
-      } catch (e) { }
+        } catch (e) { }
+      }
 
-      // Tidak ada data dummy bawaan - hanya data asli yang diinput Guru / Admin
-      return [];
+      return merged;
     },
 
     async _saveLearningsStore(list) {
@@ -1996,9 +2028,15 @@
       const sb = getClient();
       if (sb) {
         try {
+          const safeNormalized = normalized.map(item => {
+            const copy = { ...item };
+            if (copy.pdfUrl && copy.pdfUrl.length > 100000) copy.pdfUrl = '';
+            if (copy['PDF URL'] && copy['PDF URL'].length > 100000) copy['PDF URL'] = '';
+            return copy;
+          });
           await sb.from('Settings').upsert([{
             'Key': 'app_learnings_data',
-            'Value': JSON.stringify(normalized),
+            'Value': JSON.stringify(safeNormalized),
             'Label': 'Data Ruang Pembelajaran',
             'Keterangan': 'Sync modul ruang pembelajaran mandiri',
             'Diupdate': new Date().toISOString()
@@ -2223,6 +2261,21 @@
         });
         await this._saveLearningAttendeesStore(attendees);
 
+        // Sinkronkan ke tabel LearningSessions di Supabase
+        const sb = getClient();
+        if (sb) {
+          try {
+            await sb.from('LearningSessions').insert([{
+              'ID': attId,
+              'ID Pembelajaran': normalizedMatch.id,
+              'Judul Pembelajaran': normalizedMatch.judul,
+              'Nama Siswa': namaSiswa.trim(),
+              'Waktu Masuk': now,
+              'Catatan': 'Akses Siswa Web Portal'
+            }]);
+          } catch (eLs) { }
+        }
+
         return {
           success: true,
           message: 'Berhasil bergabung!',
@@ -2261,7 +2314,7 @@
     async getLearningAttendees(learningId) {
       try {
         const attendees = await this._loadLearningAttendeesStore();
-        const filtered = learningId ? attendees.filter(a => a.idPembelajaran === learningId) : attendees;
+        const filtered = learningId ? attendees.filter(a => a.idPembelajaran === learningId || a['ID Pembelajaran'] === learningId) : attendees;
         return { success: true, data: filtered };
       } catch (e) {
         return { success: false, message: e.message, data: [] };
@@ -2270,24 +2323,65 @@
 
     async _loadLearningAttendeesStore() {
       const sb = getClient();
+      let attendees = [];
+      const seen = new Set();
+
       if (sb) {
+        // 1. Ambil dari Settings
         try {
           const { data, error } = await sb.from('Settings').select('Value').eq('Key', 'app_learning_attendees_data').maybeSingle();
           if (!error && data && data.Value) {
             const parsed = typeof data.Value === 'string' ? JSON.parse(data.Value) : data.Value;
-            if (Array.isArray(parsed)) return parsed;
+            if (Array.isArray(parsed)) {
+              parsed.forEach(a => {
+                const k = (a.idPembelajaran || a['ID Pembelajaran'] || '') + '_' + (a.nisSiswa || a.namaSiswa || a['Nama Siswa'] || '');
+                if (!seen.has(k)) {
+                  seen.add(k);
+                  attendees.push(a);
+                }
+              });
+            }
+          }
+        } catch (e) { }
+
+        // 2. Ambil dari tabel LearningSessions (diinput oleh siswa via Android / mobile app)
+        try {
+          const { data: sessRows, error: sessErr } = await sb.from('LearningSessions').select('*');
+          if (!sessErr && Array.isArray(sessRows)) {
+            sessRows.forEach(ls => {
+              const lId = ls['ID Pembelajaran'] || ls.idPembelajaran;
+              const sN = ls['Nama Siswa'] || ls.namaSiswa;
+              const k = (lId || '') + '_' + (sN || '');
+              if (!seen.has(k)) {
+                seen.add(k);
+                attendees.push({
+                  id: ls['ID'] || ls.id || ('ATT-' + Math.random().toString(36).substr(2, 6)),
+                  idPembelajaran: lId,
+                  judulPembelajaran: ls['Judul Pembelajaran'] || ls.judulPembelajaran || '',
+                  namaSiswa: sN,
+                  waktuMasuk: ls['Waktu Masuk'] || ls.waktuMasuk,
+                  waktuAkses: ls['Waktu Masuk'] || ls.waktuMasuk,
+                  waktuKeluar: ls['Waktu Keluar'] || null,
+                  status: (ls['Catatan'] && ls['Catatan'].toLowerCase().includes('tugas')) ? 'tugas_dikumpulkan' : 'active',
+                  tugasCatatan: ls['Catatan'] || ''
+                });
+              }
+            });
+          }
+        } catch (e2) { }
+      }
+
+      if (attendees.length === 0) {
+        try {
+          const local = localStorage.getItem('portal_learning_attendees_data');
+          if (local) {
+            const parsed = JSON.parse(local);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
           }
         } catch (e) { }
       }
-      try {
-        const local = localStorage.getItem('portal_learning_attendees_data');
-        if (local) {
-          const parsed = JSON.parse(local);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-        }
-      } catch (e) { }
-      // Tidak ada dummy data
-      return [];
+
+      return attendees;
     },
 
     async _saveLearningAttendeesStore(list) {
