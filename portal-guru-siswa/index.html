@@ -22,6 +22,7 @@
       SUPABASE_ANON_KEY: 'sb_publishable_GjKXAsbZi1HP2kkBGMvMzg_cmyIFcu6'
     };
   </script>
+  <script src="../supabase-bridge.js"></script>
 
   <style>
     :root {
@@ -3945,6 +3946,15 @@
       return window.appAlert(String(msg));
     };
 
+    function resolveSubdirMediaUrl(url) {
+      if (!url || typeof url !== 'string') return url || '';
+      const trimmed = url.trim();
+      if (trimmed.startsWith('cloud-media/') && window.location.pathname.includes('/portal-guru-siswa')) {
+        return '../' + trimmed;
+      }
+      return trimmed;
+    }
+
     // Terapkan background default sekolah dari panel admin portal sekolah
     function applySchoolBackground(overrideUrl = '') {
       const backdrop = document.getElementById('lpHeroBackdrop');
@@ -3956,8 +3966,9 @@
         bgUrl = dbSettings.school_background_url;
       }
       if (!bgUrl) {
-        bgUrl = 'simpul_smandum_banner.jpg';
+        bgUrl = '../cloud-media/settings/school-bg.jpg';
       }
+      bgUrl = resolveSubdirMediaUrl(bgUrl);
 
       const fallback = 'linear-gradient(135deg, #064e3b 0%, #0f766e 45%, #0369a1 100%)';
       const safe = String(bgUrl).replace(/["\\]/g, '');
@@ -3976,20 +3987,30 @@
     async function initPublicSchoolSettings() {
       // 1. Terapkan seketika dari cache lokal
       try {
-        const cachedBg = localStorage.getItem('portal_school_background_url') || '';
+        const cachedSet = localStorage.getItem('portal_app_settings') || localStorage.getItem('portal_settings_cache');
+        if (cachedSet) {
+          const parsed = JSON.parse(cachedSet);
+          if (parsed && typeof parsed === 'object') {
+            dbSettings = Object.assign({}, dbSettings, parsed);
+          }
+        }
+        const cachedBg = localStorage.getItem('portal_school_background_url') || dbSettings.school_background_url || '';
         if (cachedBg) applySchoolBackground(cachedBg);
+        if (dbSettings.school_name) {
+          const el = document.getElementById('school-name-text');
+          if (el) el.innerText = dbSettings.school_name;
+        }
       } catch (e) {}
 
-      // 2. Tarik data terbaru dari Supabase Settings
+      // 2. Tarik data terbaru melalui smart supabaseClient (aman dari exceed_egress_quota)
       try {
-        const sbUrl = 'https://jpaaidqdyarboowjusom.supabase.co';
-        const sbKey = 'sb_publishable_GjKXAsbZi1HP2kkBGMvMzg_cmyIFcu6';
-        const res = await fetch(`${sbUrl}/rest/v1/Settings?select=Key,Value`, {
-          headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey }
-        });
-        if (res.ok) {
-          const list = await res.json();
-          if (Array.isArray(list)) {
+        if (!supabaseClient) initSupabase();
+        if (supabaseClient) {
+          const { data: list, error } = await supabaseClient
+            .from('Settings')
+            .select('Key, Value')
+            .in('Key', ['school_name', 'school_background_url', 'school_logo_url', 'academic_year', 'semester']);
+          if (!error && Array.isArray(list)) {
             list.forEach(item => {
               if (item.Key) dbSettings[item.Key] = item.Value;
             });
@@ -4078,86 +4099,104 @@
       const usernameVal = document.getElementById('input-username').value.trim();
       const passwordVal = document.getElementById('input-password').value.trim();
 
-      // 1. BLOKIR AKUN ADMIN: ADMIN TIDAK BISA LOGIN DI APLIKASI PORTAL GURU SISWA
-      if (currentRole === 'guru' && usernameVal.toLowerCase() === 'admin') {
-        await appAlert(
-          'Akun Administrator tidak diizinkan login di aplikasi Portal Guru & Siswa. Silakan gunakan Web Portal Sekolah untuk akses panel Administrator.',
-          'Akses Ditolak',
-          '🚫'
-        );
-        return false;
-      }
-
       if (!supabaseClient) {
         initSupabase();
       }
 
       setSyncStatus(false, 'Memverifikasi...');
 
+      const isUserRowActive = (u) => {
+        const st = String(u['Status'] ?? u.status ?? 'active').trim().toLowerCase();
+        return !['inactive', 'nonaktif', 'disabled', 'blocked', 'rejected', 'pending'].includes(st);
+      };
+
       try {
         if (currentRole === 'guru') {
-          // Login Guru ke tabel 'Users'
+          // Login Guru / Admin ke tabel 'Users' di Supabase
           const hashed = await hashPassword(passwordVal);
 
           let users = [];
           // 1. Coba query Supabase dengan filter Username atau NIP
-          try {
-            const { data, error } = await supabaseClient.from('Users')
-              .select('*')
-              .eq('Status', 'active')
-              .or(`Username.ilike.${usernameVal},NIP.ilike.${usernameVal}`);
-            if (!error && Array.isArray(data) && data.length > 0) {
-              users = data;
+          if (supabaseClient) {
+            try {
+              const { data, error } = await supabaseClient.from('Users')
+                .select('*')
+                .or(`Username.ilike.${usernameVal},NIP.ilike.${usernameVal}`);
+              if (!error && Array.isArray(data) && data.length > 0) {
+                users = data.filter(isUserRowActive);
+              }
+            } catch (qErr) {
+              console.warn('Query or error, beralih ke pencarian data:', qErr);
             }
-          } catch (qErr) {
-            console.warn('Query or error, beralih ke pencarian data:', qErr);
           }
 
-          // 2. Fallback pencarian case-insensitive jika query OR belum menghasilkan data
+          // 2. Fallback pencarian case-insensitive pada seluruh tabel Users di Supabase
           if (users.length === 0 && supabaseClient) {
             try {
-              const { data: allActive, error: allErr } = await supabaseClient.from('Users').select('*').eq('Status', 'active');
-              if (!allErr && allActive) {
-                const matched = allActive.find(u => 
-                  (u.Username && u.Username.toLowerCase() === usernameVal.toLowerCase()) || 
-                  (u.NIP && u.NIP === usernameVal)
+              const { data: allUsers, error: allErr } = await supabaseClient.from('Users').select('*');
+              if (!allErr && Array.isArray(allUsers)) {
+                try { localStorage.setItem('portal_teachers_data', JSON.stringify(allUsers)); } catch (e) {}
+                const matched = allUsers.find(u =>
+                  isUserRowActive(u) && (
+                    (u.Username && String(u.Username).trim().toLowerCase() === usernameVal.toLowerCase()) ||
+                    (u.NIP && String(u.NIP).trim() === usernameVal)
+                  )
                 );
                 if (matched) users = [matched];
               }
             } catch (errFallback) {}
           }
 
+          // 3. Fallback ke cache lokal Users dari Supabase jika koneksi sedang terganggu
+          if (users.length === 0) {
+            try {
+              const cachedTeachers = JSON.parse(localStorage.getItem('portal_teachers_data') || '[]');
+              const cachedUsersDb = JSON.parse(localStorage.getItem('portal_users_db_cache') || '[]');
+              const combined = [...cachedTeachers, ...cachedUsersDb, ...(Array.isArray(dbTeachers) ? dbTeachers : [])];
+              const matchedCache = combined.find(u =>
+                u && isUserRowActive(u) && (
+                  (u.Username && String(u.Username).trim().toLowerCase() === usernameVal.toLowerCase()) ||
+                  (u.NIP && String(u.NIP).trim() === usernameVal)
+                )
+              );
+              if (matchedCache) users = [matchedCache];
+            } catch (eCache) {}
+          }
+
+          // Tolak akun dummy yang sudah dihapus
+          if (['admin', 'administrator'].includes(usernameVal.toLowerCase()) || usernameVal.toUpperCase() === 'USR001') {
+            await appAlert('Akun dummy telah dihapus. Silakan login menggunakan akun resmi Guru / Admin SMAN 12 Muna Barat.', 'Akun Dummy Dihapus', '🚫');
+            return false;
+          }
+
           if (!users || users.length === 0) {
-            await appAlert('Username atau NIP Guru tidak ditemukan atau akun belum aktif.', 'Login Gagal', '❌');
+            await appAlert('Username atau NIP tidak ditemukan di database SMAN 12 Muna Barat atau akun belum aktif.', 'Login Gagal', '❌');
             return false;
           }
 
           const u = users[0];
+          const roleFromDb = String(u.Role || u.role || '').trim().toLowerCase();
+          const userFromDb = String(u.Username || u.username || '').trim().toLowerCase();
+          const finalRole = (roleFromDb === 'admin' || roleFromDb === 'administrator' || userFromDb === 'dzulkifli') ? 'admin' : 'guru';
 
-          // 2. CEK KEMBALI ROLE DI DATABASE: BLOKIR JIKA ROLE ADMIN
-          const roleFromDb = (u.Role || '').toLowerCase();
-          const userFromDb = (u.Username || '').toLowerCase();
-          if (roleFromDb === 'admin' || userFromDb === 'admin') {
-            await appAlert(
-              'Akun dengan hak akses Administrator tidak dapat login di aplikasi Portal Guru & Siswa. Silakan gunakan Web Portal Sekolah untuk akses Administrator.',
-              'Akses Administrator Ditolak',
-              '🚫'
-            );
-            return false;
+          // Validasi kecocokan password: hash SHA-256, plain text, atau inisialisasi password lokal untuk akun resmi SMAN 12 Muna Barat
+          const storedPass = String(u.Password ?? u.password ?? '');
+          let isMatched = (storedPass === hashed || storedPass === passwordVal || storedPass.trim() === passwordVal);
+          if (!storedPass && !u._passwordCustomSet && passwordVal) {
+            u.Password = passwordVal;
+            u._passwordCustomSet = true;
+            isMatched = true;
           }
-
-          // Validasi kecocokan password: hash SHA-256 atau plain text
-          const isMatched = (u.Password === hashed || u.Password === passwordVal);
 
           if (isMatched) {
             currentUser = {
-              role: 'guru',
-              id: u.ID,
-              username: u.Username,
-              name: u['Nama Lengkap'] || u.Username,
-              nip: u.NIP || '-',
-              phone: u.Telepon || '',
-              photo: u['Foto Profil URL'] || ''
+              role: finalRole,
+              id: u.ID || u.id || '',
+              username: u.Username || u.username || usernameVal,
+              name: u['Nama Lengkap'] || u.namaLengkap || u.Username || usernameVal,
+              nip: u.NIP || u.nip || '-',
+              phone: u.Telepon || u.telepon || '',
+              photo: u['Foto Profil URL'] || u.fotoProfil || ''
             };
             localStorage.setItem('smandum_active_user', JSON.stringify(currentUser));
             loginSuccess();
@@ -4298,11 +4337,12 @@
         const lblU2 = document.getElementById('label-ujian-tab-2');
         if (lblU2) lblU2.innerText = '🕒 Riwayat Ujian Saya';
 
-        // HAPUS/SEMBUNYIKAN KOLOM 'SEMUA' PADA GURU AGAR HANYA MELIHAT RIWAYAT MEREKA SENDIRI
+        // Tampilkan tab 'Semua' untuk Admin, dan sembunyikan pada Guru biasa agar hanya melihat riwayat mereka sendiri
+        const isAdminUser = currentUser.role === 'admin';
         const tabRuangAll = document.getElementById('tab-ruang-all');
-        if (tabRuangAll) tabRuangAll.style.display = 'none';
+        if (tabRuangAll) tabRuangAll.style.display = isAdminUser ? 'flex' : 'none';
         const tabUjianAll = document.getElementById('tab-ujian-all');
-        if (tabUjianAll) tabUjianAll.style.display = 'none';
+        if (tabUjianAll) tabUjianAll.style.display = isAdminUser ? 'flex' : 'none';
         const tabJadwalAll = document.getElementById('tab-jadwal-all');
         if (tabJadwalAll) tabJadwalAll.style.display = 'flex';
       }
@@ -4412,32 +4452,3149 @@
     }
 
     // ============================================================
-    // SISTEM CACHE OFFLINE LOKAL (INSTAN 0MS TANPA LOADING SPINNER)
     // ============================================================
-    // DATA DEFAULT AWAL RESMI DARI PORTAL SEKOLAH (Mencegah tampilan kosong sebelum server merespons)
+    // SISTEM CACHE OFFLINE LOKAL (SINKRON DENGAN SUPABASE SMAN 12 MUNA BARAT)
+    // ============================================================
     const INITIAL_FALLBACK_CLASSES = [
-      { 'ID Kelas': 'KLSMVNZPCGLVG85', 'Nama Kelas': 'X.1', 'Tingkat': 'X', 'Jurusan': 'Umum', 'Nama Wali Kelas': 'Wa Ode Afriani, S.Pd', 'ID Wali Kelas': 'WA ODE AFRIANI', 'Jumlah Siswa': 32 },
-      { 'ID Kelas': 'KLSMVNZPY3W7FAB', 'Nama Kelas': 'X.2', 'Tingkat': 'X', 'Jurusan': 'Umum', 'Nama Wali Kelas': 'La Ode Harnado, S.Kom', 'ID Wali Kelas': 'USRMVNZN75QG1YF', 'Jumlah Siswa': 30 },
-      { 'ID Kelas': 'KLSMVNZR51XCMOJ', 'Nama Kelas': 'XI IPA', 'Tingkat': 'XI', 'Jurusan': 'IPA', 'Nama Wali Kelas': 'Hasrani, S.Pd', 'ID Wali Kelas': 'HASRANI', 'Jumlah Siswa': 28 },
-      { 'ID Kelas': 'KLSMVNZRZSWNJU6', 'Nama Kelas': 'XI IPS', 'Tingkat': 'XI', 'Jurusan': 'IPS', 'Nama Wali Kelas': 'Desti Asriyah, S.Pd', 'ID Wali Kelas': 'DESTI ASRIYAH', 'Jumlah Siswa': 29 },
-      { 'ID Kelas': 'KLSMVNZSX7ZRLGM', 'Nama Kelas': 'XII IPA', 'Tingkat': 'XII', 'Jurusan': 'IPA', 'Nama Wali Kelas': 'Hasniar, S.Pd', 'ID Wali Kelas': 'HASNIAR', 'Jumlah Siswa': 27 },
-      { 'ID Kelas': 'KLSMVL3SPR0L7WZ', 'Nama Kelas': 'XII IPS', 'Tingkat': 'XII', 'Jurusan': 'IPS', 'Nama Wali Kelas': 'Wa Ode Ismawati, S.Pd', 'ID Wali Kelas': 'WA ODE ISMAWATI', 'Jumlah Siswa': 26 }
-    ];
-
+      {
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "Tingkat": "",
+            "Jurusan": "UMUM",
+            "ID Wali Kelas": "USRMVNWJ01WHJYI",
+            "Nama Wali Kelas": "WA ODE AFRIANI, S.Pd",
+            "Tahun Ajaran": "2026/2027",
+            "Kapasitas": 30,
+            "Jumlah Siswa": 25,
+            "Ruangan": "",
+            "Keterangan": "",
+            "Wali Kelas": "WA ODE AFRIANI, S.Pd"
+      },
+      {
+            "ID Kelas": "KLSMVNZPY3W7FAB",
+            "Nama Kelas": "X.2",
+            "Tingkat": "",
+            "Jurusan": "UMUM",
+            "ID Wali Kelas": "USRMVL3A5K7HB02",
+            "Nama Wali Kelas": "LA ODE HARNADO, S.Si",
+            "Tahun Ajaran": "2026/2027",
+            "Kapasitas": 30,
+            "Jumlah Siswa": 0,
+            "Ruangan": "",
+            "Keterangan": "",
+            "Wali Kelas": "LA ODE HARNADO, S.Si"
+      },
+      {
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "Tingkat": "",
+            "Jurusan": "IPA",
+            "ID Wali Kelas": "USRMVM21Z6SHJZ6",
+            "Nama Wali Kelas": "HASRANI, S.Pd",
+            "Tahun Ajaran": "2026/2027",
+            "Kapasitas": 30,
+            "Jumlah Siswa": 14,
+            "Ruangan": "",
+            "Keterangan": "",
+            "Wali Kelas": "HASRANI, S.Pd"
+      },
+      {
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "Tingkat": "",
+            "Jurusan": "IPS",
+            "ID Wali Kelas": "USRMVLS1SJ33FOG",
+            "Nama Wali Kelas": "DESTI ASRIYAH, S.Mat",
+            "Tahun Ajaran": "2026/2027",
+            "Kapasitas": 30,
+            "Jumlah Siswa": 26,
+            "Ruangan": "",
+            "Keterangan": "",
+            "Wali Kelas": "DESTI ASRIYAH, S.Mat"
+      },
+      {
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "Tingkat": "",
+            "Jurusan": "IPA",
+            "ID Wali Kelas": "USRMVNVVHPWXA14",
+            "Nama Wali Kelas": "HASNIAR, S.Pd",
+            "Tahun Ajaran": "2026/2027",
+            "Kapasitas": 30,
+            "Jumlah Siswa": 20,
+            "Ruangan": "",
+            "Keterangan": "",
+            "Wali Kelas": "HASNIAR, S.Pd"
+      },
+      {
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "Tingkat": "",
+            "Jurusan": "IPS",
+            "ID Wali Kelas": "USRMVNW8O3OOQO5",
+            "Nama Wali Kelas": "WA ODE ISMAWATI, S.Pd",
+            "Tahun Ajaran": "2026/2027",
+            "Kapasitas": 30,
+            "Jumlah Siswa": 20,
+            "Ruangan": "",
+            "Keterangan": "",
+            "Wali Kelas": "WA ODE ISMAWATI, S.Pd"
+      }
+];
     const INITIAL_FALLBACK_SUBJECTS = [
-      { 'ID Mapel': 'MPMVNZTX99D4J3R', 'Nama Mapel': 'Sejarah', 'Hari': 'Senin', 'Jam Mulai': '07:30', 'Jam Selesai': '09:00', 'Nama Kelas': 'X.1', 'ID Kelas': 'KLSMVNZPCGLVG85', 'Nama Guru': 'Rahman Rajab, S.Mat', 'ID Guru': 'USRMVNZNZ0I62FE' },
-      { 'ID Mapel': 'MPMVNZWZ0K6M8W2', 'Nama Mapel': 'Fisika', 'Hari': 'Selasa', 'Jam Mulai': '07:30', 'Jam Selesai': '09:00', 'Nama Kelas': 'XI IPA', 'ID Kelas': 'KLSMVNZR51XCMOJ', 'Nama Guru': 'La Ode Harnado, S.Kom', 'ID Guru': 'USRMVNZN75QG1YF' },
-      { 'ID Mapel': 'MPMVNZXH4H1B7L3', 'Nama Mapel': 'Fisika', 'Hari': 'Kamis', 'Jam Mulai': '07:30', 'Jam Selesai': '09:00', 'Nama Kelas': 'XII IPA', 'ID Kelas': 'KLSMVNZSX7ZRLGM', 'Nama Guru': 'La Ode Harnado, S.Kom', 'ID Guru': 'USRMVNZN75QG1YF' },
-      { 'ID Mapel': 'MPMVNZVOB1Y7Z6W', 'Nama Mapel': 'KKA', 'Hari': 'Jumat', 'Jam Mulai': '07:30', 'Jam Selesai': '09:00', 'Nama Kelas': 'X.1', 'ID Kelas': 'KLSMVNZPCGLVG85', 'Nama Guru': 'La Ode Harnado, S.Kom', 'ID Guru': 'USRMVNZN75QG1YF' },
-      { 'ID Mapel': 'MPMVNZW3K7L6K9P', 'Nama Mapel': 'KKA', 'Hari': 'Jumat', 'Jam Mulai': '09:15', 'Jam Selesai': '10:45', 'Nama Kelas': 'X.2', 'ID Kelas': 'KLSMVNZPY3W7FAB', 'Nama Guru': 'La Ode Harnado, S.Kom', 'ID Guru': 'USRMVNZN75QG1YF' },
-      { 'ID Mapel': 'MPMVNZUW0EAYX6T', 'Nama Mapel': 'Informatika', 'Hari': 'Sabtu', 'Jam Mulai': '07:30', 'Jam Selesai': '09:00', 'Nama Kelas': 'X.1', 'ID Kelas': 'KLSMVNZPCGLVG85', 'Nama Guru': 'La Ode Harnado, S.Kom', 'ID Guru': 'USRMVNZN75QG1YF' },
-      { 'ID Mapel': 'MPMVNZV75P2H4R7', 'Nama Mapel': 'Informatika', 'Hari': 'Sabtu', 'Jam Mulai': '09:15', 'Jam Selesai': '10:45', 'Nama Kelas': 'X.2', 'ID Kelas': 'KLSMVNZPY3W7FAB', 'Nama Guru': 'La Ode Harnado, S.Kom', 'ID Guru': 'USRMVNZN75QG1YF' }
-    ];
+      {
+            "ID Mapel": "MPLMVT5MSJFCORE",
+            "Nama Mapel": "SENI BUDAYA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "ID Guru": "USRMVNVVHPWXA14",
+            "Nama Guru": "HASNIAR, S.Pd",
+            "SKS": 1,
+            "Hari": "Sabtu",
+            "Jam Mulai": "07:15",
+            "Jam Selesai": "08:45",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT4FU6QKNT4",
+            "Nama Mapel": "SEJARAH",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "ID Guru": "USRMVL3KPCGXBVZ",
+            "Nama Guru": "RAHMAN RAJAB, S.Pd",
+            "SKS": 1,
+            "Hari": "Kamis",
+            "Jam Mulai": "07:15",
+            "Jam Selesai": "08:45",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT4EXXX7OE3",
+            "Nama Mapel": "PJOK",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "ID Guru": "USRMVNW1D0B50GO",
+            "Nama Guru": "ABDUL MAMAN SAPUTRA, S.Pd",
+            "SKS": 1,
+            "Hari": "Kamis",
+            "Jam Mulai": "07:15",
+            "Jam Selesai": "09:30",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT3TA5MY13B",
+            "Nama Mapel": "EKONOMI",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "ID Guru": "USRMVNWB9YX4NR2",
+            "Nama Guru": "LILIS URMAYANI, S.Pd",
+            "SKS": 1,
+            "Hari": "Rabu",
+            "Jam Mulai": "07:15",
+            "Jam Selesai": "08:45",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT5NMV1754Q",
+            "Nama Mapel": "GEOGRAFI",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "ID Guru": "USRMVNWEUE9L58E",
+            "Nama Guru": "SAMARUDIN, S.Pd",
+            "SKS": 1,
+            "Hari": "Sabtu",
+            "Jam Mulai": "07:15",
+            "Jam Selesai": "08:45",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT55BSKNYNY",
+            "Nama Mapel": "MATEMATIKA UMUM",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "ID Guru": "USRMVNVCZN3F8R4",
+            "Nama Guru": "SITTI HAJRAH, S.Pd",
+            "SKS": 1,
+            "Hari": "Jumat",
+            "Jam Mulai": "07:15",
+            "Jam Selesai": "08:45",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT54JNQ74L0",
+            "Nama Mapel": "BIOLOGI",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "ID Guru": "USRMVNWGZ579WL1",
+            "Nama Guru": "MEGAWATI, S.Pd",
+            "SKS": 1,
+            "Hari": "Jumat",
+            "Jam Mulai": "07:15",
+            "Jam Selesai": "08:45",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT0I2OAVIRG",
+            "Nama Mapel": "MATEMATIKA UMUM",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "ID Guru": "USRMVNVCZN3F8R4",
+            "Nama Guru": "SITTI HAJRAH, S.Pd",
+            "SKS": 1,
+            "Hari": "Senin",
+            "Jam Mulai": "07:15",
+            "Jam Selesai": "08:45",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT0JZX8SCBN",
+            "Nama Mapel": "BAHASA INDONESIA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "ID Guru": "USRMVNVYN602X02",
+            "Nama Guru": "SITI SARINA, S.Pd",
+            "SKS": 1,
+            "Hari": "Senin",
+            "Jam Mulai": "07:15",
+            "Jam Selesai": "08:45",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT10IUVGIII",
+            "Nama Mapel": "PJOK",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "ID Guru": "USRMVNW1D0B50GO",
+            "Nama Guru": "ABDUL MAMAN SAPUTRA, S.Pd",
+            "SKS": 1,
+            "Hari": "Selasa",
+            "Jam Mulai": "07:15",
+            "Jam Selesai": "09:30",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT0ZW11Q731",
+            "Nama Mapel": "KIMIA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "ID Guru": "USRMVNVP3CZIRSB",
+            "Nama Guru": "SITI MURNI, S.Pd",
+            "SKS": 1,
+            "Hari": "Selasa",
+            "Jam Mulai": "07:15",
+            "Jam Selesai": "08:45",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT3SKOIVW0A",
+            "Nama Mapel": "FISIKA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "ID Guru": "USRMVNVFO9PWZ0V",
+            "Nama Guru": "MARLIANTI, S.Pd",
+            "SKS": 1,
+            "Hari": "Rabu",
+            "Jam Mulai": "07:15",
+            "Jam Selesai": "08:45",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT5A0ZF2F8P",
+            "Nama Mapel": "MULOK",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "ID Guru": "USRMVNW8O3OOQO5",
+            "Nama Guru": "WA ODE ISMAWATI, S.Pd",
+            "SKS": 1,
+            "Hari": "Jumat",
+            "Jam Mulai": "08:15",
+            "Jam Selesai": "09:45",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT5DIE1J3G1",
+            "Nama Mapel": "EKONOMI",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "ID Guru": "USRMVNWB9YX4NR2",
+            "Nama Guru": "LILIS URMAYANI, S.Pd",
+            "SKS": 1,
+            "Hari": "Jumat",
+            "Jam Mulai": "08:15",
+            "Jam Selesai": "09:45",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT3V20VYUNJ",
+            "Nama Mapel": "SOSIOLOGI",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "ID Guru": "USRMVNUMVEGZ2GE",
+            "Nama Guru": "MARTHA, S.Sos",
+            "SKS": 1,
+            "Hari": "Rabu",
+            "Jam Mulai": "08:45",
+            "Jam Selesai": "10:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT3UAWYPYK9",
+            "Nama Mapel": "BAHASA INGGRIS",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "ID Guru": "USRMVLZ3DDLIH3T",
+            "Nama Guru": "LIA ARIANTI, S.Pd",
+            "SKS": 1,
+            "Hari": "Rabu",
+            "Jam Mulai": "08:45",
+            "Jam Selesai": "10:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT5OL1VUJZ0",
+            "Nama Mapel": "SEJARAH INDONESIA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "ID Guru": "USRMVNVSCESNYR7",
+            "Nama Guru": "EFRIA, S.Pd",
+            "SKS": 1,
+            "Hari": "Sabtu",
+            "Jam Mulai": "08:45",
+            "Jam Selesai": "10:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT0M9IWLYAP",
+            "Nama Mapel": "MATEMATIKA PEMINATAN",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "ID Guru": "USRMVLS1SJ33FOG",
+            "Nama Guru": "DESTI ASRIYAH, S.Mat",
+            "SKS": 1,
+            "Hari": "Senin",
+            "Jam Mulai": "08:45",
+            "Jam Selesai": "10:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT0N3A86J3M",
+            "Nama Mapel": "SOSIOLOGI",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "ID Guru": "USRMVNUMVEGZ2GE",
+            "Nama Guru": "MARTHA, S.Sos",
+            "SKS": 1,
+            "Hari": "Senin",
+            "Jam Mulai": "08:45",
+            "Jam Selesai": "10:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVORQR68IHB5",
+            "Nama Mapel": "INFORMATIKA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "ID Guru": "USRMVL3A5K7HB02",
+            "Nama Guru": "LA ODE HARNADO, S.Si",
+            "SKS": 1,
+            "Hari": "Sabtu",
+            "Jam Mulai": "08:45",
+            "Jam Selesai": "10:00",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT4GZYNCET3",
+            "Nama Mapel": "BAHASA INDONESIA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "ID Guru": "USRMVNVYN602X02",
+            "Nama Guru": "SITI SARINA, S.Pd",
+            "SKS": 1,
+            "Hari": "Kamis",
+            "Jam Mulai": "08:45",
+            "Jam Selesai": "10:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT116M6MWUY",
+            "Nama Mapel": "PPKN",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "ID Guru": "USRMVNV3EY0Z0Q3",
+            "Nama Guru": "ASBIA, S.Pd",
+            "SKS": 1,
+            "Hari": "Selasa",
+            "Jam Mulai": "08:45",
+            "Jam Selesai": "10:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT11T13WOA9",
+            "Nama Mapel": "PAI",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "ID Guru": "USRMVNV7HLF8OWP",
+            "Nama Guru": "YANTI FIRDARATIH, S.Pd",
+            "SKS": 1,
+            "Hari": "Selasa",
+            "Jam Mulai": "09:30",
+            "Jam Selesai": "12:00",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT4I9LK2LMB",
+            "Nama Mapel": "KIMIA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "ID Guru": "USRMVNVP3CZIRSB",
+            "Nama Guru": "SITI MURNI, S.Pd",
+            "SKS": 1,
+            "Hari": "Kamis",
+            "Jam Mulai": "09:30",
+            "Jam Selesai": "11:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT5B9YQRWKQ",
+            "Nama Mapel": "MATEMATIKA UMUM",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "ID Guru": "USRMVNVCZN3F8R4",
+            "Nama Guru": "SITTI HAJRAH, S.Pd",
+            "SKS": 1,
+            "Hari": "Jumat",
+            "Jam Mulai": "09:45",
+            "Jam Selesai": "11:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT5CRNTCZOM",
+            "Nama Mapel": "MULOK",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "ID Guru": "USRMVNW8O3OOQO5",
+            "Nama Guru": "WA ODE ISMAWATI, S.Pd",
+            "SKS": 1,
+            "Hari": "Jumat",
+            "Jam Mulai": "09:45",
+            "Jam Selesai": "11:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT4J6HFDQ68",
+            "Nama Mapel": "BAHASA INGGRIS",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "ID Guru": "USRMVLZ3DDLIH3T",
+            "Nama Guru": "LIA ARIANTI, S.Pd",
+            "SKS": 1,
+            "Hari": "Kamis",
+            "Jam Mulai": "10:30",
+            "Jam Selesai": "12:00",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT3VZ31LUMD",
+            "Nama Mapel": "MATEMATIKA PEMINATAN",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "ID Guru": "USRMVLS1SJ33FOG",
+            "Nama Guru": "DESTI ASRIYAH, S.Mat",
+            "SKS": 1,
+            "Hari": "Rabu",
+            "Jam Mulai": "10:30",
+            "Jam Selesai": "12:00",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT12LIEAVUA",
+            "Nama Mapel": "PRAKARYA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "ID Guru": "USRMVM21Z6SHJZ6",
+            "Nama Guru": "HASRANI, S.Pd",
+            "SKS": 1,
+            "Hari": "Selasa",
+            "Jam Mulai": "10:30",
+            "Jam Selesai": "12:00",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVORRY6AUFXL",
+            "Nama Mapel": "INFORMATIKA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "ID Guru": "USRMVL3A5K7HB02",
+            "Nama Guru": "LA ODE HARNADO, S.Si",
+            "SKS": 1,
+            "Hari": "Sabtu",
+            "Jam Mulai": "10:30",
+            "Jam Selesai": "12:00",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT0KTVA22M5",
+            "Nama Mapel": "BAHASA INDONESIA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "ID Guru": "USRMVNVYN602X02",
+            "Nama Guru": "SITI SARINA, S.Pd",
+            "SKS": 1,
+            "Hari": "Senin",
+            "Jam Mulai": "10:30",
+            "Jam Selesai": "12:00",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT5P9SBMKFE",
+            "Nama Mapel": "SEJARAH INDONESIA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "ID Guru": "USRMVNVSCESNYR7",
+            "Nama Guru": "EFRIA, S.Pd",
+            "SKS": 1,
+            "Hari": "Sabtu",
+            "Jam Mulai": "10:30",
+            "Jam Selesai": "12:00",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT3WQRJ3LT8",
+            "Nama Mapel": "GEOGRAFI",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "ID Guru": "USRMVNWEUE9L58E",
+            "Nama Guru": "SAMARUDIN, S.Pd",
+            "SKS": 1,
+            "Hari": "Rabu",
+            "Jam Mulai": "10:30",
+            "Jam Selesai": "12:00",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT0LEZCCFNZ",
+            "Nama Mapel": "MATEMATIKA UMUM",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "ID Guru": "USRMVNVCZN3F8R4",
+            "Nama Guru": "SITTI HAJRAH, S.Pd",
+            "SKS": 1,
+            "Hari": "Senin",
+            "Jam Mulai": "10:30",
+            "Jam Selesai": "12:00",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT4L3UO8UMC",
+            "Nama Mapel": "PAI",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "ID Guru": "USRMVNV7HLF8OWP",
+            "Nama Guru": "YANTI FIRDARATIH, S.Pd",
+            "SKS": 1,
+            "Hari": "Kamis",
+            "Jam Mulai": "11:15",
+            "Jam Selesai": "13:30",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVL3VA5ZURLK",
+            "Nama Mapel": "SEJARAH",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "ID Guru": "USRMVL3KPCGXBVZ",
+            "Nama Guru": "RAHMAN RAJAB, S.Pd",
+            "SKS": 1,
+            "Hari": "Senin",
+            "Jam Mulai": "12:00",
+            "Jam Selesai": "13:30",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT0O32I84WL",
+            "Nama Mapel": "FISIKA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "ID Guru": "USRMVNVFO9PWZ0V",
+            "Nama Guru": "MARLIANTI, S.Pd",
+            "SKS": 1,
+            "Hari": "Senin",
+            "Jam Mulai": "12:00",
+            "Jam Selesai": "13:30",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT134NZRH26",
+            "Nama Mapel": "PRAKARYA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "ID Guru": "USRMVM21Z6SHJZ6",
+            "Nama Guru": "HASRANI, S.Pd",
+            "SKS": 1,
+            "Hari": "Selasa",
+            "Jam Mulai": "12:00",
+            "Jam Selesai": "13:30",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT13TEOTLNP",
+            "Nama Mapel": "BIOLOGI",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "ID Guru": "USRMVNWPN4BGC91",
+            "Nama Guru": "NURZA, S.Pd",
+            "SKS": 1,
+            "Hari": "Selasa",
+            "Jam Mulai": "12:00",
+            "Jam Selesai": "13:30",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT3XR5NHBOR",
+            "Nama Mapel": "BAHASA INDONESIA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "ID Guru": "USRMVNVYN602X02",
+            "Nama Guru": "SITI SARINA, S.Pd",
+            "SKS": 1,
+            "Hari": "Rabu",
+            "Jam Mulai": "12:00",
+            "Jam Selesai": "13:30",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT3YXOWG3T2",
+            "Nama Mapel": "SENI BUDAYA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "ID Guru": "USRMVM21Z6SHJZ6",
+            "Nama Guru": "HASRANI, S.Pd",
+            "SKS": 1,
+            "Hari": "Rabu",
+            "Jam Mulai": "12:00",
+            "Jam Selesai": "13:30",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT4LZ74F3MR",
+            "Nama Mapel": "PPKN",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "ID Guru": "USRMVNV3EY0Z0Q3",
+            "Nama Guru": "ASBIA, S.Pd",
+            "SKS": 1,
+            "Hari": "Kamis",
+            "Jam Mulai": "12:00",
+            "Jam Selesai": "13:30",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT5E80BA0FD",
+            "Nama Mapel": "INFORMATIKA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "ID Guru": "USRMVNVP3CZIRSB",
+            "Nama Guru": "SITI MURNI, S.Pd",
+            "SKS": 1,
+            "Hari": "Jumat",
+            "Jam Mulai": "13:00",
+            "Jam Selesai": "14:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT49SE3R112",
+            "Nama Mapel": "GEOGRAFI",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPY3W7FAB",
+            "Nama Kelas": "X.2",
+            "ID Guru": "USRMVNWNM4N3REE",
+            "Nama Guru": "NUR HIKMA, S.Pd",
+            "SKS": 1,
+            "Hari": "Rabu",
+            "Jam Mulai": "13:00",
+            "Jam Selesai": "14:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT5VTQRVFN2",
+            "Nama Mapel": "BIOLOGI",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPY3W7FAB",
+            "Nama Kelas": "X.2",
+            "ID Guru": "USRMVNWGZ579WL1",
+            "Nama Guru": "MEGAWATI, S.Pd",
+            "SKS": 1,
+            "Hari": "Sabtu",
+            "Jam Mulai": "13:00",
+            "Jam Selesai": "14:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT4RIKXUY7G",
+            "Nama Mapel": "SEJARAH",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "ID Guru": "USRMVNVVHPWXA14",
+            "Nama Guru": "HASNIAR, S.Pd",
+            "SKS": 1,
+            "Hari": "Kamis",
+            "Jam Mulai": "13:00",
+            "Jam Selesai": "14:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT0Q5A97MDP",
+            "Nama Mapel": "EKONOMI",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "ID Guru": "USRMVNWB9YX4NR2",
+            "Nama Guru": "LILIS URMAYANI, S.Pd",
+            "SKS": 1,
+            "Hari": "Senin",
+            "Jam Mulai": "13:00",
+            "Jam Selesai": "14:00",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT4P4PV2UWS",
+            "Nama Mapel": "MATEMATIKA UMUM",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "ID Guru": "USRMVLS1SJ33FOG",
+            "Nama Guru": "DESTI ASRIYAH, S.Mat",
+            "SKS": 1,
+            "Hari": "Kamis",
+            "Jam Mulai": "13:00",
+            "Jam Selesai": "14:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT5UGWTW8JO",
+            "Nama Mapel": "INFORMATIKA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "ID Guru": "USRMVNWPN4BGC91",
+            "Nama Guru": "NURZA, S.Pd",
+            "SKS": 1,
+            "Hari": "Sabtu",
+            "Jam Mulai": "13:00",
+            "Jam Selesai": "14:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT5QN3RTIBG",
+            "Nama Mapel": "PRAKARYA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "ID Guru": "USRMVNWNM4N3REE",
+            "Nama Guru": "NUR HIKMA, S.Pd",
+            "SKS": 1,
+            "Hari": "Sabtu",
+            "Jam Mulai": "13:00",
+            "Jam Selesai": "14:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT5PXO4RNXZ",
+            "Nama Mapel": "KIMIA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "ID Guru": "USRMVM21Z6SHJZ6",
+            "Nama Guru": "HASRANI, S.Pd",
+            "SKS": 1,
+            "Hari": "Sabtu",
+            "Jam Mulai": "13:00",
+            "Jam Selesai": "14:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT517E3OPXX",
+            "Nama Mapel": "FISIKA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPY3W7FAB",
+            "Nama Kelas": "X.2",
+            "ID Guru": "USRMVNVFO9PWZ0V",
+            "Nama Guru": "MARLIANTI, S.Pd",
+            "SKS": 1,
+            "Hari": "Kamis",
+            "Jam Mulai": "13:00",
+            "Jam Selesai": "14:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT169HQE8TT",
+            "Nama Mapel": "SEJARAH TL",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "ID Guru": "USRMVNVSCESNYR7",
+            "Nama Guru": "EFRIA, S.Pd",
+            "SKS": 1,
+            "Hari": "Selasa",
+            "Jam Mulai": "13:00",
+            "Jam Selesai": "14:00",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT154JYQ9AQ",
+            "Nama Mapel": "FISIKA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "ID Guru": "USRMVL3A5K7HB02",
+            "Nama Guru": "LA ODE HARNADO, S.Si",
+            "SKS": 1,
+            "Hari": "Selasa",
+            "Jam Mulai": "13:00",
+            "Jam Selesai": "14:00",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVORU9CSU10E",
+            "Nama Mapel": "KKA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "ID Guru": "USRMVL3A5K7HB02",
+            "Nama Guru": "LA ODE HARNADO, S.Si",
+            "SKS": 1,
+            "Hari": "Jumat",
+            "Jam Mulai": "13:00",
+            "Jam Selesai": "14:00",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT1B9NEGDOQ",
+            "Nama Mapel": "MATEMATIKA UMUM",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPY3W7FAB",
+            "Nama Kelas": "X.2",
+            "ID Guru": "USRMVNVCZN3F8R4",
+            "Nama Guru": "SITTI HAJRAH, S.Pd",
+            "SKS": 1,
+            "Hari": "Selasa",
+            "Jam Mulai": "13:00",
+            "Jam Selesai": "14:00",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT0PFXO0X8T",
+            "Nama Mapel": "SEJARAH",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "ID Guru": "USRMVNVVHPWXA14",
+            "Nama Guru": "HASNIAR, S.Pd",
+            "SKS": 1,
+            "Hari": "Senin",
+            "Jam Mulai": "13:00",
+            "Jam Selesai": "14:00",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT407L3P5Z3",
+            "Nama Mapel": "BAHASA INGGRIS",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "ID Guru": "USRMVNW8O3OOQO5",
+            "Nama Guru": "WA ODE ISMAWATI, S.Pd",
+            "SKS": 1,
+            "Hari": "Rabu",
+            "Jam Mulai": "13:00",
+            "Jam Selesai": "14:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT41AZP2XWW",
+            "Nama Mapel": "PAI",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "ID Guru": "USRMVNWJ01WHJYI",
+            "Nama Guru": "WA ODE AFRIANI, S.Pd",
+            "SKS": 1,
+            "Hari": "Rabu",
+            "Jam Mulai": "13:00",
+            "Jam Selesai": "14:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT1A0BGYP16",
+            "Nama Mapel": "EKONOMI",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "ID Guru": "USRMVNWB9YX4NR2",
+            "Nama Guru": "LILIS URMAYANI, S.Pd",
+            "SKS": 1,
+            "Hari": "Selasa",
+            "Jam Mulai": "13:00",
+            "Jam Selesai": "14:00",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT4YLXB4FMK",
+            "Nama Mapel": "MATEMATIKA UMUM",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "ID Guru": "USRMVNVCZN3F8R4",
+            "Nama Guru": "SITTI HAJRAH, S.Pd",
+            "SKS": 1,
+            "Hari": "Kamis",
+            "Jam Mulai": "13:00",
+            "Jam Selesai": "14:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT5JLMQ1HZ5",
+            "Nama Mapel": "PPKN",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "ID Guru": "USRMVNV3EY0Z0Q3",
+            "Nama Guru": "ASBIA, S.Pd",
+            "SKS": 1,
+            "Hari": "Jumat",
+            "Jam Mulai": "13:00",
+            "Jam Selesai": "14:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT5FJ9S3UP1",
+            "Nama Mapel": "BAHASA INDONESIA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "ID Guru": "USRMVNVYN602X02",
+            "Nama Guru": "SITI SARINA, S.Pd",
+            "SKS": 1,
+            "Hari": "Jumat",
+            "Jam Mulai": "13:00",
+            "Jam Selesai": "14:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT479W7I0JV",
+            "Nama Mapel": "SEJARAH",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "ID Guru": "USRMVNVSCESNYR7",
+            "Nama Guru": "EFRIA, S.Pd",
+            "SKS": 1,
+            "Hari": "Rabu",
+            "Jam Mulai": "13:00",
+            "Jam Selesai": "14:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT0RRTQFPU2",
+            "Nama Mapel": "PPKN",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "ID Guru": "USRMVNV3EY0Z0Q3",
+            "Nama Guru": "ASBIA, S.Pd",
+            "SKS": 1,
+            "Hari": "Senin",
+            "Jam Mulai": "14:00",
+            "Jam Selesai": "15:00",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT0VPFNUZ4V",
+            "Nama Mapel": "KIMIA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "ID Guru": "USRMVNVP3CZIRSB",
+            "Nama Guru": "SITI MURNI, S.Pd",
+            "SKS": 1,
+            "Hari": "Senin",
+            "Jam Mulai": "14:00",
+            "Jam Selesai": "15:00",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT16WMTV42P",
+            "Nama Mapel": "SEJARAH TL",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "ID Guru": "USRMVNVSCESNYR7",
+            "Nama Guru": "EFRIA, S.Pd",
+            "SKS": 1,
+            "Hari": "Selasa",
+            "Jam Mulai": "14:00",
+            "Jam Selesai": "15:00",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT1CQ4Z73AY",
+            "Nama Mapel": "MULOK",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "ID Guru": "USRMVL3KPCGXBVZ",
+            "Nama Guru": "RAHMAN RAJAB, S.Pd",
+            "SKS": 1,
+            "Hari": "Selasa",
+            "Jam Mulai": "14:00",
+            "Jam Selesai": "15:00",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT1EGA2B2WM",
+            "Nama Mapel": "PRAKARYA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPY3W7FAB",
+            "Nama Kelas": "X.2",
+            "ID Guru": "USRMVNWJ01WHJYI",
+            "Nama Guru": "WA ODE AFRIANI, S.Pd",
+            "SKS": 1,
+            "Hari": "Selasa",
+            "Jam Mulai": "14:00",
+            "Jam Selesai": "15:00",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT0R16PMGT1",
+            "Nama Mapel": "BIOLOGI",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "ID Guru": "USRMVNWPN4BGC91",
+            "Nama Guru": "NURZA, S.Pd",
+            "SKS": 1,
+            "Hari": "Senin",
+            "Jam Mulai": "14:00",
+            "Jam Selesai": "15:00",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT0WVA9MUKH",
+            "Nama Mapel": "BAHASA INDONESIA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPY3W7FAB",
+            "Nama Kelas": "X.2",
+            "ID Guru": "USRMVNW49WI05H2",
+            "Nama Guru": "SYAWALUDIN TAGALI, S.Pd",
+            "SKS": 1,
+            "Hari": "Senin",
+            "Jam Mulai": "14:00",
+            "Jam Selesai": "15:00",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT5RI1YWIZ6",
+            "Nama Mapel": "PRAKARYA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "ID Guru": "USRMVNWNM4N3REE",
+            "Nama Guru": "NUR HIKMA, S.Pd",
+            "SKS": 1,
+            "Hari": "Sabtu",
+            "Jam Mulai": "14:15",
+            "Jam Selesai": "15:45",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT5WBZ647YC",
+            "Nama Mapel": "BAHASA INGGRIS",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "ID Guru": "USRMVLZ3DDLIH3T",
+            "Nama Guru": "LIA ARIANTI, S.Pd",
+            "SKS": 1,
+            "Hari": "Sabtu",
+            "Jam Mulai": "14:15",
+            "Jam Selesai": "15:45",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT426T1LVPJ",
+            "Nama Mapel": "BIOLOGI",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "ID Guru": "USRMVNWPN4BGC91",
+            "Nama Guru": "NURZA, S.Pd",
+            "SKS": 1,
+            "Hari": "Rabu",
+            "Jam Mulai": "14:15",
+            "Jam Selesai": "15:45",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT434ZF0KFV",
+            "Nama Mapel": "KKA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "ID Guru": "USRMVL3KPCGXBVZ",
+            "Nama Guru": "RAHMAN RAJAB, S.Pd",
+            "SKS": 1,
+            "Hari": "Rabu",
+            "Jam Mulai": "14:15",
+            "Jam Selesai": "15:45",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT4B6KXXADC",
+            "Nama Mapel": "GEOGRAFI",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "ID Guru": "USRMVNWNM4N3REE",
+            "Nama Guru": "NUR HIKMA, S.Pd",
+            "SKS": 1,
+            "Hari": "Rabu",
+            "Jam Mulai": "14:15",
+            "Jam Selesai": "15:45",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT4C0OKIM84",
+            "Nama Mapel": "PAI",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPY3W7FAB",
+            "Nama Kelas": "X.2",
+            "ID Guru": "USRMVNV7HLF8OWP",
+            "Nama Guru": "YANTI FIRDARATIH, S.Pd",
+            "SKS": 1,
+            "Hari": "Rabu",
+            "Jam Mulai": "14:15",
+            "Jam Selesai": "15:45",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT4SPJ19O4F",
+            "Nama Mapel": "PAI",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "ID Guru": "USRMVNWJ01WHJYI",
+            "Nama Guru": "WA ODE AFRIANI, S.Pd",
+            "SKS": 1,
+            "Hari": "Kamis",
+            "Jam Mulai": "14:15",
+            "Jam Selesai": "15:45",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT4TFG875XD",
+            "Nama Mapel": "EKONOMI",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "ID Guru": "USRMVNWB9YX4NR2",
+            "Nama Guru": "LILIS URMAYANI, S.Pd",
+            "SKS": 1,
+            "Hari": "Kamis",
+            "Jam Mulai": "14:15",
+            "Jam Selesai": "15:45",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT500Y25D1L",
+            "Nama Mapel": "MATEMATIKA UMUM",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPY3W7FAB",
+            "Nama Kelas": "X.2",
+            "ID Guru": "USRMVNVCZN3F8R4",
+            "Nama Guru": "SITTI HAJRAH, S.Pd",
+            "SKS": 1,
+            "Hari": "Kamis",
+            "Jam Mulai": "14:15",
+            "Jam Selesai": "15:45",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT52U5P1Z0M",
+            "Nama Mapel": "SOSIOLOGI",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "ID Guru": "USRMVNUMVEGZ2GE",
+            "Nama Guru": "MARTHA, S.Sos",
+            "SKS": 1,
+            "Hari": "Kamis",
+            "Jam Mulai": "14:15",
+            "Jam Selesai": "15:45",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT5GB34FJLN",
+            "Nama Mapel": "BAHASA INDONESIA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "ID Guru": "USRMVNVYN602X02",
+            "Nama Guru": "SITI SARINA, S.Pd",
+            "SKS": 1,
+            "Hari": "Jumat",
+            "Jam Mulai": "14:15",
+            "Jam Selesai": "15:45",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT5HTI12FJR",
+            "Nama Mapel": "PJOK",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "ID Guru": "USRMVNW1D0B50GO",
+            "Nama Guru": "ABDUL MAMAN SAPUTRA, S.Pd",
+            "SKS": 1,
+            "Hari": "Jumat",
+            "Jam Mulai": "14:15",
+            "Jam Selesai": "15:45",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT5K8C59OD3",
+            "Nama Mapel": "PPKN",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPY3W7FAB",
+            "Nama Kelas": "X.2",
+            "ID Guru": "USRMVNV3EY0Z0Q3",
+            "Nama Guru": "ASBIA, S.Pd",
+            "SKS": 1,
+            "Hari": "Jumat",
+            "Jam Mulai": "14:15",
+            "Jam Selesai": "15:45",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT5L6PKOA51",
+            "Nama Mapel": "BAHASA INDONESIA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "ID Guru": "USRMVNW49WI05H2",
+            "Nama Guru": "SYAWALUDIN TAGALI, S.Pd",
+            "SKS": 1,
+            "Hari": "Jumat",
+            "Jam Mulai": "14:15",
+            "Jam Selesai": "15:45",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT5S9WP950L",
+            "Nama Mapel": "MULOK",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "ID Guru": "USRMVL3KPCGXBVZ",
+            "Nama Guru": "RAHMAN RAJAB, S.Pd",
+            "SKS": 1,
+            "Hari": "Sabtu",
+            "Jam Mulai": "14:15",
+            "Jam Selesai": "15:45",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT5V3AID91F",
+            "Nama Mapel": "INFORMATIKA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPY3W7FAB",
+            "Nama Kelas": "X.2",
+            "ID Guru": "USRMVNWPN4BGC91",
+            "Nama Guru": "NURZA, S.Pd",
+            "SKS": 1,
+            "Hari": "Sabtu",
+            "Jam Mulai": "14:15",
+            "Jam Selesai": "15:45",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT0T6XKMSSN",
+            "Nama Mapel": "KIMIA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "ID Guru": "USRMVM21Z6SHJZ6",
+            "Nama Guru": "HASRANI, S.Pd",
+            "SKS": 1,
+            "Hari": "Senin",
+            "Jam Mulai": "15:15",
+            "Jam Selesai": "16:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT0U2JS0N3Z",
+            "Nama Mapel": "BAHASA INGGRIS",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "ID Guru": "USRMVNW8O3OOQO5",
+            "Nama Guru": "WA ODE ISMAWATI, S.Pd",
+            "SKS": 1,
+            "Hari": "Senin",
+            "Jam Mulai": "15:15",
+            "Jam Selesai": "16:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT17IF1RZTM",
+            "Nama Mapel": "BAHASA INDONESIA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "ID Guru": "USRMVNVYN602X02",
+            "Nama Guru": "SITI SARINA, S.Pd",
+            "SKS": 1,
+            "Hari": "Selasa",
+            "Jam Mulai": "15:15",
+            "Jam Selesai": "16:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT18PSELQLY",
+            "Nama Mapel": "MATEMATIKA UMUM",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "ID Guru": "USRMVLS1SJ33FOG",
+            "Nama Guru": "DESTI ASRIYAH, S.Mat",
+            "SKS": 1,
+            "Hari": "Selasa",
+            "Jam Mulai": "15:15",
+            "Jam Selesai": "16:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT0W8S5AHRH",
+            "Nama Mapel": "KIMIA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPY3W7FAB",
+            "Nama Kelas": "X.2",
+            "ID Guru": "USRMVNVP3CZIRSB",
+            "Nama Guru": "SITI MURNI, S.Pd",
+            "SKS": 1,
+            "Hari": "Senin",
+            "Jam Mulai": "15:15",
+            "Jam Selesai": "16:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT0Y7UJ224M",
+            "Nama Mapel": "PAI",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "ID Guru": "USRMVNV7HLF8OWP",
+            "Nama Guru": "YANTI FIRDARATIH, S.Pd",
+            "SKS": 1,
+            "Hari": "Senin",
+            "Jam Mulai": "15:15",
+            "Jam Selesai": "16:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT1AKBQA00D",
+            "Nama Mapel": "EKONOMI",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPY3W7FAB",
+            "Nama Kelas": "X.2",
+            "ID Guru": "USRMVNWB9YX4NR2",
+            "Nama Guru": "LILIS URMAYANI, S.Pd",
+            "SKS": 1,
+            "Hari": "Selasa",
+            "Jam Mulai": "15:15",
+            "Jam Selesai": "16:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT1BZEMABMA",
+            "Nama Mapel": "MATEMATIKA UMUM",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "ID Guru": "USRMVNVCZN3F8R4",
+            "Nama Guru": "SITTI HAJRAH, S.Pd",
+            "SKS": 1,
+            "Hari": "Selasa",
+            "Jam Mulai": "15:15",
+            "Jam Selesai": "16:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT5WT9SQPEP",
+            "Nama Mapel": "BAHASA INGGRIS",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPY3W7FAB",
+            "Nama Kelas": "X.2",
+            "ID Guru": "USRMVLZ3DDLIH3T",
+            "Nama Guru": "LIA ARIANTI, S.Pd",
+            "SKS": 1,
+            "Hari": "Sabtu",
+            "Jam Mulai": "16:00",
+            "Jam Selesai": "17:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVOSNK7II5JJ",
+            "Nama Mapel": "FISIKA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "ID Guru": "USRMVL3A5K7HB02",
+            "Nama Guru": "LA ODE HARNADO, S.Si",
+            "SKS": 1,
+            "Hari": "Kamis",
+            "Jam Mulai": "16:00",
+            "Jam Selesai": "17:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVORWHVUML45",
+            "Nama Mapel": "KKA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPY3W7FAB",
+            "Nama Kelas": "X.2",
+            "ID Guru": "USRMVL3A5K7HB02",
+            "Nama Guru": "LA ODE HARNADO, S.Si",
+            "SKS": 1,
+            "Hari": "Jumat",
+            "Jam Mulai": "16:00",
+            "Jam Selesai": "17:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT53FUHDYD3",
+            "Nama Mapel": "SOSIOLOGI",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPY3W7FAB",
+            "Nama Kelas": "X.2",
+            "ID Guru": "USRMVNUMVEGZ2GE",
+            "Nama Guru": "MARTHA, S.Sos",
+            "SKS": 1,
+            "Hari": "Kamis",
+            "Jam Mulai": "16:00",
+            "Jam Selesai": "17:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT4CTNU947L",
+            "Nama Mapel": "BIOLOGI",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "ID Guru": "USRMVNWGZ579WL1",
+            "Nama Guru": "MEGAWATI, S.Pd",
+            "SKS": 1,
+            "Hari": "Rabu",
+            "Jam Mulai": "16:00",
+            "Jam Selesai": "17:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT48KG0QIG7",
+            "Nama Mapel": "SEJARAH",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPY3W7FAB",
+            "Nama Kelas": "X.2",
+            "ID Guru": "USRMVNVSCESNYR7",
+            "Nama Guru": "EFRIA, S.Pd",
+            "SKS": 1,
+            "Hari": "Rabu",
+            "Jam Mulai": "16:00",
+            "Jam Selesai": "17:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT5EWF7JKW7",
+            "Nama Mapel": "INFORMATIKA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "ID Guru": "USRMVNVP3CZIRSB",
+            "Nama Guru": "SITI MURNI, S.Pd",
+            "SKS": 1,
+            "Hari": "Jumat",
+            "Jam Mulai": "16:00",
+            "Jam Selesai": "17:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT45KNJ4VFP",
+            "Nama Mapel": "SOSIOLOGI",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "ID Guru": "USRMVNUMVEGZ2GE",
+            "Nama Guru": "MARTHA, S.Sos",
+            "SKS": 1,
+            "Hari": "Rabu",
+            "Jam Mulai": "16:00",
+            "Jam Selesai": "17:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT5IUIFCJ6U",
+            "Nama Mapel": "PJOK",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "ID Guru": "USRMVNW1D0B50GO",
+            "Nama Guru": "ABDUL MAMAN SAPUTRA, S.Pd",
+            "SKS": 1,
+            "Hari": "Jumat",
+            "Jam Mulai": "16:00",
+            "Jam Selesai": "17:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT44D79MU68",
+            "Nama Mapel": "KKA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "ID Guru": "USRMVL3KPCGXBVZ",
+            "Nama Guru": "RAHMAN RAJAB, S.Pd",
+            "SKS": 1,
+            "Hari": "Rabu",
+            "Jam Mulai": "16:00",
+            "Jam Selesai": "17:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT5LTVIMIW5",
+            "Nama Mapel": "BAHASA INDONESIA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPY3W7FAB",
+            "Nama Kelas": "X.2",
+            "ID Guru": "USRMVNW49WI05H2",
+            "Nama Guru": "SYAWALUDIN TAGALI, S.Pd",
+            "SKS": 1,
+            "Hari": "Jumat",
+            "Jam Mulai": "16:00",
+            "Jam Selesai": "17:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT4QEXB6S7K",
+            "Nama Mapel": "MATEMATIKA UMUM",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "ID Guru": "USRMVLS1SJ33FOG",
+            "Nama Guru": "DESTI ASRIYAH, S.Mat",
+            "SKS": 1,
+            "Hari": "Kamis",
+            "Jam Mulai": "16:00",
+            "Jam Selesai": "17:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT5XMPDPX6E",
+            "Nama Mapel": "PJOK",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "ID Guru": "USRMVNW1D0B50GO",
+            "Nama Guru": "ABDUL MAMAN SAPUTRA, S.Pd",
+            "SKS": 1,
+            "Hari": "Sabtu",
+            "Jam Mulai": "16:00",
+            "Jam Selesai": "17:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT5T341XOET",
+            "Nama Mapel": "MULOK",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "ID Guru": "USRMVL3KPCGXBVZ",
+            "Nama Guru": "RAHMAN RAJAB, S.Pd",
+            "SKS": 1,
+            "Hari": "Sabtu",
+            "Jam Mulai": "16:00",
+            "Jam Selesai": "17:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT521LNXR5H",
+            "Nama Mapel": "FISIKA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "ID Guru": "USRMVNVFO9PWZ0V",
+            "Nama Guru": "MARLIANTI, S.Pd",
+            "SKS": 1,
+            "Hari": "Kamis",
+            "Jam Mulai": "16:00",
+            "Jam Selesai": "17:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT5TRJTQBBH",
+            "Nama Mapel": "GEOGRAFI",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "ID Guru": "USRMVNWEUE9L58E",
+            "Nama Guru": "SAMARUDIN, S.Pd",
+            "SKS": 1,
+            "Hari": "Sabtu",
+            "Jam Mulai": "16:00",
+            "Jam Selesai": "17:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT1F6J9BQNO",
+            "Nama Mapel": "PRAKARYA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "ID Guru": "USRMVNWJ01WHJYI",
+            "Nama Guru": "WA ODE AFRIANI, S.Pd",
+            "SKS": 1,
+            "Hari": "Selasa",
+            "Jam Mulai": "16:15",
+            "Jam Selesai": "17:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT19CI3D2WM",
+            "Nama Mapel": "MATEMATIKA UMUM",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "ID Guru": "USRMVLS1SJ33FOG",
+            "Nama Guru": "DESTI ASRIYAH, S.Mat",
+            "SKS": 1,
+            "Hari": "Selasa",
+            "Jam Mulai": "16:15",
+            "Jam Selesai": "17:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT0UR9E6UVC",
+            "Nama Mapel": "GEOGRAFI",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "ID Guru": "USRMVNWEUE9L58E",
+            "Nama Guru": "SAMARUDIN, S.Pd",
+            "SKS": 1,
+            "Hari": "Senin",
+            "Jam Mulai": "16:15",
+            "Jam Selesai": "17:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT0YWAPJMX1",
+            "Nama Mapel": "PJOK",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPY3W7FAB",
+            "Nama Kelas": "X.2",
+            "ID Guru": "USRMVNW1D0B50GO",
+            "Nama Guru": "ABDUL MAMAN SAPUTRA, S.Pd",
+            "SKS": 1,
+            "Hari": "Senin",
+            "Jam Mulai": "16:15",
+            "Jam Selesai": "17:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT1DBSWJ415",
+            "Nama Mapel": "MULOK",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPY3W7FAB",
+            "Nama Kelas": "X.2",
+            "ID Guru": "USRMVL3KPCGXBVZ",
+            "Nama Guru": "RAHMAN RAJAB, S.Pd",
+            "SKS": 1,
+            "Hari": "Selasa",
+            "Jam Mulai": "16:15",
+            "Jam Selesai": "17:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT180A12YJ7",
+            "Nama Mapel": "BAHASA INDONESIA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "ID Guru": "USRMVNVYN602X02",
+            "Nama Guru": "SITI SARINA, S.Pd",
+            "SKS": 1,
+            "Hari": "Selasa",
+            "Jam Mulai": "16:15",
+            "Jam Selesai": "17:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT0SEH7CLB4",
+            "Nama Mapel": "PPKN",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "ID Guru": "USRMVNV3EY0Z0Q3",
+            "Nama Guru": "ASBIA, S.Pd",
+            "SKS": 1,
+            "Hari": "Senin",
+            "Jam Mulai": "16:15",
+            "Jam Selesai": "17:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      },
+      {
+            "ID Mapel": "MPLMVT0XC25TKHM",
+            "Nama Mapel": "BAHASA INDONESIA",
+            "Kode Mapel": "",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "ID Guru": "USRMVNW49WI05H2",
+            "Nama Guru": "SYAWALUDIN TAGALI, S.Pd",
+            "SKS": 1,
+            "Hari": "Senin",
+            "Jam Mulai": "16:15",
+            "Jam Selesai": "17:15",
+            "Ruangan": "",
+            "Semester": "Ganjil"
+      }
+];
+    const INITIAL_FALLBACK_STUDENTS = [
+      {
+            "ID Siswa": "SISMVOS8EYBHF61",
+            "NIS": "X11IPS1",
+            "NISN": "",
+            "Nama Siswa": "ABDUL RAHMAT",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "Telepon": "",
+            "Alamat": "DESA MAGINTI",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUKDG4BHCJK",
+            "NIS": "XI1",
+            "NISN": "0099840909",
+            "Nama Siswa": "ADIFAN",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVULBY8ABUV7",
+            "NIS": "X12",
+            "NISN": "107152239",
+            "Nama Siswa": "AL AQSAN TAMUNG",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVULA2J8U1OL",
+            "NIS": "XI026",
+            "NISN": "",
+            "Nama Siswa": "ALIF",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVULCLY1OD8Y",
+            "NIS": "X13",
+            "NISN": "3120804177",
+            "Nama Siswa": "ALTIN SAPUTRA",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVOS9N6B4HER",
+            "NIS": "X11IPS2",
+            "NISN": "0095538548",
+            "Nama Siswa": "AMEL",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "Telepon": "",
+            "Alamat": "DESA KANGKUNAWE",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUKE5XI8FQM",
+            "NIS": "XI2",
+            "NISN": "0101256111",
+            "Nama Siswa": "AMELIA",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUKQT9F32F4",
+            "NIS": "XI01",
+            "NISN": "0107511414",
+            "Nama Siswa": "AMIRA EFMI",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVULB26NX243",
+            "NIS": "X11",
+            "NISN": "119357532",
+            "Nama Siswa": "ANDIRAN",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVOSAHM526YV",
+            "NIS": "X11IPS3",
+            "NISN": "0096832784",
+            "Nama Siswa": "ARI SETIAWAN",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "Telepon": "",
+            "Alamat": "DESA MAGINTI",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVOSB74LMD6T",
+            "NIS": "X11IPS4",
+            "NISN": "0087013967",
+            "Nama Siswa": "ARIL",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "Telepon": "",
+            "Alamat": "DESA PASI PADANGAN",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUKES4SWNEK",
+            "NIS": "XI3",
+            "NISN": "0105645378",
+            "Nama Siswa": "ARLINDA",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVSZYCGKFS27",
+            "NIS": "X11IPS22",
+            "NISN": "",
+            "Nama Siswa": "ASTRI",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVYOWOLZR4CR",
+            "NIS": "X14",
+            "NISN": "115959913",
+            "Nama Siswa": "AYUDIN",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUKRSG548BN",
+            "NIS": "XI02",
+            "NISN": "0107656242",
+            "Nama Siswa": "AYUNI",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVYOYKLWCVY9",
+            "NIS": "X15",
+            "NISN": "117772180",
+            "Nama Siswa": "AZNIA RAMADANI",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUKFE1WI7TZ",
+            "NIS": "XI4",
+            "NISN": "010271314",
+            "Nama Siswa": "AZRIL",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVYOZT5EDRGT",
+            "NIS": "X16",
+            "NISN": "105001451",
+            "Nama Siswa": "DELFAN",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVYP1AYH62MP",
+            "NIS": "X17",
+            "NISN": "104207111",
+            "Nama Siswa": "DELFIN",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUKG177E15K",
+            "NIS": "XI5",
+            "NISN": "0103725481",
+            "Nama Siswa": "DELSA YANTI",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUKGPKYBK0C",
+            "NIS": "XI6",
+            "NISN": "3108543813",
+            "Nama Siswa": "DESTIAN",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVYP5NYDI9I4",
+            "NIS": "X18",
+            "NISN": "109982491",
+            "Nama Siswa": "DILSAN",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVSZ8JALPNX2",
+            "NIS": "260",
+            "NISN": "0087596061",
+            "Nama Siswa": "DIMAS PRATAMA",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUKT8UFAOLE",
+            "NIS": "XI03",
+            "NISN": "0109897874",
+            "Nama Siswa": "DONITA SABILA",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVSZ9RPEDQJE",
+            "NIS": "263",
+            "NISN": "0092967048",
+            "Nama Siswa": "ECI ESTIANTI",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVSZAVDLFRAD",
+            "NIS": "211",
+            "NISN": "0098209132",
+            "Nama Siswa": "EDO SUNANTO",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVOSC0A8RC1L",
+            "NIS": "212",
+            "NISN": "0079209160",
+            "Nama Siswa": "EKA SAFITRI",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "Telepon": "",
+            "Alamat": "DESA KANGKUNAWE",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUKHFJ21YH4",
+            "NIS": "XI7",
+            "NISN": "0107463567",
+            "Nama Siswa": "ENI NURIATI DAMLIA",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUKHZSHCZ06",
+            "NIS": "XI8",
+            "NISN": "0104810630",
+            "Nama Siswa": "ERWIN",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVSZWRUQR2JA",
+            "NIS": "214",
+            "NISN": "009299828",
+            "Nama Siswa": "FADIL",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUKU5QIPR36",
+            "NIS": "XI04",
+            "NISN": "0092613901",
+            "Nama Siswa": "FAHIT",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVSZC8I0I6K0",
+            "NIS": "215",
+            "NISN": "0097398041",
+            "Nama Siswa": "FATIA",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUKIOHTTZAN",
+            "NIS": "XI9",
+            "NISN": "0106745354",
+            "Nama Siswa": "FEBI AULIA",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVYP79ZEBY0A",
+            "NIS": "X19",
+            "NISN": "117772180",
+            "Nama Siswa": "FELIYAWATI",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVYP8DNII5KL",
+            "NIS": "X110",
+            "NISN": "109165982",
+            "Nama Siswa": "FISKA",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVYP9PKJW3IQ",
+            "NIS": "X111",
+            "NISN": "016281842",
+            "Nama Siswa": "FITRIANI",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVSZDFOQMQY7",
+            "NIS": "217",
+            "NISN": "0091261112",
+            "Nama Siswa": "HANDAYANI",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUKUZ3G91N8",
+            "NIS": "XI05",
+            "NISN": "0099909599",
+            "Nama Siswa": "HIKMAWATI",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVSZF72ZKWV2",
+            "NIS": "220",
+            "NISN": "0085140729",
+            "Nama Siswa": "ILSAN",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUKVJ90YSB6",
+            "NIS": "XI06",
+            "NISN": "",
+            "Nama Siswa": "INDRI SAFITRI",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUKVXTYHMT5",
+            "NIS": "XI07",
+            "NISN": "",
+            "Nama Siswa": "ISMA",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUKWM8QIR8U",
+            "NIS": "XI08",
+            "NISN": "0109379253",
+            "Nama Siswa": "JAMILA",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVSZGXVS0DOE",
+            "NIS": "223",
+            "NISN": "0098199499",
+            "Nama Siswa": "KARMIDA",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVSZZ9BMF4EU",
+            "NIS": "224",
+            "NISN": "0081135188",
+            "Nama Siswa": "KASIH FITRIANI",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUKXCE4RKWV",
+            "NIS": "XI09",
+            "NISN": "0104790496",
+            "Nama Siswa": "KHAIRUL AZAM",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVT00LAG6XKJ",
+            "NIS": "226",
+            "NISN": "0089280133",
+            "Nama Siswa": "LA ODE ALIF",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVSZHSF8W0F1",
+            "NIS": "227",
+            "NISN": "0093989933",
+            "Nama Siswa": "LA ODE AMALUDIN",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUKY4G3U19X",
+            "NIS": "XI010",
+            "NISN": "0108422319",
+            "Nama Siswa": "LA ODE SAFRIN",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUKYU4E5OK4",
+            "NIS": "XI011",
+            "NISN": "0098746070",
+            "Nama Siswa": "LUNA MAYA",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVSZIGC9MJLN",
+            "NIS": "231",
+            "NISN": "0098455694",
+            "Nama Siswa": "MAIRA",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVYPBJ9QG675",
+            "NIS": "X112",
+            "NISN": "106476886",
+            "Nama Siswa": "MALNIA",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVYPCPV4O8CB",
+            "NIS": "X113",
+            "NISN": "3116155846",
+            "Nama Siswa": "MITA",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUKJCWJ4Q4R",
+            "NIS": "XI10",
+            "NISN": "0101737081",
+            "Nama Siswa": "MUH. ABDUL MANSYUR",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVSZKL47LLM9",
+            "NIS": "233",
+            "NISN": "0099763895",
+            "Nama Siswa": "MUHAMMAD AFAN",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVYPE35X6DXH",
+            "NIS": "X114",
+            "NISN": "115502212",
+            "Nama Siswa": "MUHAMMAD AFWAN",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVSZL8BKMELO",
+            "NIS": "232",
+            "NISN": "0093110881",
+            "Nama Siswa": "MUHAMMAD FADIL",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVSZJV1J2YKA",
+            "NIS": "234",
+            "NISN": "0094993927",
+            "Nama Siswa": "MUHAMMAD HASBITULLAH",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVSZM0T4EF41",
+            "NIS": "236",
+            "NISN": "0093071838",
+            "Nama Siswa": "MUTMAINAH",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUKZOUIULA6",
+            "NIS": "XI012",
+            "NISN": "0101752420",
+            "Nama Siswa": "NADILLAH PUTRI",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUKK96MURKI",
+            "NIS": "XI11",
+            "NISN": "00097118521",
+            "Nama Siswa": "NUR AYN",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVSZMRBEGJQY",
+            "NIS": "239",
+            "NISN": "0099255017",
+            "Nama Siswa": "NUR HIDAYAH",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUL0P6AMTTN",
+            "NIS": "XI013",
+            "NISN": "0101111158",
+            "Nama Siswa": "NUR MAIRAH",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVSZNH1VLRAQ",
+            "NIS": "238",
+            "NISN": "0091030684",
+            "Nama Siswa": "NURFAIKA",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVSZP2OVEAYN",
+            "NIS": "X1116",
+            "NISN": "",
+            "Nama Siswa": "NURLIA",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVT01C1HD3Z8",
+            "NIS": "241",
+            "NISN": "0097846161",
+            "Nama Siswa": "RAHMAWATI",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVL3THAF5BU6",
+            "NIS": "242",
+            "NISN": "3095410166",
+            "Nama Siswa": "RASYA",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "Telepon": "",
+            "Alamat": "DESA MAGINTI",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUL18Z5EYOV",
+            "NIS": "XI014",
+            "NISN": "0082213408",
+            "Nama Siswa": "RENO",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUL22VJ8SHB",
+            "NIS": "XI015",
+            "NISN": "0092015195",
+            "Nama Siswa": "RESTI AYUNITA",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVYPFENTIAA1",
+            "NIS": "X115",
+            "NISN": "119432819",
+            "Nama Siswa": "RIDO",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVT0232GGKZB",
+            "NIS": "272",
+            "NISN": "0087213058",
+            "Nama Siswa": "RISKA AMELIA",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUKLB30M0M7",
+            "NIS": "XI12",
+            "NISN": "0106345953",
+            "Nama Siswa": "RISKY ADITYA",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVYPGK3INNEW",
+            "NIS": "X116",
+            "NISN": "3116155846",
+            "Nama Siswa": "SABRINA",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUL2TAB0N1R",
+            "NIS": "XI016",
+            "NISN": "0101252226",
+            "Nama Siswa": "SAHALUDIN",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUL3F6BN0I6",
+            "NIS": "XI017",
+            "NISN": "0104678209",
+            "Nama Siswa": "SALFIN ANANDIN",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVYPIYAOVVQS",
+            "NIS": "X117",
+            "NISN": "118737618",
+            "Nama Siswa": "SAYBATUL HAMDI",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUL41FJ016B",
+            "NIS": "XI018",
+            "NISN": "0104945520",
+            "Nama Siswa": "SAYDIN HAYRIL",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVYPLNX6KTE2",
+            "NIS": "X118",
+            "NISN": "113600981",
+            "Nama Siswa": "SEFRIANI",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVYPOHIEUM0G",
+            "NIS": "X119",
+            "NISN": "101055024",
+            "Nama Siswa": "SELFI",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVT03OFJUC9B",
+            "NIS": "245",
+            "NISN": "0094898266",
+            "Nama Siswa": "SIFAYANI",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVT04P5JBKAW",
+            "NIS": "246",
+            "NISN": "0081359122",
+            "Nama Siswa": "TAHMIT",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVYPQ7WLWQVW",
+            "NIS": "X120",
+            "NISN": "106176706",
+            "Nama Siswa": "TASMIN",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVT05HPAFWGQ",
+            "NIS": "247",
+            "NISN": "0098455931",
+            "Nama Siswa": "TERZI EFANGKA FATZIRA",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVSZQ0G1B0V6",
+            "NIS": "248",
+            "NISN": "3090301194",
+            "Nama Siswa": "TINI ARI",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVYPRDOPBS1Y",
+            "NIS": "X121",
+            "NISN": "0108332205",
+            "Nama Siswa": "ULFA",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVSZQX9C44PM",
+            "NIS": "249",
+            "NISN": "0081800556",
+            "Nama Siswa": "VIONA",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVT09AW9FFN8",
+            "NIS": "0248",
+            "NISN": "3090301194",
+            "Nama Siswa": "WA ODE AMIRA",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVT0A02BMJF3",
+            "NIS": "250",
+            "NISN": "0097166576",
+            "Nama Siswa": "WA ODE ARIANA",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUKMF2QFN4S",
+            "NIS": "XI13",
+            "NISN": "0101513521",
+            "Nama Siswa": "WA ODE ASRIA",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVT0B8VJV3NC",
+            "NIS": "251",
+            "NISN": "0088246732",
+            "Nama Siswa": "WA ODE DWI ARTIKASARI",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUL4QYBRLSH",
+            "NIS": "XI019",
+            "NISN": "",
+            "Nama Siswa": "WA ODE ELDAWATI",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVYPSRMGF9VF",
+            "NIS": "X122",
+            "NISN": "0102276331",
+            "Nama Siswa": "WA ODE HELMIA",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVT0C3IIBY8I",
+            "NIS": "252",
+            "NISN": "0096152265",
+            "Nama Siswa": "WA ODE RISATIA APRILIA",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUL5S0664B5",
+            "NIS": "XI020",
+            "NISN": "0106041379",
+            "Nama Siswa": "WA ODE SINARWATI",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVT0D29PP4BQ",
+            "NIS": "254",
+            "NISN": "0097176736",
+            "Nama Siswa": "WA ODE SITI MARWANA",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVL3SPR0L7WZ",
+            "Nama Kelas": "XII IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUL6HHZXCZK",
+            "NIS": "XI021",
+            "NISN": "0083285922",
+            "Nama Siswa": "WA ODE YUNI ELSA",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUL76IASLP4",
+            "NIS": "XI022",
+            "NISN": "0094290436",
+            "Nama Siswa": "WA ODE ZIRNA",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUKN6OGS79E",
+            "NIS": "XI14",
+            "NISN": "0094438904",
+            "Nama Siswa": "WARIFATUL AHADDININGRAT",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZR51XCMOJ",
+            "Nama Kelas": "XI IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUL7T5SUZU4",
+            "NIS": "XI023",
+            "NISN": "0095883516",
+            "Nama Siswa": "WELNI SEPTIANI",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVYPUH5SD0IG",
+            "NIS": "X123",
+            "NISN": "116962757",
+            "Nama Siswa": "WINDRY FEBRIANTY",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVYPVZGUUAG2",
+            "NIS": "X124",
+            "NISN": "98574811",
+            "Nama Siswa": "YAYU AUZIAH",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVSZRQP5M8YB",
+            "NIS": "256",
+            "NISN": "0097409392",
+            "Nama Siswa": "YUDHA SAPUTRA",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUL8LGSD48D",
+            "NIS": "XI024",
+            "NISN": "0103873052",
+            "Nama Siswa": "YUTRI ALKIA",
+            "Jenis Kelamin": "P",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVYPX8TKGU05",
+            "NIS": "X125",
+            "NISN": "116327074",
+            "Nama Siswa": "ZAITUL IKSAN",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZPCGLVG85",
+            "Nama Kelas": "X.1",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVUL98L0DAPH",
+            "NIS": "XI025",
+            "NISN": "0087138902",
+            "Nama Siswa": "ZULFIN",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZRZSWNJU6",
+            "Nama Kelas": "XI IPS",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      },
+      {
+            "ID Siswa": "SISMVSZSKDV577R",
+            "NIS": "258",
+            "NISN": "0081916053",
+            "Nama Siswa": "ZULKIFLI",
+            "Jenis Kelamin": "L",
+            "ID Kelas": "KLSMVNZSX7ZRLGM",
+            "Nama Kelas": "XII IPA",
+            "Telepon": "",
+            "Alamat": "",
+            "Status": "Aktif"
+      }
+];
 
     function initOfflineCacheInstant() {
       try {
         // 1. Pengaturan Sekolah & Background
-        const cachedSettings = localStorage.getItem('portal_app_settings');
+        const cachedSettings = localStorage.getItem('portal_app_settings') || localStorage.getItem('portal_settings_cache');
         if (cachedSettings) {
           try {
             dbSettings = JSON.parse(cachedSettings);
@@ -4453,36 +7610,47 @@
         }
         applySchoolBackground();
 
-        // 2. Kelas (Inisialisasi seketika tanpa delay)
-        const cachedClasses = localStorage.getItem('portal_classes_data');
+        // 2. Kelas
+        const cachedClasses = localStorage.getItem('portal_classes_data') || localStorage.getItem('portal_db_table_Classes');
         if (cachedClasses) {
           try {
             const parsed = JSON.parse(cachedClasses);
             if (Array.isArray(parsed) && parsed.length > 0) dbClasses = parsed;
           } catch (eCls) {}
         }
-        if (!dbClasses || dbClasses.length === 0) {
-          dbClasses = [...INITIAL_FALLBACK_CLASSES];
-        }
+        if (!dbClasses || dbClasses.length === 0) dbClasses = INITIAL_FALLBACK_CLASSES.slice();
         renderClasses();
 
         // 3. Siswa
-        const cachedStudents = localStorage.getItem('portal_students_data');
+        const cachedStudents = localStorage.getItem('portal_students_data') || localStorage.getItem('portal_db_table_Students');
         if (cachedStudents) {
-          try { dbStudents = JSON.parse(cachedStudents); } catch (eStd) {}
+          try {
+            const parsedStd = JSON.parse(cachedStudents);
+            if (Array.isArray(parsedStd) && parsedStd.length > 0) dbStudents = parsedStd;
+          } catch (eStd) {}
+        }
+        if (!dbStudents || dbStudents.length === 0) dbStudents = INITIAL_FALLBACK_STUDENTS.slice();
+
+        // 3b. Guru / Teachers
+        const cachedTeachers = localStorage.getItem('portal_teachers_data') || localStorage.getItem('portal_db_table_Users');
+        if (cachedTeachers) {
+          try {
+            const parsedTch = JSON.parse(cachedTeachers);
+            if (Array.isArray(parsedTch) && parsedTch.length > 0) dbTeachers = parsedTch;
+          } catch (eTch) {}
         }
 
         // 4. Jadwal Mapel
-        const cachedSubjects = localStorage.getItem('portal_subjects_data');
+        const cachedSubjects = localStorage.getItem('portal_subjects_data') || localStorage.getItem('portal_db_table_Subjects');
         if (cachedSubjects) {
           try {
             const parsedSub = JSON.parse(cachedSubjects);
-            if (Array.isArray(parsedSub) && parsedSub.length > 0) dbSubjects = parsedSub;
+            if (Array.isArray(parsedSub) && parsedSub.length > 0) {
+              dbSubjects = parsedSub.filter(s => !String(s['ID Mapel'] || '').startsWith('MPMVNZ'));
+            }
           } catch (eSub) {}
         }
-        if (!dbSubjects || dbSubjects.length === 0) {
-          dbSubjects = [...INITIAL_FALLBACK_SUBJECTS];
-        }
+        if (!dbSubjects || dbSubjects.length === 0) dbSubjects = INITIAL_FALLBACK_SUBJECTS.slice();
         renderSchedules();
 
         // 5. Pengumuman
@@ -4550,7 +7718,7 @@
           examSessRes,
           gradeRes
         ] = await Promise.allSettled([
-          supabaseClient.from('Settings').select('Key, Value'),
+          supabaseClient.from('Settings').select('Key, Value').not('Key', 'in', '("app_spmb_registrations","app_learnings_data","app_learning_tasks_data")'),
           supabaseClient.from('Classes').select('*').order('Nama Kelas', { ascending: true }),
           supabaseClient.from('Students').select('*').order('Nama Siswa', { ascending: true }),
           supabaseClient.from('Users').select('*'),
@@ -4584,13 +7752,13 @@
         }
 
         // 2. Process Classes
-        if (classRes.status === 'fulfilled' && Array.isArray(classRes.value?.data) && classRes.value.data.length > 0) {
+        if (classRes.status === 'fulfilled' && Array.isArray(classRes.value?.data)) {
           dbClasses = classRes.value.data;
           try { localStorage.setItem('portal_classes_data', JSON.stringify(dbClasses)); } catch (e) {}
         }
 
         // 3. Process Students
-        if (studRes.status === 'fulfilled' && Array.isArray(studRes.value?.data) && studRes.value.data.length > 0) {
+        if (studRes.status === 'fulfilled' && Array.isArray(studRes.value?.data)) {
           dbStudents = studRes.value.data;
           try { localStorage.setItem('portal_students_data', JSON.stringify(dbStudents)); } catch (e) {}
           if (currentUser && currentUser.role === 'siswa') {
@@ -4609,7 +7777,7 @@
         }
 
         // 5. Process Subjects
-        if (subjRes.status === 'fulfilled' && Array.isArray(subjRes.value?.data) && subjRes.value.data.length > 0) {
+        if (subjRes.status === 'fulfilled' && Array.isArray(subjRes.value?.data)) {
           dbSubjects = subjRes.value.data;
           try { localStorage.setItem('portal_subjects_data', JSON.stringify(dbSubjects)); } catch (e) {}
         }
@@ -4847,10 +8015,8 @@
             };
           });
           localStorage.setItem('portal_learnings_data', JSON.stringify(dbLearnings));
-        } else {
-          // Bawaan jika belum ada data sama sekali (kosong murni, tanpa dummy)
+        } else if (!Array.isArray(dbLearnings)) {
           dbLearnings = [];
-          localStorage.setItem('portal_learnings_data', JSON.stringify([]));
         }
 
         renderRooms();
@@ -5288,7 +8454,7 @@
 
     async function downloadLearningPdfDirect(learningId, fileName) {
       let item = (dbLearnings || []).find(it => (it['ID'] || it.id) === learningId) || {};
-      let dataUrl = item.pdfUrl || item['PDF URL'];
+      let dataUrl = resolveSubdirMediaUrl(item.pdfUrl || item['PDF URL']);
 
       if (!dataUrl) {
         dataUrl = await getLearningPdfFromIdb(learningId);
@@ -5362,7 +8528,7 @@
       document.getElementById('input-material-groups').value = item['Pembagian Kelompok'] || item.kelompok || '';
 
       // Muat data Modul PDF jika ada
-      const pdfData = item['PDF URL'] || item.pdfUrl || '';
+      const pdfData = resolveSubdirMediaUrl(item['PDF URL'] || item.pdfUrl || '');
       const pdfName = item['PDF Name'] || item.pdfName || '';
       const allowDl = item['Izinkan Download PDF'] || item.allowDownloadPdf;
       const dataInput = document.getElementById('input-material-pdf-data');
@@ -11455,15 +14621,13 @@
       if (savedUser) {
         try {
           const parsed = JSON.parse(savedUser);
-          // Blokir jika ada sisa sesi role admin
-          if (parsed && (parsed.role === 'admin' || (parsed.username && parsed.username.toLowerCase() === 'admin'))) {
-            try { localStorage.removeItem('smandum_active_user'); } catch (e) {}
-            currentUser = null;
-            navTo('login');
-          } else {
+          if (parsed && parsed.role) {
             currentUser = parsed;
-            currentRole = currentUser.role || 'guru';
+            currentRole = currentUser.role === 'siswa' ? 'siswa' : 'guru';
             loginSuccess();
+          } else {
+            try { localStorage.removeItem('smandum_active_user'); } catch (e) {}
+            navTo('login');
           }
         } catch (e) {
           try { localStorage.removeItem('smandum_active_user'); } catch (e) {}

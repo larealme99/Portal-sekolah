@@ -6539,6 +6539,7 @@
                             ujian komputer, dan input rekap nilai otomatis.
                         </p>
                     </div>
+                    
                     <div>
                         <button type="button" class="simpul-card-btn"
                             onclick="event.stopPropagation();showLogin('guru')">
@@ -6926,7 +6927,7 @@
                     </div>
                     <div id="kepsekEditorPreviewName"
                         style="font-size:17px;font-weight:800;color:#78350f;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
-                        Drs. H. Kepala Sekolah, M.Pd</div>
+                        La Ode Mursaban Indi, S.Pd., M.Pd</div>
                     <div style="font-size:12px;color:#92400e;display:flex;align-items:center;gap:6px">
                         <i class="fas fa-building" style="font-size:11px"></i> Pemimpin Satuan Pendidikan SMAN 12 Muna
                         Barat
@@ -7469,6 +7470,10 @@
                             class="fas fa-times"></i></button>
                 </div>
                 <div class="sidebar-section">
+                    <div class="sidebar-item" onclick="loadPage('dashboardAdmin')" id="menu-dashboardAdmin"><i
+                            class="fas fa-tachometer-alt"></i><span>Dashboard Admin</span></div>
+                </div>
+                <div class="sidebar-section">
                     <div class="sidebar-section-label">Data Pengguna</div>
                     <div class="sidebar-item" onclick="loadPage('daftarGuru')" id="menu-daftarGuru"><i
                             class="fas fa-users"></i><span>Daftar Guru</span></div>
@@ -7992,58 +7997,58 @@
                                 <tr>
                                     <td style="text-align:left;font-weight:600">Matematika</td>
                                     <td><input class="spmb-grade-input" id="g_mtk_1" type="number" min="0" max="100"
-                                            value="85" oninput="calculateSpmbGrades()" /></td>
+                                            value="" placeholder="0" oninput="calculateSpmbGrades()" /></td>
                                     <td><input class="spmb-grade-input" id="g_mtk_2" type="number" min="0" max="100"
-                                            value="86" oninput="calculateSpmbGrades()" /></td>
+                                            value="" placeholder="0" oninput="calculateSpmbGrades()" /></td>
                                     <td><input class="spmb-grade-input" id="g_mtk_3" type="number" min="0" max="100"
-                                            value="85" oninput="calculateSpmbGrades()" /></td>
+                                            value="" placeholder="0" oninput="calculateSpmbGrades()" /></td>
                                     <td><input class="spmb-grade-input" id="g_mtk_4" type="number" min="0" max="100"
-                                            value="88" oninput="calculateSpmbGrades()" /></td>
+                                            value="" placeholder="0" oninput="calculateSpmbGrades()" /></td>
                                     <td><input class="spmb-grade-input" id="g_mtk_5" type="number" min="0" max="100"
-                                            value="87" oninput="calculateSpmbGrades()" /></td>
-                                    <td><strong id="avg_mtk" style="color:#10b981">86.20</strong></td>
+                                            value="" placeholder="0" oninput="calculateSpmbGrades()" /></td>
+                                    <td><strong id="avg_mtk" style="color:#10b981">0.00</strong></td>
                                 </tr>
                                 <tr>
                                     <td style="text-align:left;font-weight:600">Bahasa Indonesia</td>
                                     <td><input class="spmb-grade-input" id="g_ind_1" type="number" min="0" max="100"
-                                            value="88" oninput="calculateSpmbGrades()" /></td>
+                                            value="" placeholder="0" oninput="calculateSpmbGrades()" /></td>
                                     <td><input class="spmb-grade-input" id="g_ind_2" type="number" min="0" max="100"
-                                            value="87" oninput="calculateSpmbGrades()" /></td>
+                                            value="" placeholder="0" oninput="calculateSpmbGrades()" /></td>
                                     <td><input class="spmb-grade-input" id="g_ind_3" type="number" min="0" max="100"
-                                            value="89" oninput="calculateSpmbGrades()" /></td>
+                                            value="" placeholder="0" oninput="calculateSpmbGrades()" /></td>
                                     <td><input class="spmb-grade-input" id="g_ind_4" type="number" min="0" max="100"
-                                            value="88" oninput="calculateSpmbGrades()" /></td>
+                                            value="" placeholder="0" oninput="calculateSpmbGrades()" /></td>
                                     <td><input class="spmb-grade-input" id="g_ind_5" type="number" min="0" max="100"
-                                            value="90" oninput="calculateSpmbGrades()" /></td>
-                                    <td><strong id="avg_ind" style="color:#10b981">88.40</strong></td>
+                                            value="" placeholder="0" oninput="calculateSpmbGrades()" /></td>
+                                    <td><strong id="avg_ind" style="color:#10b981">0.00</strong></td>
                                 </tr>
                                 <tr>
                                     <td style="text-align:left;font-weight:600">Bahasa Inggris</td>
                                     <td><input class="spmb-grade-input" id="g_ing_1" type="number" min="0" max="100"
-                                            value="84" oninput="calculateSpmbGrades()" /></td>
+                                            value="" placeholder="0" oninput="calculateSpmbGrades()" /></td>
                                     <td><input class="spmb-grade-input" id="g_ing_2" type="number" min="0" max="100"
-                                            value="85" oninput="calculateSpmbGrades()" /></td>
+                                            value="" placeholder="0" oninput="calculateSpmbGrades()" /></td>
                                     <td><input class="spmb-grade-input" id="g_ing_3" type="number" min="0" max="100"
-                                            value="86" oninput="calculateSpmbGrades()" /></td>
+                                            value="" placeholder="0" oninput="calculateSpmbGrades()" /></td>
                                     <td><input class="spmb-grade-input" id="g_ing_4" type="number" min="0" max="100"
-                                            value="86" oninput="calculateSpmbGrades()" /></td>
+                                            value="" placeholder="0" oninput="calculateSpmbGrades()" /></td>
                                     <td><input class="spmb-grade-input" id="g_ing_5" type="number" min="0" max="100"
-                                            value="88" oninput="calculateSpmbGrades()" /></td>
-                                    <td><strong id="avg_ing" style="color:#10b981">85.80</strong></td>
+                                            value="" placeholder="0" oninput="calculateSpmbGrades()" /></td>
+                                    <td><strong id="avg_ing" style="color:#10b981">0.00</strong></td>
                                 </tr>
                                 <tr>
                                     <td style="text-align:left;font-weight:600">Ilmu Pengetahuan Alam (IPA)</td>
                                     <td><input class="spmb-grade-input" id="g_ipa_1" type="number" min="0" max="100"
-                                            value="85" oninput="calculateSpmbGrades()" /></td>
+                                            value="" placeholder="0" oninput="calculateSpmbGrades()" /></td>
                                     <td><input class="spmb-grade-input" id="g_ipa_2" type="number" min="0" max="100"
-                                            value="86" oninput="calculateSpmbGrades()" /></td>
+                                            value="" placeholder="0" oninput="calculateSpmbGrades()" /></td>
                                     <td><input class="spmb-grade-input" id="g_ipa_3" type="number" min="0" max="100"
-                                            value="87" oninput="calculateSpmbGrades()" /></td>
+                                            value="" placeholder="0" oninput="calculateSpmbGrades()" /></td>
                                     <td><input class="spmb-grade-input" id="g_ipa_4" type="number" min="0" max="100"
-                                            value="88" oninput="calculateSpmbGrades()" /></td>
+                                            value="" placeholder="0" oninput="calculateSpmbGrades()" /></td>
                                     <td><input class="spmb-grade-input" id="g_ipa_5" type="number" min="0" max="100"
-                                            value="89" oninput="calculateSpmbGrades()" /></td>
-                                    <td><strong id="avg_ipa" style="color:#10b981">87.00</strong></td>
+                                            value="" placeholder="0" oninput="calculateSpmbGrades()" /></td>
+                                    <td><strong id="avg_ipa" style="color:#10b981">0.00</strong></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -8054,7 +8059,7 @@
                         <div>
                             <div style="font-size:12px;color:var(--text2)">Total Nilai Rata-rata Gabungan (Semester
                                 1–5):</div>
-                            <div style="font-size:24px;font-weight:800;color:#10b981" id="spmbTotalAvgScore">86.85</div>
+                            <div style="font-size:24px;font-weight:800;color:#10b981" id="spmbTotalAvgScore">0.00</div>
                         </div>
                         <button type="button" class="btn btn-outline btn-sm" onclick="calculateSpmbGrades()"><i
                                 class="fas fa-sync-alt"></i> Hitung Ulang</button>
@@ -8493,9 +8498,16 @@
 
             // 1. Ambil setting & pengumuman dari cache localStorage seketika (0 ms)
             try {
-                var cachedSettings = localStorage.getItem('portal_app_settings');
+                var cachedSettings = localStorage.getItem('portal_app_settings') || localStorage.getItem('portal_settings_cache');
                 if (cachedSettings) {
-                    APP.settings = JSON.parse(cachedSettings) || {};
+                    var parsedSet = JSON.parse(cachedSettings) || {};
+                    if (parsedSet.principal_name === 'Drs. H. Kepala Sekolah, M.Pd') {
+                        parsedSet.principal_name = 'La Ode Mursaban Indi, S.Pd., M.Pd';
+                    }
+                    if (parsedSet.school_npsn === '69989028') {
+                        parsedSet.school_npsn = '70011748';
+                    }
+                    APP.settings = parsedSet;
                 }
             } catch (e) { }
 
@@ -8518,7 +8530,10 @@
                 var savedUser = localStorage.getItem('portal_current_user');
                 if (savedUser) {
                     var u = JSON.parse(savedUser);
-                    if (u && u.id && u.role) {
+                    var isDummySession = !u || u.id === 'USR001' || String(u.username || '').toLowerCase() === 'admin' || String(u.namaLengkap || '').toLowerCase() === 'administrator';
+                    if (isDummySession) {
+                        localStorage.removeItem('portal_current_user');
+                    } else if (u && u.id && u.role) {
                         APP.currentUser = u;
                         initDashboard();
                         return;
@@ -8592,9 +8607,9 @@
 
         function applySettings() {
             var s = APP.settings || {};
-            var sn = s.school_name || 'SMAN 12 Muna Barat';
-            var sAddr = s.school_address || 'Jl. Poros Lagadi-Tondasi, Muna Barat';
-            var sNpsn = s.school_npsn || '69989028';
+            var sn = s.school_name || 'SMA Negeri 12 Muna Barat';
+            var sAddr = s.school_address || 'Pulau Maginti_Desa Kangkunawe_Kecamatan Maginti';
+            var sNpsn = s.school_npsn || '70011748';
             function setText(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
             setText('lpSchoolName', sn);
             setText('lpHeroSchoolTitle', sn);
@@ -8668,20 +8683,9 @@
         }
 
         // ═══════════════════════════════════════════════════
-        // GALERI BERGERAK DI TENGAH LANDING PAGE (ADMIN BISA GANTI)
+        // GALERI BERGERAK DI TENGAH LANDING PAGE (DARI DATABASE SUPABASE)
         // ═══════════════════════════════════════════════════
-        var DEFAULT_GALLERY_IMAGES = [
-            { url: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1200&q=85', caption: 'Gedung dan Lingkungan SMAN 12 Muna Barat yang Asri dan Nyaman' },
-            { url: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&q=85', caption: 'Proses Pembelajaran Interaktif Siswa di Ruang Kelas' },
-            { url: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=1200&q=85', caption: 'Praktikum Eksperimen Laboratorium Sains dan Biologi' },
-            { url: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1200&q=85', caption: 'Pembinaan Belajar Terstruktur oleh Dewan Guru Berdedikasi' },
-            { url: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=85', caption: 'Kegiatan Kolaborasi dan Diskusi Kelompok Belajar Siswa' },
-            { url: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1200&q=85', caption: 'Pemanfaatan Fasilitas Perpustakaan Digital & Buku Referensi' },
-            { url: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=85', caption: 'Pelaksanaan Ujian Berbasis Komputer & Mobile (CBT Online)' },
-            { url: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1200&q=85', caption: 'Upacara Bendera dan Pembinaan Karakter Kebangsaan' },
-            { url: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1200&q=85', caption: 'Pengembangan Bakat dan Prestasi Olahraga Siswa' },
-            { url: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=85', caption: 'Pelepasan & Wisuda Siswa-Siswi Angkatan Berprestasi' }
-        ];
+        var DEFAULT_GALLERY_IMAGES = [];
 
         var currentGalleryIndex = 0;
         var galleryAutoTimer = null;
@@ -8689,9 +8693,15 @@
         // Cache in-memory untuk galeri — selalu sinkron dengan data terbaru
         var _galleryPhotosCache = null;
 
+        function isLegacyUnsplashGallery(arr) {
+            return Array.isArray(arr) && arr.some(function (g) {
+                return g && String(g.url || '').indexOf('images.unsplash.com/photo-1580582932707-520aed937b7b') !== -1;
+            });
+        }
+
         function getActiveGalleryPhotos() {
             // 1. Prioritas: cache in-memory (paling fresh)
-            if (_galleryPhotosCache && Array.isArray(_galleryPhotosCache) && _galleryPhotosCache.length >= 2) {
+            if (_galleryPhotosCache && Array.isArray(_galleryPhotosCache) && _galleryPhotosCache.length > 0 && !isLegacyUnsplashGallery(_galleryPhotosCache)) {
                 return _galleryPhotosCache;
             }
             try {
@@ -8700,7 +8710,7 @@
                     var parsedSetting = typeof APP.settings.gallery_images === 'string'
                         ? JSON.parse(APP.settings.gallery_images)
                         : APP.settings.gallery_images;
-                    if (Array.isArray(parsedSetting) && parsedSetting.length >= 2) {
+                    if (Array.isArray(parsedSetting) && parsedSetting.length > 0 && !isLegacyUnsplashGallery(parsedSetting)) {
                         _galleryPhotosCache = parsedSetting;
                         return _galleryPhotosCache;
                     }
@@ -8709,7 +8719,7 @@
                 var stored = localStorage.getItem('portal_gallery_images');
                 if (stored) {
                     var parsed = JSON.parse(stored);
-                    if (Array.isArray(parsed) && parsed.length >= 2) {
+                    if (Array.isArray(parsed) && parsed.length > 0 && !isLegacyUnsplashGallery(parsed)) {
                         _galleryPhotosCache = parsed;
                         return _galleryPhotosCache;
                     }
@@ -8724,9 +8734,17 @@
             if (!track || !dots) return;
             // Gunakan photos yang dikirim langsung (paling akurat), atau baca dari cache
             var photos = photosOverride || getActiveGalleryPhotos();
+            if (!photos || photos.length === 0) {
+                track.innerHTML = '<div class="lp-gallery-slide" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0f172a,#1e293b);min-height:280px;color:#94a3b8;text-align:center;padding:32px">' +
+                    '<div><i class="fas fa-images fa-3x" style="opacity:0.35;margin-bottom:12px;display:block"></i>' +
+                    '<div style="font-size:14px;font-weight:600;color:#cbd5e1">Belum ada dokumentasi galeri sekolah</div>' +
+                    '<div style="font-size:12px;opacity:0.8;margin-top:4px">Admin dapat mengunggah foto kegiatan melalui menu Pengaturan Portal.</div></div></div>';
+                dots.innerHTML = '';
+                return;
+            }
             track.innerHTML = photos.map(function (item, idx) {
                 return '<div class="lp-gallery-slide" id="slide-' + idx + '" onclick="openGalleryPhotoLightbox(' + idx + ')" title="Klik untuk melihat foto resolusi penuh">' +
-                    '<img src="' + item.url + '" alt="' + esc(item.caption || 'Foto Sekolah') + '" loading="lazy" onerror="this.src=\'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1200&q=85\'"/>' +
+                    '<img src="' + item.url + '" alt="' + esc(item.caption || 'Foto Sekolah') + '" loading="lazy" onerror="this.src=\'simpul_smandum_banner.jpg\'"/>' +
                     '<div class="lp-gallery-caption">' +
                     '<span>' + esc(item.caption || 'Dokumentasi Sekolah') + '</span>' +
                     '<span style="font-size:11.5px;color:rgba(255,255,255,0.9);margin-left:8px;font-weight:600;display:inline-flex;align-items:center;gap:4px;background:rgba(0,0,0,0.35);padding:2px 8px;border-radius:12px;border:1px solid rgba(255,255,255,0.25)"><i class="fas fa-search-plus"></i> Klik Perbesar HD</span>' +
@@ -9042,45 +9060,11 @@
                         '</div>';
                 }).join('');
             } else {
-                // Default rich school information cards for SMAN 12 Muna Barat
                 grid.innerHTML =
-                    '<div class="lp-info-card">' +
-                    '<div class="lp-info-card-top">' +
-                    '<span class="lp-info-badge prio-tinggi"><i class="fas fa-laptop-code"></i> CBT ONLINE</span>' +
-                    '<span style="font-size:11px;color:#94a3b8"><i class="fas fa-info-circle"></i> Info Ujian</span>' +
-                    '</div>' +
-                    '<h4>Pelaksanaan Ujian Berbasis Komputer & Handphone</h4>' +
-                    '<p>Ujian Tengah Semester dan Ujian Akhir Semester dilaksanakan terjadwal secara daring. Siswa wajib mempersiapkan token resmi dari guru mata pelajaran masing-masing untuk memulai ujian.</p>' +
-                    '<div class="lp-info-meta">' +
-                    '<span><i class="fas fa-user-shield" style="color:#38bdf8;margin-right:4px"></i> Panitia CBT</span>' +
-                    '<span style="color:#10b981"><i class="fas fa-check-circle" style="margin-right:4px"></i> Aktif</span>' +
-                    '</div>' +
-                    '</div>' +
-
-                    '<div class="lp-info-card">' +
-                    '<div class="lp-info-card-top">' +
-                    '<span class="lp-info-badge prio-normal"><i class="fas fa-clipboard-list"></i> KESISWAAN</span>' +
-                    '<span style="font-size:11px;color:#94a3b8"><i class="fas fa-calendar-day"></i> Tata Tertib</span>' +
-                    '</div>' +
-                    '<h4>Ketertiban dan Absensi Digital Siswa</h4>' +
-                    '<p>Seluruh peserta didik diimbau hadir tepat waktu sebelum jam pelajaran dimulai. Kehadiran dicatat secara real-time oleh bapak/ibu guru pengampu jam pelajaran melalui portal absensi terpadu.</p>' +
-                    '<div class="lp-info-meta">' +
-                    '<span><i class="fas fa-user-tie" style="color:#38bdf8;margin-right:4px"></i> Kesiswaan</span>' +
-                    '<span style="color:#10b981"><i class="fas fa-check-circle" style="margin-right:4px"></i> Resmi</span>' +
-                    '</div>' +
-                    '</div>' +
-
-                    '<div class="lp-info-card">' +
-                    '<div class="lp-info-card-top">' +
-                    '<span class="lp-info-badge prio-normal"><i class="fas fa-graduation-cap"></i> AKADEMIK</span>' +
-                    '<span style="font-size:11px;color:#94a3b8"><i class="fas fa-university"></i> Portal Sekolah</span>' +
-                    '</div>' +
-                    '<h4>Layanan Administrasi & Rekap Nilai Terintegrasi</h4>' +
-                    '<p>Bapak/Ibu dewan guru dapat mengelola bank soal, membagikan token ujian, mencatat absensi siswa per kelas, dan merekap nilai otomatis yang tersinkronisasi langsung dengan pangkalan data sekolah.</p>' +
-                    '<div class="lp-info-meta">' +
-                    '<span><i class="fas fa-school" style="color:#38bdf8;margin-right:4px"></i> Kurikulum</span>' +
-                    '<span style="color:#10b981"><i class="fas fa-check-circle" style="margin-right:4px"></i> Terhubung</span>' +
-                    '</div>' +
+                    '<div class="lp-info-card" style="grid-column:1/-1;text-align:center;padding:32px 20px">' +
+                    '<i class="fas fa-bullhorn fa-2x" style="color:#38bdf8;opacity:0.5;margin-bottom:10px;display:block"></i>' +
+                    '<h4 style="margin-bottom:6px">Belum Ada Pengumuman Resmi</h4>' +
+                    '<p style="color:#94a3b8;margin:0">Pengumuman dan informasi terbaru dari sekolah akan ditampilkan di sini setelah diterbitkan melalui database.</p>' +
                     '</div>';
             }
         }
@@ -10914,7 +10898,7 @@
                         APP.currentUser = res.user;
                         try {
                             localStorage.setItem('portal_current_user', JSON.stringify(res.user));
-                            var startPage = (userRole === 'admin') ? 'daftarGuru' : 'dashboardGuru';
+                            var startPage = (userRole === 'admin') ? 'dashboardAdmin' : 'dashboardGuru';
                             localStorage.setItem('portal_current_page', startPage);
                         } catch (e) { }
                         closeModal('loginModal');
@@ -10991,7 +10975,7 @@
                 var savedPage = '';
                 try { savedPage = localStorage.getItem('portal_current_page') || ''; } catch (e) { }
                 if (!savedPage || savedPage.toLowerCase().includes('guru') || savedPage === 'dashboardGuru') {
-                    savedPage = 'daftarGuru';
+                    savedPage = 'dashboardAdmin';
                 }
                 loadPage(savedPage);
             } else {
@@ -11098,6 +11082,7 @@
             var main = document.getElementById('dashMain');
             main.innerHTML = '<div style="display:flex;justify-content:center;padding:60px"><div class="loader-ring"></div></div>';
             switch (page) {
+                case 'dashboardAdmin': renderDashboardAdmin(); break;
                 case 'dashboardGuru': renderDashboardGuru(); break;
                 case 'daftarGuru': renderDaftarGuru(); break;
                 case 'daftarSiswaAdmin': renderDaftarSiswaAdmin(); break;
@@ -11589,9 +11574,9 @@
             closeModal('spmbCheckStatusModal');
             SPMB_CURRENT_RECEIPT_ITEM = item;
             var s = APP.settings || {};
-            var schoolName = s.school_name || 'SMAN 12 MUNA BARAT';
-            var schoolAddr = s.school_address || 'Desa Kangkunawe, Kec. Maginti, Kab. Muna Barat, Sulawesi Tenggara';
-            var schoolNpsn = s.school_npsn || '69989028';
+            var schoolName = s.school_name || 'SMA NEGERI 12 MUNA BARAT';
+            var schoolAddr = s.school_address || 'Pulau Maginti_Desa Kangkunawe_Kecamatan Maginti';
+            var schoolNpsn = s.school_npsn || '70011748';
             var regNo = item.nomorPendaftaran || item.id;
             var tglStr = new Date(item.tanggalDaftar || Date.now()).toLocaleDateString('id-ID', {
                 day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
@@ -12947,8 +12932,7 @@
                     var qCount = parseInt(e['Jumlah Soal'] || 0, 10);
                     var emptyAlert = (qCount === 0) ?
                         '<div style="background:rgba(251,188,4,0.15);border:1px solid rgba(251,188,4,0.4);border-radius:10px;padding:10px 14px;margin:10px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">' +
-                        '<div style="font-size:13px;color:#d97706;font-weight:600"><i class="fas fa-exclamation-triangle"></i> Soal ujian ini belum diisi (0 butir soal). Siswa belum bisa mulai jika belum ada soal!</div>' +
-                        '<button class="btn btn-warning btn-sm" onclick="quickAddSampleQuestions(\'' + e['ID Ujian'] + '\')"><i class="fas fa-magic"></i> +5 Soal Contoh Otomatis</button>' +
+                        '<div style="font-size:13px;color:#d97706;font-weight:600"><i class="fas fa-exclamation-triangle"></i> Soal ujian ini belum diisi (0 butir soal). Silakan tambahkan soal melalui tombol Kelola Soal.</div>' +
                         '</div>' : '';
 
                     return '<div class="exam-card">' +
@@ -13093,7 +13077,6 @@
                         '</div>' +
                         '<div id="exTokenWarning" style="display:none;margin-top:6px;font-size:11.5px;padding:6px 10px;border-radius:8px"></div>' +
                         '</div>' +
-                        '<div class="form-group" style="display:flex;align-items:center;padding-top:24px"><label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;font-size:13px"><input type="checkbox" id="exAutoSeed" style="width:18px;height:18px"/><span>Buat 5 soal contoh otomatis</span></label></div>' +
                         '</div>' +
                         '<div class="form-row"><div class="form-group"><label>Tanggal Mulai</label><input class="form-control" type="datetime-local" id="exStart" value="' + esc(e['Tanggal Mulai'] || '') + '"/></div><div class="form-group"><label>Tanggal Selesai</label><input class="form-control" type="datetime-local" id="exEnd" value="' + esc(e['Tanggal Selesai'] || '') + '"/></div></div>' +
                         '<div class="form-row">' +
@@ -13159,7 +13142,7 @@
                 judulUjian: v('exJudul'),
                 tokenUjian: tokenVal,
                 token: tokenVal,
-                autoSeed: autoSeedEl ? autoSeedEl.checked : true,
+                autoSeed: false,
                 idMapel: subjVal[0] || '',
                 namaMapel: subjVal[1] || '',
                 idKelas: kelasVal[0],
@@ -15057,9 +15040,84 @@
             google.script.run.withSuccessHandler(function (res) {
                 hideWaiting();
                 var s = res.data || {};
+                var curAdmin = (window.APP && APP.currentUser && (APP.currentUser.role === 'admin' || APP.currentUser.Role === 'admin' || String(APP.currentUser.username || '').toUpperCase() === 'DZULKIFLI'))
+                    ? APP.currentUser
+                    : null;
+                if (!curAdmin) {
+                    try {
+                        var rawU = localStorage.getItem('portal_current_user');
+                        if (rawU) curAdmin = JSON.parse(rawU);
+                    } catch (e) { }
+                }
+                var admNama = (curAdmin && curAdmin.namaLengkap) || 'DZULKIFLI, S.Pd';
+                var admAlamat = (curAdmin && curAdmin.alamat) || 'Desa Lagadi, Kec. Lawa, Kab. Muna Barat';
+                var admNip = (curAdmin && curAdmin.nip) || '';
+                var admTelp = (curAdmin && curAdmin.telepon) || '';
+                var admEmail = (curAdmin && curAdmin.email) || 'dzulkifli@sman12munabarat.sch.id';
+                var admFoto = (curAdmin && (curAdmin.fotoProfil || curAdmin['Foto Profil URL'] || curAdmin.foto)) || '';
+                var admUsername = (curAdmin && curAdmin.username) || 'DZULKIFLI';
+
+                var cloudStats = (window.PortalCloudStorage && typeof window.PortalCloudStorage.getVaultStats === 'function')
+                    ? window.PortalCloudStorage.getVaultStats()
+                    : { fileCount: 0, kbSaved: 0, mbSaved: '0.00', config: { driveAccountEmail: 'larealme99@gmail.com', githubRepo: 'larealme99/Portal-sekolah', driveFolderUrl: '', driveWebAppUrl: '', githubToken: '' } };
+                var cloudCfg = cloudStats.config || {};
                 var main = document.getElementById('dashMain');
-                main.innerHTML = '<div class="page-header"><h1><i class="fas fa-cog" style="color:var(--text2)"></i> Pengaturan Portal</h1><p>Konfigurasi tampilan dan identitas sekolah</p></div>' +
+                main.innerHTML = '<div class="page-header"><h1><i class="fas fa-cog" style="color:var(--text2)"></i> Pengaturan Portal</h1><p>Konfigurasi tampilan, identitas sekolah, profil Administrator, dan penyimpanan media Cloud Drive</p></div>' +
                     '<div class="card">' +
+                    '<div class="settings-section" id="stAdminSection" style="background:linear-gradient(135deg,rgba(59,130,246,0.06),rgba(99,102,241,0.06));border:1px solid rgba(59,130,246,0.25);border-radius:12px;padding:18px;margin-bottom:20px">' +
+                    '<div class="settings-section-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px">' +
+                    '<span><i class="fas fa-user-shield" style="color:var(--primary)"></i> Profil &amp; Alamat Administrator</span>' +
+                    '<span class="badge badge-primary" style="font-size:11px"><i class="fas fa-id-badge"></i> Akun Utama: ' + esc(admUsername) + '</span>' +
+                    '</div>' +
+                    '<p style="font-size:12px;color:var(--text2);margin-bottom:16px">Kelola foto profil resmi dan alamat tempat tinggal Administrator. Seluruh perubahan akan otomatis tersimpan ke database profil akun serta kartu Hero Dashboard Admin.</p>' +
+                    '<div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:16px;padding:14px;background:var(--card-bg, #fff);border:1px solid var(--border);border-radius:10px">' +
+                    '<div style="position:relative;width:76px;height:76px;border-radius:50%;overflow:hidden;border:3px solid var(--primary);box-shadow:0 4px 12px rgba(59,130,246,0.25);flex-shrink:0;background:var(--bg3);display:flex;align-items:center;justify-content:center">' +
+                    (admFoto
+                        ? '<img id="stAdminPhotoPreview" src="' + esc(admFoto) + '" alt="Foto Admin" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display=\'none\';document.getElementById(\'stAdminPhotoPlaceholder\').style.display=\'flex\';"/><div id="stAdminPhotoPlaceholder" style="display:none;width:100%;height:100%;background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;font-weight:700;font-size:24px;align-items:center;justify-content:center">' + esc(admNama.substring(0, 2).toUpperCase()) + '</div>'
+                        : '<img id="stAdminPhotoPreview" src="" alt="Foto Admin" style="display:none;width:100%;height:100%;object-fit:cover"/><div id="stAdminPhotoPlaceholder" style="display:flex;width:100%;height:100%;background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;font-weight:700;font-size:24px;align-items:center;justify-content:center">' + esc(admNama.substring(0, 2).toUpperCase()) + '</div>') +
+                    '</div>' +
+                    '<div style="flex:1;min-width:200px">' +
+                    '<label style="font-weight:600;font-size:13px;display:block;margin-bottom:6px"><i class="fas fa-camera"></i> Foto Profil Administrator</label>' +
+                    '<input type="hidden" id="stAdminPhoto" value="' + esc(admFoto) + '"/>' +
+                    '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
+                    '<label class="btn btn-primary btn-sm" style="margin:0;cursor:pointer"><i class="fas fa-upload"></i> Unggah / Ganti Foto' +
+                    '<input type="file" id="stAdminPhotoFileInput" accept="image/*" style="display:none" onchange="handleAdminSettingsPhoto(this)"/>' +
+                    '</label>' +
+                    '<button type="button" class="btn btn-outline btn-sm" onclick="clearAdminSettingsPhoto()"><i class="fas fa-trash-alt"></i> Reset Foto</button>' +
+                    '</div>' +
+                    '<small style="color:var(--text2);display:block;margin-top:4px">Format: JPG, PNG, WEBP. Otomatis dikompres &amp; dioptimasi (&lt; 60 KB) agar ringan.</small>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div class="form-row">' +
+                    '<div class="form-group" style="flex:1"><label><i class="fas fa-user"></i> Nama Lengkap Administrator *</label><input class="form-control" id="stAdminNama" value="' + esc(admNama) + '" placeholder="Nama Lengkap Admin"/></div>' +
+                    '<div class="form-group" style="flex:1"><label><i class="fas fa-id-card"></i> NIP / NUPTK</label><input class="form-control" id="stAdminNip" value="' + esc(admNip) + '" placeholder="Nomor Induk Pegawai"/></div>' +
+                    '</div>' +
+                    '<div class="form-group">' +
+                    '<label><i class="fas fa-map-marker-alt" style="color:#ef4444"></i> Alamat Domisili / Tempat Tinggal Administrator *</label>' +
+                    '<textarea class="form-control" id="stAdminAlamat" rows="2" placeholder="Masukkan alamat lengkap domisili admin...">' + esc(admAlamat) + '</textarea>' +
+                    '<small style="color:var(--text2)">Alamat ini akan ditampilkan di kartu profil Dashboard Admin serta data resmi pengguna.</small>' +
+                    '</div>' +
+                    '<div class="form-row">' +
+                    '<div class="form-group" style="flex:1"><label><i class="fas fa-phone"></i> Nomor WhatsApp / Telepon</label><input class="form-control" id="stAdminTelp" value="' + esc(admTelp) + '" placeholder="08xxxxxxxxxx"/></div>' +
+                    '<div class="form-group" style="flex:1"><label><i class="fas fa-envelope"></i> Email Administrator</label><input class="form-control" id="stAdminEmail" value="' + esc(admEmail) + '" placeholder="admin@sekolah.sch.id"/></div>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div class="settings-section" style="background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(59,130,246,0.08));border:1px solid rgba(16,185,129,0.3);border-radius:12px;padding:16px;margin-bottom:20px">' +
+                    '<div class="settings-section-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">' +
+                    '<span><i class="fab fa-google-drive" style="color:#10b981"></i> Penyimpanan Cloud Foto & Berkas (Google Drive / GitHub)</span>' +
+                    '<span class="badge badge-success" style="font-size:11px"><i class="fas fa-check-circle"></i> Aktif Menghemat Supabase (' + cloudStats.fileCount + ' berkas / ' + cloudStats.kbSaved + ' KB dialihkan)</span>' +
+                    '</div>' +
+                    '<p style="font-size:12px;color:var(--text2);margin-bottom:12px">Seluruh jenis <b>Foto (Guru, Kepala Sekolah, Logo, Background, Galeri)</b> dan <b>Berkas (PDF/PPT Materi, Tugas Siswa, Dokumen SPMB)</b> otomatis dialihkan ke penyimpanan akun Google Drive / GitHub Anda (<b>' + esc(cloudCfg.driveAccountEmail || 'larealme99@gmail.com') + '</b>) sehingga penyimpanan database Supabase tetap ringan dan tidak terkena batas kuota (<i>exceed_egress_quota</i>).</p>' +
+                    '<div class="form-row">' +
+                    '<div class="form-group"><label><i class="fas fa-envelope"></i> Akun Google Drive Utama</label><input class="form-control" id="stCloudDriveEmail" value="' + esc(cloudCfg.driveAccountEmail || s.cloud_drive_account || 'larealme99@gmail.com') + '" placeholder="larealme99@gmail.com"/></div>' +
+                    '<div class="form-group"><label><i class="fab fa-github"></i> Repositori GitHub Penyimpanan Media</label><input class="form-control" id="stCloudGithubRepo" value="' + esc(cloudCfg.githubRepo || s.cloud_github_repo || 'larealme99/Portal-sekolah') + '" placeholder="larealme99/Portal-sekolah"/></div>' +
+                    '</div>' +
+                    '<div class="form-row">' +
+                    '<div class="form-group"><label><i class="fas fa-folder-open"></i> Link Folder Google Drive (Opsional)</label><input class="form-control" id="stCloudDriveFolder" value="' + esc(cloudCfg.driveFolderUrl || s.cloud_drive_folder_url || '') + '" placeholder="https://drive.google.com/drive/folders/..."/></div>' +
+                    '<div class="form-group"><label><i class="fas fa-cloud-upload-alt"></i> Endpoint Web App Google Drive Script (Opsional)</label><input class="form-control" id="stCloudDriveWebApp" value="' + esc(cloudCfg.driveWebAppUrl || '') + '" placeholder="https://script.google.com/macros/s/.../exec"/></div>' +
+                    '</div>' +
+                    '<small style="color:var(--text2);display:block">💡 <b>Tips:</b> Anda juga dapat menempelkan langsung tautan <i>Bagikan Google Drive</i> (<code>https://drive.google.com/file/d/...</code>) pada kolom foto/dokumen mana pun, sistem otomatis mengubahnya menjadi tautan gambar/file berkecepatan tinggi.</small>' +
+                    '</div>' +
                     '<div class="settings-section"><div class="settings-section-title"><i class="fas fa-image"></i> Gambar & Logo (Upload)</div>' +
                     '<div class="form-group">' +
                     '<label>Logo Sekolah</label>' +
@@ -15146,6 +15204,10 @@
             var container = document.getElementById('galleryManagementList');
             if (!container) return;
             var photos = getActiveGalleryPhotos();
+            if (!photos || photos.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text2);background:var(--bg3);border-radius:10px;border:1px dashed var(--border)">Belum ada foto galeri di database. Klik tombol <b>Tambah Foto</b> di atas untuk mengunggah dokumentasi sekolah.</div>';
+                return;
+            }
             container.innerHTML =
                 '<div class="table-wrap"><table>' +
                 '<thead><tr><th>#</th><th>Foto</th><th>Keterangan / Caption</th><th>Aksi</th></tr></thead>' +
@@ -15157,7 +15219,7 @@
                         : '<span style="color:var(--text2);font-size:11px"><i class="fas fa-link"></i> Foto dari URL Online</span>';
                     return '<tr>' +
                         '<td>' + (idx + 1) + '</td>' +
-                        '<td><img src="' + imgSrc + '" style="width:72px;height:46px;border-radius:8px;object-fit:cover;border:1px solid var(--border)" onerror="this.src=\'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=800&q=80\'"/></td>' +
+                        '<td><img src="' + imgSrc + '" style="width:72px;height:46px;border-radius:8px;object-fit:cover;border:1px solid var(--border)" onerror="this.src=\'simpul_smandum_banner.jpg\'"/></td>' +
                         '<td><strong>' + esc(item.caption || 'Foto Sekolah') + '</strong><br/>' + srcLabel + '</td>' +
                         '<td><div class="action-btns">' +
                         '<button class="btn btn-warning btn-sm btn-icon" title="Edit Foto & Keterangan" onclick="openEditGalleryModal(' + idx + ')"><i class="fas fa-edit"></i></button>' +
@@ -15327,10 +15389,6 @@
 
         function deleteGalleryItem(idx) {
             var photos = getActiveGalleryPhotos().slice();
-            if (photos.length <= 2) {
-                showToast('Galeri harus memiliki minimal 2 foto!', 'warning');
-                return;
-            }
             showConfirmDialog('Hapus Foto Galeri', 'Apakah Anda yakin ingin menghapus foto galeri ini?', function () {
                 photos.splice(idx, 1);
                 saveGalleryPhotos(photos, function () {
@@ -15545,9 +15603,73 @@
             }
         }
 
+        window.handleAdminSettingsPhoto = function (input) {
+            if (!input || !input.files || !input.files[0]) return;
+            var file = input.files[0];
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                var rawData = e.target.result;
+                var img = new Image();
+                img.onload = function () {
+                    var canvas = document.createElement('canvas');
+                    var maxDim = 400;
+                    var w = img.width, h = img.height;
+                    if (w > h) {
+                        if (w > maxDim) { h = Math.round(h * maxDim / w); w = maxDim; }
+                    } else {
+                        if (h > maxDim) { w = Math.round(w * maxDim / h); h = maxDim; }
+                    }
+                    canvas.width = w;
+                    canvas.height = h;
+                    var ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+                    var compressed = canvas.toDataURL('image/jpeg', 0.82);
+
+                    var prev = document.getElementById('stAdminPhotoPreview');
+                    var holder = document.getElementById('stAdminPhotoPlaceholder');
+                    var hiddenInput = document.getElementById('stAdminPhoto');
+                    if (prev) {
+                        prev.src = compressed;
+                        prev.style.display = 'block';
+                    }
+                    if (holder) holder.style.display = 'none';
+                    if (hiddenInput) hiddenInput.value = compressed;
+
+                    showToast('Foto profil Administrator siap disimpan!', 'info');
+                };
+                img.src = rawData;
+            };
+            reader.readAsDataURL(file);
+        };
+
+        window.clearAdminSettingsPhoto = function () {
+            var prev = document.getElementById('stAdminPhotoPreview');
+            var holder = document.getElementById('stAdminPhotoPlaceholder');
+            var hiddenInput = document.getElementById('stAdminPhoto');
+            if (prev) {
+                prev.src = '';
+                prev.style.display = 'none';
+            }
+            if (holder) holder.style.display = 'flex';
+            if (hiddenInput) hiddenInput.value = '';
+            showToast('Foto profil admin dikosongkan. Klik "Simpan Pengaturan" untuk menyimpan.', 'warning');
+        };
+
         function submitSettings() {
             var bgVal = v('stBgUrl');
             var kepsekPhotoVal = v('stKepsekPhoto');
+            var cloudDriveEmail = v('stCloudDriveEmail') || 'larealme99@gmail.com';
+            var cloudGithubRepo = v('stCloudGithubRepo') || 'larealme99/Portal-sekolah';
+            var cloudDriveFolder = v('stCloudDriveFolder') || '';
+            var cloudDriveWebApp = v('stCloudDriveWebApp') || '';
+            if (window.PortalCloudStorage && typeof window.PortalCloudStorage.saveConfig === 'function') {
+                window.PortalCloudStorage.saveConfig({
+                    driveAccountEmail: cloudDriveEmail,
+                    githubRepo: cloudGithubRepo,
+                    driveFolderUrl: cloudDriveFolder,
+                    driveWebAppUrl: cloudDriveWebApp
+                });
+            }
             var data = {
                 school_name: v('stNama'), school_npsn: v('stNPSN'), school_address: v('stAlamat'),
                 school_phone: v('stTelp'), school_email: v('stEmail'), school_accreditation: v('stAkred'),
@@ -15557,6 +15679,9 @@
                 school_logo_url: v('stLogoUrl'), school_background_url: bgVal,
                 spmb_active: v('stSpmbActive'),
                 spmb_disabled_notice: v('stSpmbNotice'),
+                cloud_drive_account: cloudDriveEmail,
+                cloud_github_repo: cloudGithubRepo,
+                cloud_drive_folder_url: cloudDriveFolder,
                 gallery_images: JSON.stringify(getActiveGalleryPhotos())
             };
             if (bgVal) {
@@ -15565,10 +15690,41 @@
             if (kepsekPhotoVal) {
                 try { localStorage.setItem('portal_principal_photo', kepsekPhotoVal); } catch (e) { }
             }
+
+            // Simpan Profil & Alamat Administrator dari Menu Pengaturan
+            var adminNama = v('stAdminNama');
+            var adminAlamat = v('stAdminAlamat');
+            var adminNip = v('stAdminNip');
+            var adminTelp = v('stAdminTelp');
+            var adminEmail = v('stAdminEmail');
+            var adminPhoto = v('stAdminPhoto');
+
+            var curAdmin = APP.currentUser || {};
+            var adminId = curAdmin.id || curAdmin.ID || 'USRMVOW3VFZ8LCZ';
+            var adminUpdatePayload = {
+                namaLengkap: adminNama || curAdmin.namaLengkap || 'DZULKIFLI, S.Pd',
+                alamat: adminAlamat || curAdmin.alamat || '',
+                nip: adminNip || curAdmin.nip || '',
+                telepon: adminTelp || curAdmin.telepon || '',
+                email: adminEmail || curAdmin.email || '',
+                fotoProfil: adminPhoto !== undefined ? adminPhoto : (curAdmin.fotoProfil || '')
+            };
+
+            if (APP.currentUser && (APP.currentUser.role === 'admin' || APP.currentUser.Role === 'admin' || String(APP.currentUser.username || '').toUpperCase() === 'DZULKIFLI')) {
+                Object.assign(APP.currentUser, adminUpdatePayload);
+                try { localStorage.setItem('portal_current_user', JSON.stringify(APP.currentUser)); } catch (e) { }
+            }
+
+            try {
+                google.script.run.withSuccessHandler(function () {
+                    console.log('✅ Profil & alamat Administrator berhasil tersinkron ke database.');
+                }).adminUpdateUser(adminId, adminUpdatePayload);
+            } catch (e) { }
+
             showWaiting('Menyimpan Pengaturan...', 'Menyimpan konfigurasi sekolah');
             google.script.run.withSuccessHandler(function (res) {
                 hideWaiting();
-                showToast(res.message, res.success ? 'success' : 'error');
+                showToast(res.message || 'Pengaturan berhasil disimpan!', res.success ? 'success' : 'error');
                 if (res.success) {
                     google.script.run.withSuccessHandler(function (sRes) {
                         if (sRes.success) {
@@ -15658,10 +15814,18 @@
                 showToast(res.message, res.success ? 'success' : 'error');
                 if (res.success) {
                     APP.currentUser.namaLengkap = data.namaLengkap;
+                    APP.currentUser.nip = data.nip;
                     APP.currentUser.email = data.email;
-                    APP.currentUser.fotoProfil = data.fotoProfil;
+                    APP.currentUser.telepon = data.telepon;
+                    APP.currentUser.alamat = data.alamat;
+                    APP.currentUser['Alamat'] = data.alamat;
+                    if (data.fotoProfil) {
+                        APP.currentUser.fotoProfil = data.fotoProfil;
+                        APP.currentUser['Foto Profil URL'] = data.fotoProfil;
+                    }
+                    try { localStorage.setItem('portal_current_user', JSON.stringify(APP.currentUser)); } catch (e) { }
                     document.getElementById('topbarUserName').textContent = data.namaLengkap;
-                    if (data.fotoProfil) document.getElementById('topbarAvatarWrap').innerHTML = '<img src="' + data.fotoProfil + '" class="topbar-avatar" onerror="this.style.display=\'none\'">';
+                    if (data.fotoProfil) document.getElementById('topbarAvatarWrap').innerHTML = '<img src="' + data.fotoProfil + '" class="topbar-avatar" onclick="previewFotoGuru(esc(APP.currentUser.namaLengkap), APP.currentUser.fotoProfil)" style="cursor:pointer" onerror="this.style.display=\'none\'">';
                 }
             }).withFailureHandler(err).updateUserProfile(APP.currentUser.id, data);
         }
@@ -15672,7 +15836,7 @@
             if (!newUsername || !password) { showToast('Isi semua field!', 'warning'); return; }
             google.script.run.withSuccessHandler(function (res) {
                 showToast(res.message, res.success ? 'success' : 'error');
-                if (res.success) { APP.currentUser.username = newUsername; }
+                if (res.success) { APP.currentUser.username = newUsername; try { localStorage.setItem('portal_current_user', JSON.stringify(APP.currentUser)); } catch (e) { } }
             }).withFailureHandler(err).updateUsername(APP.currentUser.id, newUsername, password);
         }
 
@@ -15690,7 +15854,11 @@
         }
 
         function openProfileModal() {
-            if (APP.currentUser.role === 'guru') loadPage('profileGuru');
+            if (APP.currentUser && APP.currentUser.role === 'guru') {
+                loadPage('profileGuru');
+            } else {
+                openEditAdminProfileModal();
+            }
         }
 
         // ═══════════════════════════════════════════════════
@@ -16066,6 +16234,539 @@
         }
 
         // ═══════════════════════════════════════════════════
+        // DASHBOARD ADMIN
+        // ═══════════════════════════════════════════════════
+        function renderDashboardAdmin() {
+            showWaiting('Memuat Dashboard Admin...', 'Mengambil rekapitulasi data akademik & portal');
+            var u = APP.currentUser || {};
+            var pUsers = new Promise(function (resolve) {
+                google.script.run.withSuccessHandler(resolve).withFailureHandler(function () { resolve({ success: false, data: [] }); }).getUsers();
+            });
+            var pStudents = new Promise(function (resolve) {
+                google.script.run.withSuccessHandler(resolve).withFailureHandler(function () { resolve({ success: false, data: [] }); }).getStudents();
+            });
+            var pClasses = new Promise(function (resolve) {
+                google.script.run.withSuccessHandler(resolve).withFailureHandler(function () { resolve({ success: false, data: [] }); }).getClasses();
+            });
+            var pSubjects = new Promise(function (resolve) {
+                google.script.run.withSuccessHandler(resolve).withFailureHandler(function () { resolve({ success: false, data: [] }); }).getSubjects();
+            });
+            var pExams = new Promise(function (resolve) {
+                google.script.run.withSuccessHandler(resolve).withFailureHandler(function () { resolve({ success: false, data: [] }); }).getExams();
+            });
+            var pLearnings = new Promise(function (resolve) {
+                google.script.run.withSuccessHandler(resolve).withFailureHandler(function () { resolve({ success: false, data: [] }); }).getLearnings();
+            });
+            var pSpmb = new Promise(function (resolve) {
+                google.script.run.withSuccessHandler(resolve).withFailureHandler(function () { resolve({ success: false, data: [] }); }).getSpmbList();
+            });
+
+            Promise.all([pUsers, pStudents, pClasses, pSubjects, pExams, pLearnings, pSpmb]).then(function (results) {
+                hideWaiting();
+                var main = document.getElementById('dashMain');
+                if (!main) return;
+
+                var allUsers = (results[0] && results[0].data) || [];
+                var allStudents = (results[1] && results[1].data) || [];
+                var allClasses = (results[2] && results[2].data) || [];
+                var allSubjects = (results[3] && results[3].data) || [];
+                var allExams = (results[4] && results[4].data) || [];
+                var allLearnings = (results[5] && results[5].data) || [];
+                var allSpmb = (results[6] && results[6].data) || [];
+
+                // Filter guru (non-admin)
+                var teachers = allUsers.filter(function (t) {
+                    return (t.Role || t.role || '').toLowerCase() !== 'admin';
+                });
+
+                // Ambil data admin terbaru dari tabel Users jika ada
+                var currentAdminRecord = allUsers.find(function (x) {
+                    return (x.ID || x.id) === (u.id || u.ID) || (x.Username || '').toUpperCase() === 'DZULKIFLI';
+                });
+                if (currentAdminRecord) {
+                    if (currentAdminRecord['Alamat'] !== undefined) {
+                        u.alamat = currentAdminRecord['Alamat'];
+                        u['Alamat'] = currentAdminRecord['Alamat'];
+                    }
+                    if (currentAdminRecord['Foto Profil URL']) {
+                        u.fotoProfil = currentAdminRecord['Foto Profil URL'];
+                        u['Foto Profil URL'] = currentAdminRecord['Foto Profil URL'];
+                    }
+                    if (currentAdminRecord['Nama Lengkap']) {
+                        u.namaLengkap = currentAdminRecord['Nama Lengkap'];
+                    }
+                    if (currentAdminRecord['Telepon']) {
+                        u.telepon = currentAdminRecord['Telepon'];
+                    }
+                    if (currentAdminRecord['Email']) {
+                        u.email = currentAdminRecord['Email'];
+                    }
+                    if (currentAdminRecord['NIP']) {
+                        u.nip = currentAdminRecord['NIP'];
+                    }
+                }
+
+                // Siapkan opsi guru & kelas untuk modal pintasan cepat
+                var guruOptions = teachers.map(function (t) {
+                    return '<option value="' + t['ID'] + '|' + esc(t['Nama Lengkap']) + '">' + esc(t['Nama Lengkap']) + '</option>';
+                }).join('');
+                var classOptions = allClasses.map(function (c) {
+                    return '<option value="' + c['ID Kelas'] + '|' + esc(c['Nama Kelas']) + '">' + esc(c['Nama Kelas']) + '</option>';
+                }).join('');
+                var encGuru = encodeURIComponent(guruOptions);
+                var encClass = encodeURIComponent(classOptions);
+
+                // Hari ini dalam Bahasa Indonesia
+                var daysId = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+                var todayDate = new Date();
+                var todayDayName = daysId[todayDate.getDay()];
+                var todayDateStr = todayDayName + ', ' + todayDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+                // Jadwal Hari Ini
+                var todaySubjects = allSubjects.filter(function (s) {
+                    var h = (s['Hari'] || '').trim().toLowerCase();
+                    return h === todayDayName.toLowerCase();
+                });
+                if (todaySubjects.length === 0 && allSubjects.length > 0) {
+                    todaySubjects = allSubjects.slice(0, 6);
+                }
+
+                // Avatar Admin Interaktif
+                var adminAvatarImg = u.fotoProfil
+                    ? '<img src="' + esc(u.fotoProfil) + '" class="guru-dash-avatar" id="dashAdminAvatarImg" onclick="previewFotoGuru(esc(APP.currentUser.namaLengkap), APP.currentUser.fotoProfil)" style="cursor:pointer;border:2.5px solid #10b981;object-fit:cover" title="Klik untuk lihat foto profil penuh">'
+                    : '<div class="guru-dash-avatar-placeholder" id="dashAdminAvatarImg" style="background:linear-gradient(135deg,#059669,#10b981);font-size:28px">' + (u.namaLengkap ? u.namaLengkap[0] : 'A') + '</div>';
+
+                var adminAvatar =
+                    '<div style="position:relative;display:inline-block">' +
+                    adminAvatarImg +
+                    '<label for="dashAdminPhotoInput" style="position:absolute;bottom:2px;right:2px;background:#10b981;color:#fff;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:2.5px solid #fff;box-shadow:0 3px 8px rgba(0,0,0,0.35);cursor:pointer;transition:transform 0.15s ease" title="Ganti Foto Profil">' +
+                    '<i class="fas fa-camera" style="font-size:12px"></i>' +
+                    '</label>' +
+                    '<input type="file" id="dashAdminPhotoInput" accept="image/*" style="display:none" onchange="handleAdminDashPhoto(this)"/>' +
+                    '</div>';
+
+                var adminAlamatDisplay = (u.alamat || u['Alamat'] || '').trim();
+                var alamatBadge = adminAlamatDisplay
+                    ? '<span id="dashAdminAlamatText" style="color:var(--text);font-weight:600">' + esc(adminAlamatDisplay) + '</span>'
+                    : '<span id="dashAdminAlamatText" style="color:var(--text2);font-style:italic">Belum diatur (Klik Ubah Alamat)</span>';
+
+                var html =
+                    '<div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px">' +
+                    '<div>' +
+                    '<h1 style="display:flex;align-items:center;gap:10px;margin:0"><i class="fas fa-tachometer-alt" style="color:#10b981"></i> Dashboard Administrator</h1>' +
+                    '<p style="margin:4px 0 0;color:var(--text2)">Pusat Kendali Sistem Informasi &amp; Akademik SMAN 12 Muna Barat</p>' +
+                    '</div>' +
+                    '<div style="display:flex;align-items:center;gap:8px">' +
+                    '<span class="badge badge-success" style="padding:6px 12px;font-size:12px;display:inline-flex;align-items:center;gap:6px"><i class="fas fa-check-circle"></i> Supabase Cloud Aktif (100% Sinkron)</span>' +
+                    '<button class="btn btn-outline btn-sm" onclick="renderDashboardAdmin()" title="Muat ulang data"><i class="fas fa-sync-alt"></i> Segarkan</button>' +
+                    '</div>' +
+                    '</div>' +
+
+                    // HERO CARD
+                    '<div class="guru-dash-hero" style="background:linear-gradient(135deg, rgba(16,185,129,0.08), rgba(6,78,59,0.2));border:1px solid rgba(16,185,129,0.25);margin-bottom:24px">' +
+                    adminAvatar +
+                    '<div class="guru-dash-info" style="flex:1">' +
+                    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">' +
+                    '<h2 style="margin:0;font-size:22px">' + esc(u.namaLengkap || 'Administrator') + '</h2>' +
+                    '<span class="badge badge-purple" style="font-size:11px"><i class="fas fa-shield-alt"></i> Super Admin</span>' +
+                    '</div>' +
+                    '<p><i class="fas fa-id-badge" style="width:20px;color:#10b981"></i> <strong>NIP:</strong> ' + esc(u.nip || '-') + ' &bull; <strong>Username:</strong> ' + esc(u.username || 'admin') + ' &bull; <strong>No. HP:</strong> ' + esc(u.telepon || '-') + '</p>' +
+                    '<p style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:4px 0"><i class="fas fa-map-marker-alt" style="width:20px;color:#10b981"></i> <strong>Alamat Domisili:</strong> ' + alamatBadge + ' ' +
+                    '<button type="button" class="btn btn-outline btn-xs" onclick="openEditAdminAddressModal()" style="margin-left:6px;padding:2px 8px;font-size:11px;border-radius:6px;display:inline-flex;align-items:center;gap:4px;cursor:pointer"><i class="fas fa-edit"></i> Ubah Alamat</button></p>' +
+                    '<p><i class="fas fa-school" style="width:20px;color:#10b981"></i> <strong>Institusi:</strong> SMAN 12 MUNA BARAT &bull; ' + esc((APP.settings && APP.settings.school_address) || 'Jl. Poros Lagadi - Tondasi, Tiworo Tengah, Muna Barat') + '</p>' +
+                    '<p><i class="fas fa-clock" style="width:20px;color:#10b981"></i> Sesi Aktif: <strong>' + esc(todayDateStr) + '</strong></p>' +
+                    '</div>' +
+                    '<div style="display:flex;flex-direction:column;gap:8px;min-width:180px">' +
+                    '<button class="btn btn-primary btn-sm" onclick="openEditAdminProfileModal()"><i class="fas fa-user-edit"></i> Edit Profil &amp; Alamat</button>' +
+                    '<label class="btn btn-outline btn-sm" for="dashAdminPhotoInput" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;justify-content:center"><i class="fas fa-camera"></i> Ganti Foto Profil</label>' +
+                    '<button class="btn btn-outline btn-sm" onclick="openAddUserModal()"><i class="fas fa-user-plus"></i> Tambah Guru</button>' +
+                    '<button class="btn btn-outline btn-sm" onclick="openStudentModal(null)"><i class="fas fa-user-graduate"></i> Tambah Siswa</button>' +
+                    '<button class="btn btn-outline btn-sm" onclick="openKelasModal(null,\'' + encGuru + '\')"><i class="fas fa-school"></i> Tambah Kelas</button>' +
+                    '<button class="btn btn-outline btn-sm" onclick="openMapelModal(null,\'' + encClass + '\',\'' + encGuru + '\')"><i class="fas fa-calendar-plus"></i> Tambah Jadwal</button>' +
+                    '<button class="btn btn-outline btn-sm" onclick="loadPage(\'settingsAdmin\')"><i class="fas fa-cog"></i> Pengaturan Web</button>' +
+                    '</div>' +
+                    '</div>' +
+
+                    // STATS GRID (8 CARDS)
+                    '<div class="stat-grid" style="grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:16px;margin-bottom:24px">' +
+
+                    // 1. Dewan Guru
+                    '<div class="stat-card" style="cursor:pointer" onclick="loadPage(\'daftarGuru\')" title="Klik untuk buka Data Guru">' +
+                    '<div class="stat-icon" style="background:rgba(16,185,129,0.15);color:#10b981"><i class="fas fa-chalkboard-teacher"></i></div>' +
+                    '<div class="stat-info"><h4>' + teachers.length + '</h4><p>Dewan Guru</p><span style="font-size:11px;color:var(--text2)">Tenaga Pendidik Aktif</span></div>' +
+                    '</div>' +
+
+                    // 2. Peserta Didik
+                    '<div class="stat-card" style="cursor:pointer" onclick="loadPage(\'daftarSiswaAdmin\')" title="Klik untuk buka Data Siswa">' +
+                    '<div class="stat-icon" style="background:rgba(14,165,233,0.15);color:#0ea5e9"><i class="fas fa-user-graduate"></i></div>' +
+                    '<div class="stat-info"><h4>' + allStudents.length + '</h4><p>Peserta Didik</p><span style="font-size:11px;color:var(--text2)">105 Siswa Terdaftar</span></div>' +
+                    '</div>' +
+
+                    // 3. Rombel / Kelas
+                    '<div class="stat-card" style="cursor:pointer" onclick="loadPage(\'daftarKelasAdmin\')" title="Klik untuk buka Data Kelas">' +
+                    '<div class="stat-icon" style="background:rgba(168,85,247,0.15);color:#a855f7"><i class="fas fa-school"></i></div>' +
+                    '<div class="stat-info"><h4>' + allClasses.length + '</h4><p>Rombel / Kelas</p><span style="font-size:11px;color:var(--text2)">Tingkat X, XI, XII</span></div>' +
+                    '</div>' +
+
+                    // 4. Jadwal Mengajar
+                    '<div class="stat-card" style="cursor:pointer" onclick="loadPage(\'daftarMapelAdmin\')" title="Klik untuk buka Jadwal">' +
+                    '<div class="stat-icon" style="background:rgba(245,158,11,0.15);color:#f59e0b"><i class="fas fa-calendar-alt"></i></div>' +
+                    '<div class="stat-info"><h4>' + allSubjects.length + '</h4><p>Jadwal Mengajar</p><span style="font-size:11px;color:var(--text2)">119 Alokasi Tatap Muka</span></div>' +
+                    '</div>' +
+
+                    // 5. Ruang Pembelajaran
+                    '<div class="stat-card" style="cursor:pointer" onclick="loadPage(\'pembelajaranAdmin\')" title="Klik untuk buka Pembelajaran">' +
+                    '<div class="stat-icon" style="background:rgba(236,72,153,0.15);color:#ec4899"><i class="fas fa-laptop-code"></i></div>' +
+                    '<div class="stat-info"><h4>' + allLearnings.length + '</h4><p>Ruang Pembelajaran</p><span style="font-size:11px;color:var(--text2)">Materi &amp; Diskusi Digital</span></div>' +
+                    '</div>' +
+
+                    // 6. Ujian CBT Online
+                    '<div class="stat-card" style="cursor:pointer" onclick="loadPage(\'ujianAdmin\')" title="Klik untuk buka Ujian">' +
+                    '<div class="stat-icon" style="background:rgba(99,102,241,0.15);color:#6366f1"><i class="fas fa-file-signature"></i></div>' +
+                    '<div class="stat-info"><h4>' + allExams.length + '</h4><p>Ujian CBT Online</p><span style="font-size:11px;color:var(--text2)">Ulangan &amp; Bank Soal</span></div>' +
+                    '</div>' +
+
+                    // 7. SPMB
+                    '<div class="stat-card" style="cursor:pointer" onclick="loadPage(\'spmbAdmin\')" title="Klik untuk buka Layanan SPMB">' +
+                    '<div class="stat-icon" style="background:rgba(34,197,94,0.15);color:#22c55e"><i class="fas fa-id-card-alt"></i></div>' +
+                    '<div class="stat-info"><h4>' + allSpmb.length + '</h4><p>Layanan SPMB</p><span style="font-size:11px;color:var(--text2)">Pendaftar Murid Baru</span></div>' +
+                    '</div>' +
+
+                    // 8. Presensi & Absensi
+                    '<div class="stat-card" style="cursor:pointer" onclick="loadPage(\'absenAdmin\')" title="Klik untuk buka Presensi">' +
+                    '<div class="stat-icon" style="background:rgba(20,184,166,0.15);color:#14b8a6"><i class="fas fa-calendar-check"></i></div>' +
+                    '<div class="stat-info"><h4>Aktif</h4><p>Presensi Kelas</p><span style="font-size:11px;color:var(--text2)">Rekap Kehadiran Siswa</span></div>' +
+                    '</div>' +
+
+                    '</div>' +
+
+                    // DUA BOX KONTAINER UTAMA ADMIN
+                    '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(420px, 1fr));gap:20px;margin-bottom:24px">' +
+
+                    // ── BOX 1: DISTRIBUSI SISWA PER ROMBEL / KELAS ──
+                    '<div class="guru-bento-card">' +
+                    '<div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:16px">' +
+                    '<div style="display:flex;align-items:center;gap:10px">' +
+                    '<div style="width:38px;height:38px;border-radius:10px;background:rgba(14,165,233,0.15);display:flex;align-items:center;justify-content:center;color:#0ea5e9;font-size:16px"><i class="fas fa-school"></i></div>' +
+                    '<div><h3 style="font-size:16px;font-weight:700;color:var(--text);margin:0">Distribusi Siswa per Rombel</h3><span style="font-size:12px;color:var(--text2)">Sebaran ' + allStudents.length + ' siswa di ' + allClasses.length + ' kelas</span></div>' +
+                    '</div>' +
+                    '<button class="btn btn-outline btn-xs" onclick="loadPage(\'daftarKelasAdmin\')"><i class="fas fa-external-link-alt"></i> Kelola Kelas</button>' +
+                    '</div>' +
+
+                    '<div style="display:flex;flex-direction:column;gap:12px;max-height:380px;overflow-y:auto;padding-right:4px">' +
+                    (allClasses.map(function (c) {
+                        var cId = c['ID Kelas'];
+                        var cNama = c['Nama Kelas'] || '';
+                        var cWali = c['Nama Wali Kelas'] || c['Wali Kelas'] || 'Belum Ditentukan';
+                        var countInClass = allStudents.filter(function (s) {
+                            return s['ID Kelas'] === cId || (s['Nama Kelas'] && s['Nama Kelas'].toLowerCase() === cNama.toLowerCase());
+                        }).length;
+                        var pct = allStudents.length ? Math.round((countInClass / allStudents.length) * 100) : 0;
+                        var barColor = '#10b981';
+                        if (cNama.includes('X.')) barColor = '#0ea5e9';
+                        else if (cNama.includes('XI IPA')) barColor = '#a855f7';
+                        else if (cNama.includes('XI IPS')) barColor = '#f59e0b';
+                        else if (cNama.includes('XII IPA')) barColor = '#10b981';
+                        else if (cNama.includes('XII IPS')) barColor = '#ec4899';
+
+                        return '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px">' +
+                            '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">' +
+                            '<div>' +
+                            '<strong style="font-size:14px;color:var(--text)">' + esc(cNama) + '</strong>' +
+                            '<span style="font-size:12px;color:var(--text2);margin-left:8px"><i class="fas fa-user-tie" style="font-size:11px"></i> ' + esc(cWali) + '</span>' +
+                            '</div>' +
+                            '<span class="badge" style="background:' + barColor + '20;color:' + barColor + ';font-weight:700">' + countInClass + ' Siswa (' + pct + '%)</span>' +
+                            '</div>' +
+                            '<div style="width:100%;height:8px;background:var(--bg2);border-radius:99px;overflow:hidden">' +
+                            '<div style="width:' + pct + '%;height:100%;background:' + barColor + ';border-radius:99px;transition:width 0.4s ease"></div>' +
+                            '</div>' +
+                            '</div>';
+                    }).join('')) +
+                    '</div>' +
+                    '</div>' +
+
+                    // ── BOX 2: JADWAL MENGAJAR HARI INI ──
+                    '<div class="guru-bento-card">' +
+                    '<div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:16px;flex-wrap:wrap;gap:8px">' +
+                    '<div style="display:flex;align-items:center;gap:10px">' +
+                    '<div style="width:38px;height:38px;border-radius:10px;background:rgba(245,158,11,0.15);display:flex;align-items:center;justify-content:center;color:#f59e0b;font-size:16px"><i class="fas fa-calendar-day"></i></div>' +
+                    '<div><h3 style="font-size:16px;font-weight:700;color:var(--text);margin:0">Jadwal Mengajar Hari Ini</h3><span style="font-size:12px;color:var(--text2)">' + esc(todayDateStr) + '</span></div>' +
+                    '</div>' +
+                    '<button class="btn btn-outline btn-xs" onclick="loadPage(\'daftarMapelAdmin\')"><i class="fas fa-list"></i> Semua Jadwal</button>' +
+                    '</div>' +
+
+                    (todaySubjects.length ?
+                        '<div style="display:flex;flex-direction:column;gap:10px;max-height:380px;overflow-y:auto;padding-right:4px">' +
+                        todaySubjects.map(function (s) {
+                            var jamText = (s['Jam Mulai'] || s['Jam Selesai']) ? ((s['Jam Mulai'] || '') + ' - ' + (s['Jam Selesai'] || '')) : 'Jam Sesuai Jadwal';
+                            return '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px">' +
+                                '<div style="flex:1">' +
+                                '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">' +
+                                '<span class="badge badge-info" style="font-size:11px">' + esc(s['Hari'] || 'Hari Aktif') + '</span>' +
+                                '<span class="badge badge-purple" style="font-size:11px"><i class="fas fa-clock" style="margin-right:3px"></i>' + esc(jamText) + '</span>' +
+                                '<span class="badge badge-warning" style="font-size:11px"><i class="fas fa-door-open" style="margin-right:3px"></i>' + esc(s['Ruangan'] || 'Kelas') + '</span>' +
+                                '</div>' +
+                                '<strong style="font-size:14px;color:var(--text)">' + esc(s['Nama Mapel']) + '</strong>' +
+                                '<div style="font-size:12px;color:var(--text2);margin-top:2px"><i class="fas fa-school" style="margin-right:4px"></i>' + esc(s['Nama Kelas'] || 'Semua Kelas') + ' &bull; <i class="fas fa-chalkboard-teacher" style="margin-left:4px;margin-right:4px"></i>' + esc(s['Nama Guru'] || '-') + '</div>' +
+                                '</div>' +
+                                '<button class="btn btn-outline btn-xs" onclick="openAbsenForSchedule(\'' + (s['ID Kelas'] || '') + '\', \'' + esc(s['Nama Kelas'] || '') + '\', \'' + (s['ID Mapel'] || '') + '\', \'' + esc(s['Nama Mapel'] || '') + '\')" title="Absen Kelas Ini"><i class="fas fa-check"></i> Absen</button>' +
+                                '</div>';
+                        }).join('') +
+                        '</div>'
+                        : '<div style="text-align:center;padding:36px;color:var(--text2)"><i class="fas fa-calendar-times fa-2x" style="opacity:0.3;margin-bottom:8px"></i><br/>Tidak ada jadwal belajar tatap muka hari ini.</div>'
+                    ) +
+                    '</div>' +
+
+                    '</div>' +
+
+                    // AKSES CEPAT MANAJEMEN SISTEM (QUICK ACCESS CARDS)
+                    '<div class="guru-bento-card" style="margin-bottom:24px">' +
+                    '<div style="border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:16px">' +
+                    '<h3 style="font-size:16px;font-weight:700;color:var(--text);margin:0"><i class="fas fa-th-large" style="color:#10b981;margin-right:8px"></i> Menu Cepat Manajemen Portal &amp; Data Sekolah</h3>' +
+                    '<span style="font-size:12px;color:var(--text2)">Pintasan cepat untuk mengelola seluruh aspek operasional sekolah</span>' +
+                    '</div>' +
+                    '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(210px, 1fr));gap:12px">' +
+
+                    '<div onclick="loadPage(\'daftarGuru\')" style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:transform 0.15s ease" onmouseover="this.style.borderColor=\'#10b981\'" onmouseout="this.style.borderColor=\'var(--border)\'">' +
+                    '<div style="width:38px;height:38px;border-radius:10px;background:rgba(16,185,129,0.15);color:#10b981;display:flex;align-items:center;justify-content:center;font-size:16px"><i class="fas fa-users"></i></div>' +
+                    '<div><strong style="font-size:13px;display:block;color:var(--text)">Kelola Dewan Guru</strong><span style="font-size:11px;color:var(--text2)">Data NIP, Akun &amp; Foto</span></div>' +
+                    '</div>' +
+
+                    '<div onclick="loadPage(\'daftarSiswaAdmin\')" style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:transform 0.15s ease" onmouseover="this.style.borderColor=\'#0ea5e9\'" onmouseout="this.style.borderColor=\'var(--border)\'">' +
+                    '<div style="width:38px;height:38px;border-radius:10px;background:rgba(14,165,233,0.15);color:#0ea5e9;display:flex;align-items:center;justify-content:center;font-size:16px"><i class="fas fa-user-graduate"></i></div>' +
+                    '<div><strong style="font-size:13px;display:block;color:var(--text)">Kelola Siswa</strong><span style="font-size:11px;color:var(--text2)">NISN, Rombel &amp; Biodata</span></div>' +
+                    '</div>' +
+
+                    '<div onclick="loadPage(\'daftarKelasAdmin\')" style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:transform 0.15s ease" onmouseover="this.style.borderColor=\'#a855f7\'" onmouseout="this.style.borderColor=\'var(--border)\'">' +
+                    '<div style="width:38px;height:38px;border-radius:10px;background:rgba(168,85,247,0.15);color:#a855f7;display:flex;align-items:center;justify-content:center;font-size:16px"><i class="fas fa-school"></i></div>' +
+                    '<div><strong style="font-size:13px;display:block;color:var(--text)">Daftar Kelas</strong><span style="font-size:11px;color:var(--text2)">Rombel &amp; Wali Kelas</span></div>' +
+                    '</div>' +
+
+                    '<div onclick="loadPage(\'daftarMapelAdmin\')" style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:transform 0.15s ease" onmouseover="this.style.borderColor=\'#f59e0b\'" onmouseout="this.style.borderColor=\'var(--border)\'">' +
+                    '<div style="width:38px;height:38px;border-radius:10px;background:rgba(245,158,11,0.15);color:#f59e0b;display:flex;align-items:center;justify-content:center;font-size:16px"><i class="fas fa-calendar-alt"></i></div>' +
+                    '<div><strong style="font-size:13px;display:block;color:var(--text)">Jadwal Mengajar</strong><span style="font-size:11px;color:var(--text2)">Alokasi Jam &amp; Guru</span></div>' +
+                    '</div>' +
+
+                    '<div onclick="loadPage(\'absenAdmin\')" style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:transform 0.15s ease" onmouseover="this.style.borderColor=\'#14b8a6\'" onmouseout="this.style.borderColor=\'var(--border)\'">' +
+                    '<div style="width:38px;height:38px;border-radius:10px;background:rgba(20,184,166,0.15);color:#14b8a6;display:flex;align-items:center;justify-content:center;font-size:16px"><i class="fas fa-calendar-check"></i></div>' +
+                    '<div><strong style="font-size:13px;display:block;color:var(--text)">Absen Siswa</strong><span style="font-size:11px;color:var(--text2)">Rekapitulasi Kehadiran</span></div>' +
+                    '</div>' +
+
+                    '<div onclick="loadPage(\'pembelajaranAdmin\')" style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:transform 0.15s ease" onmouseover="this.style.borderColor=\'#ec4899\'" onmouseout="this.style.borderColor=\'var(--border)\'">' +
+                    '<div style="width:38px;height:38px;border-radius:10px;background:rgba(236,72,153,0.15);color:#ec4899;display:flex;align-items:center;justify-content:center;font-size:16px"><i class="fas fa-chalkboard"></i></div>' +
+                    '<div><strong style="font-size:13px;display:block;color:var(--text)">Ruang Belajar</strong><span style="font-size:11px;color:var(--text2)">Modul Materi &amp; PDF</span></div>' +
+                    '</div>' +
+
+                    '<div onclick="loadPage(\'ujianAdmin\')" style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:transform 0.15s ease" onmouseover="this.style.borderColor=\'#6366f1\'" onmouseout="this.style.borderColor=\'var(--border)\'">' +
+                    '<div style="width:38px;height:38px;border-radius:10px;background:rgba(99,102,241,0.15);color:#6366f1;display:flex;align-items:center;justify-content:center;font-size:16px"><i class="fas fa-file-alt"></i></div>' +
+                    '<div><strong style="font-size:13px;display:block;color:var(--text)">Ujian CBT</strong><span style="font-size:11px;color:var(--text2)">Bank Soal &amp; Pelaksanaan</span></div>' +
+                    '</div>' +
+
+                    '<div onclick="loadPage(\'spmbAdmin\')" style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:transform 0.15s ease" onmouseover="this.style.borderColor=\'#22c55e\'" onmouseout="this.style.borderColor=\'var(--border)\'">' +
+                    '<div style="width:38px;height:38px;border-radius:10px;background:rgba(34,197,94,0.15);color:#22c55e;display:flex;align-items:center;justify-content:center;font-size:16px"><i class="fas fa-id-card-alt"></i></div>' +
+                    '<div><strong style="font-size:13px;display:block;color:var(--text)">Layanan SPMB</strong><span style="font-size:11px;color:var(--text2)">Verifikasi Calon Murid</span></div>' +
+                    '</div>' +
+
+                    '<div onclick="loadPage(\'rekapNilaiAdmin\')" style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:transform 0.15s ease" onmouseover="this.style.borderColor=\'#3b82f6\'" onmouseout="this.style.borderColor=\'var(--border)\'">' +
+                    '<div style="width:38px;height:38px;border-radius:10px;background:rgba(59,130,246,0.15);color:#3b82f6;display:flex;align-items:center;justify-content:center;font-size:16px"><i class="fas fa-chart-bar"></i></div>' +
+                    '<div><strong style="font-size:13px;display:block;color:var(--text)">Rekap Nilai</strong><span style="font-size:11px;color:var(--text2)">Hasil Ujian &amp; Rapor</span></div>' +
+                    '</div>' +
+
+                    '<div onclick="loadPage(\'settingsAdmin\')" style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:transform 0.15s ease" onmouseover="this.style.borderColor=\'#eab308\'" onmouseout="this.style.borderColor=\'var(--border)\'">' +
+                    '<div style="width:38px;height:38px;border-radius:10px;background:rgba(234,179,8,0.15);color:#eab308;display:flex;align-items:center;justify-content:center;font-size:16px"><i class="fas fa-cog"></i></div>' +
+                    '<div><strong style="font-size:13px;display:block;color:var(--text)">Pengaturan Portal</strong><span style="font-size:11px;color:var(--text2)">Profil Sekolah, Galeri &amp; Logo</span></div>' +
+                    '</div>' +
+
+                    '</div>' +
+                    '</div>';
+
+                main.innerHTML = html;
+            }).catch(function (err) {
+                hideWaiting();
+                errPage(err);
+            });
+        }
+
+        // ═══════════════════════════════════════════════════
+        // PENGELOLAAN PROFIL, FOTO & ALAMAT ADMINISTRATOR
+        // ═══════════════════════════════════════════════════
+        window.handleAdminDashPhoto = function (input) {
+            if (input && input.files && input.files[0]) {
+                var file = input.files[0];
+                showWaiting('Menyimpan Foto Profil...', 'Memproses dan memperbarui foto profil Administrator');
+                compressImage(file, 360, 0.85, function (dataUrl) {
+                    var u = APP.currentUser || {};
+                    var uid = u.id || u.ID || 'USRMVOW3VFZ8LCZ';
+                    google.script.run.withSuccessHandler(function (res) {
+                        hideWaiting();
+                        if (res && res.success) {
+                            APP.currentUser.fotoProfil = dataUrl;
+                            APP.currentUser['Foto Profil URL'] = dataUrl;
+                            try { localStorage.setItem('portal_current_user', JSON.stringify(APP.currentUser)); } catch (e) { }
+                            var topbarWrap = document.getElementById('topbarAvatarWrap');
+                            if (topbarWrap) {
+                                topbarWrap.innerHTML = '<img src="' + dataUrl + '" class="topbar-avatar" onclick="previewFotoGuru(esc(APP.currentUser.namaLengkap), APP.currentUser.fotoProfil)" style="cursor:pointer" title="Klik untuk lihat foto profil penuh">';
+                            }
+                            showToast('Foto profil Administrator berhasil diperbarui!', 'success');
+                            renderDashboardAdmin();
+                        } else {
+                            showToast((res && res.message) || 'Gagal memperbarui foto profil.', 'error');
+                        }
+                    }).withFailureHandler(function (e) {
+                        hideWaiting();
+                        showToast('Gagal mengunggah foto: ' + (e && e.message ? e.message : e), 'error');
+                    }).updateUserProfile(uid, { fotoProfil: dataUrl });
+                });
+            }
+        };
+
+        window.openEditAdminProfileModal = function () {
+            var u = APP.currentUser || {};
+            var modalTitle = document.getElementById('generalModalTitle');
+            var modalBody = document.getElementById('generalModalBody');
+            if (!modalTitle || !modalBody) return;
+
+            modalTitle.innerHTML = '<i class="fas fa-user-edit" style="color:#10b981"></i> Edit Profil &amp; Alamat Administrator';
+
+            var initial = (u.namaLengkap || 'A').split(' ').map(function (w) { return w[0]; }).join('').substring(0, 2).toUpperCase() || 'AD';
+            var avatarHtml = u.fotoProfil
+                ? '<img src="' + esc(u.fotoProfil) + '" id="admModalAvatarPreview" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid #10b981;box-shadow:0 2px 8px rgba(0,0,0,0.15)">'
+                : '<div id="admModalAvatarPreview" style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#059669,#10b981);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:24px;border:3px solid #10b981;box-shadow:0 2px 8px rgba(0,0,0,0.15)">' + initial + '</div>';
+
+            var html =
+                '<div style="display:flex;flex-direction:column;gap:16px">' +
+                // Avatar Preview & Upload Box
+                '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">' +
+                avatarHtml +
+                '<div style="flex:1">' +
+                '<strong style="font-size:14px;display:block;color:var(--text);margin-bottom:4px">Foto Profil Administrator</strong>' +
+                '<span style="font-size:12px;color:var(--text2);display:block;margin-bottom:8px">Format JPG/PNG, rasio 1:1 persegi untuk hasil terbaik.</span>' +
+                '<div style="display:flex;gap:8px;align-items:center">' +
+                '<label class="btn btn-outline btn-xs" for="admModalFileInput" style="cursor:pointer"><i class="fas fa-camera"></i> Pilih Foto Baru</label>' +
+                '<input type="file" id="admModalFileInput" accept="image/*" style="display:none" onchange="handleAdminModalPhotoSelect(this)"/>' +
+                (u.fotoProfil ? '<button type="button" class="btn btn-xs btn-outline" onclick="previewFotoGuru(\'' + esc(u.namaLengkap || 'Admin').replace(/'/g, "\\'") + '\',\'' + esc(u.fotoProfil).replace(/'/g, "\\'") + '\')"><i class="fas fa-eye"></i> Lihat</button>' : '') +
+                '</div>' +
+                '<input type="hidden" id="admModalFotoData" value="' + esc(u.fotoProfil || '') + '">' +
+                '</div>' +
+                '</div>' +
+
+                // Form Fields
+                '<div class="form-row">' +
+                '<div class="form-group"><label>Nama Lengkap</label><input class="form-control" id="admEditNama" value="' + esc(u.namaLengkap || '') + '"/></div>' +
+                '<div class="form-group"><label>Username</label><input class="form-control" id="admEditUser" value="' + esc(u.username || 'DZULKIFLI') + '" readonly style="background:var(--bg2);cursor:not-allowed"/></div>' +
+                '</div>' +
+
+                '<div class="form-row">' +
+                '<div class="form-group"><label>NIP</label><input class="form-control" id="admEditNip" placeholder="Masukkan NIP jika ada" value="' + esc(u.nip || '') + '"/></div>' +
+                '<div class="form-group"><label>Email</label><input class="form-control" type="email" id="admEditEmail" value="' + esc(u.email || '') + '"/></div>' +
+                '</div>' +
+
+                '<div class="form-group">' +
+                '<label>No. Telepon / WhatsApp</label>' +
+                '<input class="form-control" id="admEditTelp" placeholder="Contoh: 082292169010" value="' + esc(u.telepon || '') + '"/>' +
+                '</div>' +
+
+                // ALAMAT FIELD
+                '<div class="form-group">' +
+                '<label><i class="fas fa-map-marker-alt" style="color:#10b981;margin-right:4px"></i> Alamat Domisili / Tempat Tinggal Admin <span style="color:#ef4444">*</span></label>' +
+                '<textarea class="form-control" id="admEditAlamat" rows="3" placeholder="Masukkan alamat lengkap domisili Admin (contoh: Jl. Poros Lagadi - Tondasi, Kel. Barangka, Kab. Muna Barat)">' + esc(u.alamat || '') + '</textarea>' +
+                '<small style="color:var(--text2);font-size:11px;margin-top:4px;display:block">Alamat ini akan langsung disimpan dan tampil di kartu Dashboard Admin.</small>' +
+                '</div>' +
+
+                // Buttons
+                '<div style="display:flex;justify-content:flex-end;gap:10px;margin-top:8px">' +
+                '<button type="button" class="btn btn-outline" onclick="closeModal(\'generalModal\')">Batal</button>' +
+                '<button type="button" class="btn btn-primary" onclick="submitSaveAdminProfile()"><i class="fas fa-save"></i> Simpan Profil &amp; Alamat</button>' +
+                '</div>' +
+                '</div>';
+
+            modalBody.innerHTML = html;
+            openModal('generalModal');
+            setTimeout(function () {
+                var el = document.getElementById('admEditAlamat');
+                if (el) el.focus();
+            }, 300);
+        };
+
+        window.openEditAdminAddressModal = function () {
+            window.openEditAdminProfileModal();
+        };
+
+        window.handleAdminModalPhotoSelect = function (input) {
+            if (input && input.files && input.files[0]) {
+                var file = input.files[0];
+                showWaiting('Memproses Foto...', 'Menyiapkan foto profil proporsional');
+                compressImage(file, 360, 0.85, function (dataUrl) {
+                    hideWaiting();
+                    var prev = document.getElementById('admModalAvatarPreview');
+                    var dataInp = document.getElementById('admModalFotoData');
+                    if (prev) {
+                        prev.outerHTML = '<img src="' + dataUrl + '" id="admModalAvatarPreview" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid #10b981;box-shadow:0 2px 8px rgba(0,0,0,0.15)">';
+                    }
+                    if (dataInp) dataInp.value = dataUrl;
+                    showToast('Foto profil dipilih dan siap disimpan!', 'info');
+                });
+            }
+        };
+
+        window.submitSaveAdminProfile = function () {
+            var u = APP.currentUser || {};
+            var uid = u.id || u.ID || 'USRMVOW3VFZ8LCZ';
+            var namaLengkap = (v('admEditNama') || u.namaLengkap || 'Administrator').trim();
+            var nip = (v('admEditNip') || '').trim();
+            var email = (v('admEditEmail') || '').trim();
+            var telepon = (v('admEditTelp') || '').trim();
+            var alamat = (v('admEditAlamat') || '').trim();
+            var fotoProfil = (document.getElementById('admModalFotoData') ? document.getElementById('admModalFotoData').value : (u.fotoProfil || '')).trim();
+
+            var updatePayload = {
+                namaLengkap: namaLengkap,
+                nip: nip,
+                email: email,
+                telepon: telepon,
+                alamat: alamat,
+                fotoProfil: fotoProfil
+            };
+
+            showWaiting('Menyimpan Perubahan...', 'Menyimpan profil dan alamat Administrator');
+            google.script.run.withSuccessHandler(function (res) {
+                hideWaiting();
+                if (res && res.success) {
+                    APP.currentUser.namaLengkap = namaLengkap;
+                    APP.currentUser.nip = nip;
+                    APP.currentUser.email = email;
+                    APP.currentUser.telepon = telepon;
+                    APP.currentUser.alamat = alamat;
+                    APP.currentUser['Alamat'] = alamat;
+                    if (fotoProfil) {
+                        APP.currentUser.fotoProfil = fotoProfil;
+                        APP.currentUser['Foto Profil URL'] = fotoProfil;
+                    }
+                    try { localStorage.setItem('portal_current_user', JSON.stringify(APP.currentUser)); } catch (e) { }
+
+                    // Perbarui elemen Topbar
+                    var topbarName = document.getElementById('topbarUserName');
+                    if (topbarName) topbarName.textContent = namaLengkap;
+                    if (fotoProfil) {
+                        var topbarWrap = document.getElementById('topbarAvatarWrap');
+                        if (topbarWrap) {
+                            topbarWrap.innerHTML = '<img src="' + fotoProfil + '" class="topbar-avatar" onclick="previewFotoGuru(esc(APP.currentUser.namaLengkap), APP.currentUser.fotoProfil)" style="cursor:pointer" title="Klik untuk lihat foto profil penuh">';
+                        }
+                    }
+
+                    closeModal('generalModal');
+                    showToast('Profil dan alamat Administrator berhasil diperbarui!', 'success');
+                    renderDashboardAdmin();
+                } else {
+                    showToast((res && res.message) || 'Gagal menyimpan perubahan profil.', 'error');
+                }
+            }).withFailureHandler(function (e) {
+                hideWaiting();
+                showToast('Gagal menyimpan: ' + (e && e.message ? e.message : e), 'error');
+            }).updateUserProfile(uid, updatePayload);
+        };
+
+        // ═══════════════════════════════════════════════════
         // DASHBOARD GURU
         // ═══════════════════════════════════════════════════
         function renderDashboardGuru() {
@@ -16375,13 +17076,8 @@
             }
 
             if (!questions || !questions.length) {
-                questions = [
-                    { id: 1, soal: '1. Apa fungsi utama dari klorofil pada tumbuhan hijau?', tipeSoal: 'pilihan_ganda', opsi: { A: 'Menyerap energi cahaya matahari untuk fotosintesis', B: 'Menyerap air dan mineral dari tanah', C: 'Menghasilkan gas karbon dioksida', D: 'Melindungi daun dari hama' }, kunci: 'A' },
-                    { id: 2, soal: '2. Jelaskan peranan siswa dalam menjaga kelestarian lingkungan sekolah di era modern!', tipeSoal: 'essay', opsi: {}, kunci: '' },
-                    { id: 3, soal: '3. Berapakah hasil perhitungan dari: 15 × 8 + 40 ÷ 5?', tipeSoal: 'pilihan_ganda', opsi: { A: '128', B: '124', C: '130', D: '120' }, kunci: 'A' },
-                    { id: 4, soal: '4. Tuliskan 3 nilai luhur yang terkandung dalam sila ketiga Pancasila!', tipeSoal: 'essay', opsi: {}, kunci: '' },
-                    { id: 5, soal: '5. Planet dalam tata surya yang mendapat julukan sebagai Planet Merah adalah...', tipeSoal: 'pilihan_ganda', opsi: { A: 'Mars', B: 'Venus', C: 'Jupiter', D: 'Merkurius' }, kunci: 'A' }
-                ];
+                showToast('Ujian ini belum memiliki soal di database. Silakan hubungi guru pengampu.', 'warning');
+                return;
             }
 
             APP.examQuestions = questions;
@@ -17693,7 +18389,7 @@
 
         window.doHamLogin = function () {
             var u = (document.getElementById('hamLoginUser').value || '').trim();
-            var p = (document.getElementById('hamLoginPass').value || '').trim();
+            var p = document.getElementById('hamLoginPass').value || '';
             if (!u || !p) { showToast('Isi username dan password!', 'warning'); return; }
 
             var btn = document.querySelector('.ham-login-submit');
@@ -17702,17 +18398,24 @@
 
             google.script.run.withSuccessHandler(function (res) {
                 if (btn) { btn.innerHTML = oldHtml; btn.disabled = false; }
-                if (res && res.success) {
-                    if (_hamLoginRole === 'admin' && res.user.role !== 'admin') {
+                if (res && res.success && res.user) {
+                    var userRole = String(res.user.role || 'guru').toLowerCase();
+                    res.user.role = userRole;
+                    if (_hamLoginRole === 'admin' && userRole !== 'admin') {
                         showToast('Akses ditolak. Akun ini bukan administrator!', 'error');
                         return;
                     }
-                    if (_hamLoginRole === 'guru' && res.user.role === 'admin') {
+                    if (_hamLoginRole === 'guru' && userRole === 'admin') {
                         showToast('Login berhasil sebagai Administrator.', 'info');
                     } else {
                         showToast('Login berhasil! Selamat datang, ' + (res.user.namaLengkap || res.user.username), 'success');
                     }
                     APP.currentUser = res.user;
+                    try {
+                        localStorage.setItem('portal_current_user', JSON.stringify(res.user));
+                        var startPage = (userRole === 'admin') ? 'dashboardAdmin' : 'dashboardGuru';
+                        localStorage.setItem('portal_current_page', startPage);
+                    } catch (e) { }
                     closeHamPanel();
                     initDashboard();
                 } else {
@@ -17784,22 +18487,12 @@
                 var subjRes = results[1];
                 var allUsersRes = results[2];
 
-                var users = (usersRes && (usersRes.data || usersRes) || []).filter(function (u) { return u.Role === 'guru' || u.role === 'guru'; });
+                var users = (usersRes && (usersRes.data || usersRes) || []).filter(function (u) {
+                    var r = String(u.Role || u.role || '').toLowerCase();
+                    return r === 'guru' || (r && r !== 'admin' && r !== 'siswa');
+                });
                 var allU = allUsersRes && (allUsersRes.data || allUsersRes) || [];
                 var subjects = subjRes && (subjRes.data || subjRes) || [];
-
-                if (users.length === 0) {
-                    users = [
-                        { 'ID': 'G1', 'Nama Lengkap': 'Ahmad Fauzi, S.Pd', 'Jenis Kelamin': 'L', 'Mapel': 'Matematika' },
-                        { 'ID': 'G2', 'Nama Lengkap': 'Siti Rahmah, M.Pd', 'Jenis Kelamin': 'P', 'Mapel': 'Bahasa Indonesia' },
-                        { 'ID': 'G3', 'Nama Lengkap': 'Budi Santoso, S.Pd', 'Jenis Kelamin': 'L', 'Mapel': 'Fisika' },
-                        { 'ID': 'G4', 'Nama Lengkap': 'Dewi Lestari, S.Pd', 'Jenis Kelamin': 'P', 'Mapel': 'Bahasa Inggris' },
-                        { 'ID': 'G5', 'Nama Lengkap': 'Hendra Wijaya, S.Kom', 'Jenis Kelamin': 'L', 'Mapel': 'Informatika' },
-                        { 'ID': 'G6', 'Nama Lengkap': 'Nurul Hidayah, S.Pd', 'Jenis Kelamin': 'P', 'Mapel': 'Biologi' },
-                        { 'ID': 'G7', 'Nama Lengkap': 'Eko Prasetyo, S.Pd', 'Jenis Kelamin': 'L', 'Mapel': 'PJOK' },
-                        { 'ID': 'G8', 'Nama Lengkap': 'Rina Marlina, S.Pd', 'Jenis Kelamin': 'P', 'Mapel': 'Kimia' }
-                    ];
-                }
 
                 var mapelMap = {};
                 subjects.forEach(function (s) {
@@ -17824,14 +18517,11 @@
                         if (!kepsek) kepsek = u;
                     }
                 });
-                if (!kepsek) {
-                    kepsek = allU.find(function (u) { return u.Role === 'admin'; });
-                }
 
                 var sSetting = (window.APP && APP.settings) || {};
-                var kepsekName = (sSetting.principal_name)
+                var kepsekName = (sSetting.principal_name && sSetting.principal_name !== 'Drs. H. Kepala Sekolah, M.Pd')
                     ? sSetting.principal_name
-                    : ((kepsek && kepsek['Nama Lengkap'] && kepsek['Nama Lengkap'] !== 'Administrator') ? kepsek['Nama Lengkap'] : 'Drs. H. Kepala Sekolah, M.Pd');
+                    : ((kepsek && kepsek['Nama Lengkap'] && kepsek['Nama Lengkap'] !== 'Administrator') ? kepsek['Nama Lengkap'] : 'La Ode Mursaban Indi, S.Pd., M.Pd');
                 var localKepsekFoto = '';
                 try { localKepsekFoto = localStorage.getItem('portal_principal_photo') || ''; } catch (e) { }
                 var kepsekFoto = (sSetting.principal_photo || localKepsekFoto)
@@ -17865,26 +18555,30 @@
                 html += '<div class="guru-chart-branch-line"></div>';
                 html += '</div>';
 
-                html += '<div class="guru-seating-grid">';
-                users.forEach(function (u) {
-                    var foto = u['Foto Profil URL'] || u['Foto'] || '';
-                    var nama = u['Nama Lengkap'] || u['Username'] || 'Guru';
-                    var inisial = nama.split(' ').map(function (w) { return w[0]; }).join('').substring(0, 2).toUpperCase();
-                    var g = detectUserGender(u);
+                if (users.length === 0) {
+                    html += '<div style="text-align:center;padding:16px;color:#94a3b8;font-size:12px">Belum ada data guru yang terdaftar di database.</div>';
+                } else {
+                    html += '<div class="guru-seating-grid">';
+                    users.forEach(function (u) {
+                        var foto = u['Foto Profil URL'] || u['Foto'] || '';
+                        var nama = u['Nama Lengkap'] || u['Username'] || 'Guru';
+                        var inisial = nama.split(' ').map(function (w) { return w[0]; }).join('').substring(0, 2).toUpperCase();
+                        var g = detectUserGender(u);
 
-                    var mapelList = mapelMap[u['ID']] || mapelMap[nama.toLowerCase().trim()] || [];
-                    var mapelStr = mapelList.length ? mapelList.join(', ') : (u['Mapel'] || u['Mata Pelajaran'] || 'Guru Mapel');
+                        var mapelList = mapelMap[u['ID']] || mapelMap[nama.toLowerCase().trim()] || [];
+                        var mapelStr = mapelList.length ? mapelList.join(', ') : (u['Mapel'] || u['Mata Pelajaran'] || 'Guru Mapel');
 
-                    var avatarSrc = foto || ('data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'50\' fill=\'%231e293b\'/><text x=\'50\' y=\'65\' text-anchor=\'middle\' font-size=\'36\' fill=\'%2338bdf8\'>' + inisial + '</text></svg>');
+                        var avatarSrc = foto || ('data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'50\' fill=\'%231e293b\'/><text x=\'50\' y=\'65\' text-anchor=\'middle\' font-size=\'36\' fill=\'%2338bdf8\'>' + inisial + '</text></svg>');
 
-                    html += '<div class="guru-seat-card">';
-                    html += '<span class="guru-seat-gender ' + g + '">' + g + '</span>';
-                    html += '<img class="guru-seat-avatar" src="' + avatarSrc + '" onerror="this.src=\'' + avatarSrc + '\'" alt="' + nama + '" />';
-                    html += '<div class="guru-seat-name" title="' + nama + '">' + nama + '</div>';
-                    html += '<div class="guru-seat-mapel" title="' + mapelStr + '"><i class="fas fa-book" style="margin-right:3px;font-size:8.5px"></i>' + mapelStr + '</div>';
+                        html += '<div class="guru-seat-card">';
+                        html += '<span class="guru-seat-gender ' + g + '">' + g + '</span>';
+                        html += '<img class="guru-seat-avatar" src="' + avatarSrc + '" onerror="this.src=\'' + avatarSrc + '\'" alt="' + nama + '" />';
+                        html += '<div class="guru-seat-name" title="' + nama + '">' + nama + '</div>';
+                        html += '<div class="guru-seat-mapel" title="' + mapelStr + '"><i class="fas fa-book" style="margin-right:3px;font-size:8.5px"></i>' + mapelStr + '</div>';
+                        html += '</div>';
+                    });
                     html += '</div>';
-                });
-                html += '</div>';
+                }
 
                 el.innerHTML = html;
             } catch (e) {
@@ -17914,27 +18608,6 @@
                 var allSiswa = (results[1] && (results[1].data || results[1]) || []);
                 if (!Array.isArray(allSiswa)) allSiswa = [];
 
-                if (classes.length === 0) {
-                    classes = [
-                        { 'ID Kelas': 'K1', 'Nama Kelas': 'Kelas X-1' },
-                        { 'ID Kelas': 'K2', 'Nama Kelas': 'Kelas X-2' },
-                        { 'ID Kelas': 'K3', 'Nama Kelas': 'Kelas XI-MIPA' },
-                        { 'ID Kelas': 'K4', 'Nama Kelas': 'Kelas XII-MIPA' }
-                    ];
-                    allSiswa = [
-                        { 'Nama Siswa': 'Aditya Pratama', 'Jenis Kelamin': 'L', 'NIS': '2024101', 'ID Kelas': 'K1' },
-                        { 'Nama Siswa': 'Aisyah Putri', 'Jenis Kelamin': 'P', 'NIS': '2024102', 'ID Kelas': 'K1' },
-                        { 'Nama Siswa': 'Bagas Setiawan', 'Jenis Kelamin': 'L', 'NIS': '2024103', 'ID Kelas': 'K1' },
-                        { 'Nama Siswa': 'Cantika Dewi', 'Jenis Kelamin': 'P', 'NIS': '2024104', 'ID Kelas': 'K1' },
-                        { 'Nama Siswa': 'Dimas Anggara', 'Jenis Kelamin': 'L', 'NIS': '2024201', 'ID Kelas': 'K2' },
-                        { 'Nama Siswa': 'Fitri Handayani', 'Jenis Kelamin': 'P', 'NIS': '2024202', 'ID Kelas': 'K2' },
-                        { 'Nama Siswa': 'Gilang Ramadhan', 'Jenis Kelamin': 'L', 'NIS': '2023301', 'ID Kelas': 'K3' },
-                        { 'Nama Siswa': 'Hana Maulida', 'Jenis Kelamin': 'P', 'NIS': '2023302', 'ID Kelas': 'K3' },
-                        { 'Nama Siswa': 'Irfan Hakim', 'Jenis Kelamin': 'L', 'NIS': '2022401', 'ID Kelas': 'K4' },
-                        { 'Nama Siswa': 'Jasmine Zahra', 'Jenis Kelamin': 'P', 'NIS': '2022402', 'ID Kelas': 'K4' }
-                    ];
-                }
-
                 classes.sort(function (a, b) {
                     return (a['Nama Kelas'] || '').localeCompare(b['Nama Kelas'] || '');
                 });
@@ -17952,6 +18625,10 @@
                 html += '<span class="ham-stat-chip" style="background:rgba(59,130,246,0.12);color:#60a5fa"><i class="fas fa-male"></i> ' + totalL + ' Laki-laki</span>';
                 html += '<span class="ham-stat-chip" style="background:rgba(236,72,153,0.12);color:#f472b6"><i class="fas fa-female"></i> ' + totalP + ' Perempuan</span>';
                 html += '</div>';
+
+                if (classes.length === 0) {
+                    html += '<div style="text-align:center;padding:16px;color:#94a3b8;font-size:12px">Belum ada data kelas dan siswa di database.</div>';
+                }
 
                 classes.forEach(function (cls, idx) {
                     var clsId = cls['ID Kelas'] || cls.id || '';
@@ -18487,7 +19164,7 @@
             var nameEl = document.getElementById('kepsekEditorPreviewName');
             var stKepsek = document.getElementById('stKepsek');
             if (nameEl) {
-                nameEl.textContent = (stKepsek && stKepsek.value) ? stKepsek.value : ((window.APP && APP.settings && APP.settings.principal_name) || 'Drs. H. Kepala Sekolah, M.Pd');
+                nameEl.textContent = (stKepsek && stKepsek.value) ? stKepsek.value : ((window.APP && APP.settings && APP.settings.principal_name) || 'La Ode Mursaban Indi, S.Pd., M.Pd');
             }
 
             updateKepsekPhotoEditorLive();
@@ -18792,8 +19469,18 @@
                 var cached = localStorage.getItem('portal_landing_teachers_cache');
                 if (cached) {
                     var parsed = JSON.parse(cached);
-                    if (parsed && Array.isArray(parsed.teachers) && parsed.teachers.length > 0) {
-                        renderLandingTeachersData(parsed);
+                    if (parsed && Array.isArray(parsed.teachers)) {
+                        var hasDummy = parsed.teachers.some(function (t) {
+                            return t && (t.ID === 'G1' || t['Nama Lengkap'] === 'Ahmad Fauzi, S.Pd');
+                        });
+                        var hasMissingPhotos = parsed.teachers.some(function (t) {
+                            return t && t.ID && t.ID !== 'USRMVNWLAO14X9O' && (!t['Foto Profil URL'] && !t.fotoProfil && !t.Foto && !t.foto);
+                        });
+                        if (hasDummy || hasMissingPhotos) {
+                            localStorage.removeItem('portal_landing_teachers_cache');
+                        } else if (parsed.teachers.length > 0) {
+                            renderLandingTeachersData(parsed);
+                        }
                     }
                 }
             } catch (e) { }
@@ -18853,34 +19540,17 @@
                         if (!kepsek) kepsek = u;
                     }
                 });
-                if (!kepsek) {
-                    kepsek = allUsers.find(function (u) { return (u.Role || '').toLowerCase() === 'admin'; });
-                }
 
                 var sSetting = (window.APP && APP.settings) || {};
-                var kepsekName = (sSetting.principal_name)
+                var kepsekName = (sSetting.principal_name && sSetting.principal_name !== 'Drs. H. Kepala Sekolah, M.Pd')
                     ? sSetting.principal_name
-                    : ((kepsek && kepsek['Nama Lengkap'] && kepsek['Nama Lengkap'] !== 'Administrator') ? kepsek['Nama Lengkap'] : 'Drs. H. Kepala Sekolah, M.Pd');
+                    : ((kepsek && kepsek['Nama Lengkap'] && kepsek['Nama Lengkap'] !== 'Administrator') ? kepsek['Nama Lengkap'] : 'La Ode Mursaban Indi, S.Pd., M.Pd');
                 var localKepsekFoto = '';
                 try { localKepsekFoto = localStorage.getItem('portal_principal_photo') || ''; } catch (e) { }
                 var kepsekFoto = (sSetting.principal_photo || localKepsekFoto)
                     ? (sSetting.principal_photo || localKepsekFoto)
                     : ((kepsek && (kepsek['Foto Profil URL'] || kepsek['Foto'])) ? (kepsek['Foto Profil URL'] || kepsek['Foto']) : '');
                 var kepsekNip = (kepsek && kepsek['NIP']) ? kepsek['NIP'] : (sSetting.school_npsn ? 'NPSN: ' + sSetting.school_npsn : '-');
-
-                // Fallback default teachers if database empty
-                if (teachers.length === 0) {
-                    teachers = [
-                        { 'ID': 'G1', 'Nama Lengkap': 'Ahmad Fauzi, S.Pd', 'Jenis Kelamin': 'L', 'Mapel': 'Matematika', 'NIP': '19820415 200801 1 008' },
-                        { 'ID': 'G2', 'Nama Lengkap': 'Siti Rahmah, M.Pd', 'Jenis Kelamin': 'P', 'Mapel': 'Bahasa Indonesia', 'NIP': '19850920 200902 2 004' },
-                        { 'ID': 'G3', 'Nama Lengkap': 'Budi Santoso, S.Pd', 'Jenis Kelamin': 'L', 'Mapel': 'Fisika', 'NIP': '19790312 200501 1 003' },
-                        { 'ID': 'G4', 'Nama Lengkap': 'Dewi Lestari, S.Pd', 'Jenis Kelamin': 'P', 'Mapel': 'Bahasa Inggris', 'NIP': '19881105 201101 2 007' },
-                        { 'ID': 'G5', 'Nama Lengkap': 'Hendra Wijaya, S.Kom', 'Jenis Kelamin': 'L', 'Mapel': 'Informatika & Komputer', 'NIP': '19900218 201402 1 002' },
-                        { 'ID': 'G6', 'Nama Lengkap': 'Nurul Hidayah, S.Pd', 'Jenis Kelamin': 'P', 'Mapel': 'Biologi', 'NIP': '19870624 201001 2 009' },
-                        { 'ID': 'G7', 'Nama Lengkap': 'Eko Prasetyo, S.Pd', 'Jenis Kelamin': 'L', 'Mapel': 'Pendidikan Jasmani & Olahraga', 'NIP': '19840830 200803 1 006' },
-                        { 'ID': 'G8', 'Nama Lengkap': 'Rina Marlina, S.Pd', 'Jenis Kelamin': 'P', 'Mapel': 'Kimia', 'NIP': '19890114 201202 2 005' }
-                    ];
-                }
 
                 var maleCount = 0, femaleCount = 0;
                 teachers.forEach(function (u) {
@@ -18922,7 +19592,12 @@
 
         function buildLandingTeacherCardHtml(u, idx, mapelMap) {
             var nama = u['Nama Lengkap'] || u['Username'] || 'Dewan Guru';
-            var foto = (u['Foto Profil URL'] || u['Foto'] || '').trim();
+            var foto = (u['Foto Profil URL'] || u['Foto'] || u.fotoProfil || u.foto || '').trim();
+            var teacherId = String(u['ID'] || u.id || '').trim();
+            // Otomatis arahkan ke file lokal resmi untuk seluruh dewan guru yang memiliki foto
+            if ((!foto || foto.length < 5) && teacherId && teacherId !== 'USRMVOW3VFZ8LCZ' && teacherId !== 'USRMVNWLAO14X9O') {
+                foto = 'cloud-media/teachers/' + teacherId + '.jpg';
+            }
             var init = nama.split(' ').map(function (w) { return w[0]; }).join('').substring(0, 2).toUpperCase() || 'GR';
 
             var g = typeof detectUserGender === 'function' ? detectUserGender(u) : ((u['Jenis Kelamin'] || 'L').toUpperCase().indexOf('P') === 0 ? 'P' : 'L');
@@ -18935,10 +19610,22 @@
             var mapelStr = mapelList.length ? mapelList.join(', ') : (u['Mapel'] || u['Mata Pelajaran'] || 'Tenaga Pendidik');
             var nipStr = u['NIP'] ? 'NIP. ' + u['NIP'] : 'Tenaga Pendidik Profesional';
 
-            // Foto guru: Jika belum di-upload, gunakan inisial saja secara langsung
-            var hasFoto = foto && foto.length > 10 && (foto.indexOf('http') === 0 || foto.indexOf('data:image') === 0);
+            // Foto guru: Mendukung http, https, data:image, cloud-media/, serta file path relatif/lokal
+            var hasFoto = foto && foto.length > 4 && (
+                foto.indexOf('http://') === 0 ||
+                foto.indexOf('https://') === 0 ||
+                foto.indexOf('data:image') === 0 ||
+                foto.indexOf('cloud-media/') === 0 ||
+                foto.indexOf('./cloud-media/') === 0 ||
+                foto.indexOf('../cloud-media/') === 0 ||
+                foto.indexOf('/') === 0 ||
+                foto.indexOf('./') === 0 ||
+                /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(foto.split('?')[0])
+            );
+            var safeNamaEsc = esc(nama).replace(/'/g, "\\'");
+            var safeFotoEsc = esc(foto).replace(/'/g, "\\'");
             var avatarHtml = hasFoto
-                ? '<img class="lp-guru-avatar" src="' + esc(foto) + '" onerror="this.outerHTML=\'<div class=\\\'lp-guru-avatar lp-guru-initials-box ' + genderClass + '\\\'><span>' + esc(init) + '</span></div>\'" alt="' + esc(nama) + '" loading="lazy"/>'
+                ? '<img class="lp-guru-avatar" src="' + esc(foto) + '" onclick="previewFotoGuru(\'' + safeNamaEsc + '\',\'' + safeFotoEsc + '\')" style="cursor:pointer" title="Klik untuk lihat foto ' + esc(nama) + '" onerror="if(!this._retried){this._retried=1;if(this.src.indexOf(\'cloud-media/\')!==-1){this.src=\'./\'+this.src.substring(this.src.indexOf(\'cloud-media/\'));return;}}this.outerHTML=\'<div class=\\\'lp-guru-avatar lp-guru-initials-box ' + genderClass + '\\\'><span>' + esc(init) + '</span></div>\'" alt="' + esc(nama) + '" loading="lazy"/>'
                 : '<div class="lp-guru-avatar lp-guru-initials-box ' + genderClass + '"><span>' + esc(init) + '</span></div>';
 
             return '<div class="lp-guru-card" data-name="' + esc(nama.toLowerCase()) + '" data-mapel="' + esc(mapelStr.toLowerCase()) + '">' +
@@ -18977,10 +19664,22 @@
             if (kepWrap && data.kepsek) {
                 var k = data.kepsek;
                 var kInit = (k.nama || 'KS').split(' ').map(function (w) { return w[0]; }).join('').substring(0, 2).toUpperCase();
-                var kFotoSrc = (k.foto || '').trim();
-                var hasKepsekFoto = kFotoSrc && kFotoSrc.length > 10 && (kFotoSrc.indexOf('http') === 0 || kFotoSrc.indexOf('data:image') === 0);
+                var kFotoSrc = (k.foto || 'cloud-media/settings/principal-photo.jpg').trim();
+                var hasKepsekFoto = kFotoSrc && kFotoSrc.length > 4 && (
+                    kFotoSrc.indexOf('http://') === 0 ||
+                    kFotoSrc.indexOf('https://') === 0 ||
+                    kFotoSrc.indexOf('data:image') === 0 ||
+                    kFotoSrc.indexOf('cloud-media/') === 0 ||
+                    kFotoSrc.indexOf('./cloud-media/') === 0 ||
+                    kFotoSrc.indexOf('../cloud-media/') === 0 ||
+                    kFotoSrc.indexOf('/') === 0 ||
+                    kFotoSrc.indexOf('./') === 0 ||
+                    /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(kFotoSrc.split('?')[0])
+                );
+                var safeKepsekNama = esc(k.nama || 'Kepala Sekolah').replace(/'/g, "\\'");
+                var safeKepsekFoto = esc(kFotoSrc).replace(/'/g, "\\'");
                 var kepsekAvatarHtml = hasKepsekFoto
-                    ? '<img class="lp-guru-kepsek-avatar" src="' + kFotoSrc + '" onerror="this.outerHTML=\'<div class=\\\'lp-guru-kepsek-avatar lp-guru-kepsek-initials-box\\\'><span>' + esc(kInit) + '</span></div>\'" alt="Foto Kepala Sekolah" />'
+                    ? '<img class="lp-guru-kepsek-avatar" src="' + esc(kFotoSrc) + '" onclick="previewFotoGuru(\'' + safeKepsekNama + '\',\'' + safeKepsekFoto + '\')" style="cursor:pointer" title="Klik untuk lihat foto Kepala Sekolah" onerror="if(!this._retried){this._retried=1;if(this.src.indexOf(\'cloud-media/\')!==-1){this.src=\'./\'+this.src.substring(this.src.indexOf(\'cloud-media/\'));return;}}this.outerHTML=\'<div class=\\\'lp-guru-kepsek-avatar lp-guru-kepsek-initials-box\\\'><span>' + esc(kInit) + '</span></div>\'" alt="Foto Kepala Sekolah" />'
                     : '<div class="lp-guru-kepsek-avatar lp-guru-kepsek-initials-box"><span>' + esc(kInit) + '</span></div>';
 
                 kepWrap.innerHTML =
