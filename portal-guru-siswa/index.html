@@ -89,73 +89,103 @@
       display: none !important;
     }
 
-    /* KOP BANNER SOAL UJIAN STICKY (TIDAK HILANG SAAT DI SCROLL) */
-    .kop-banner-sticky {
+    /* ============================================================ */
+    /* KOP BANNER SOAL UJIAN STICKY & FULLSCREEN EXAM RESILIENT     */
+    /* ============================================================ */
+    .exam-sticky-header {
       position: sticky;
       top: 0;
       z-index: 1000;
+      width: 100%;
+      max-width: 100vw;
+      box-sizing: border-box;
+      overflow-x: hidden;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.5);
+    }
+    .kop-banner-sticky {
       background: #0f172a;
       border-bottom: 2px solid #0284c7;
-      padding: 8px 12px;
+      padding: 6px 10px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.5);
+      gap: 8px;
       width: 100%;
+      max-width: 100%;
       box-sizing: border-box;
+      overflow: hidden;
     }
     .kop-logo-left, .kop-logo-right {
-      width: 38px;
-      height: 38px;
-      flex-shrink: 0;
+      width: 34px;
+      height: 34px;
+      min-width: 34px;
+      min-height: 34px;
+      max-width: 34px;
+      max-height: 34px;
+      flex-shrink: 0 !important;
       display: flex;
       align-items: center;
       justify-content: center;
       background: #ffffff;
       border-radius: 8px;
       padding: 2px;
+      box-sizing: border-box;
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
     .kop-logo-left img, .kop-logo-right img {
       width: 100%;
       height: 100%;
+      max-width: 100%;
+      max-height: 100%;
       object-fit: contain;
+      display: block;
     }
     .kop-text-center {
-      flex: 1;
+      flex: 1 1 0%;
+      min-width: 0 !important;
+      width: 0;
+      max-width: 100%;
       text-align: center;
-      padding: 0 6px;
+      padding: 0 4px;
       color: #f8fafc;
+      box-sizing: border-box;
+      overflow: hidden;
     }
     .kop-school-name {
-      font-size: 10px;
+      font-size: 9.5px;
       font-weight: 800;
       letter-spacing: 0.5px;
       color: #38bdf8;
       text-transform: uppercase;
-      line-height: 1.1;
-    }
-    .kop-title {
-      font-size: 11.5px;
-      font-weight: 800;
-      color: #ffffff;
-      line-height: 1.2;
-      margin-top: 2px;
+      line-height: 1.15;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      display: block;
     }
-    .kop-subtitle {
-      font-size: 9.5px;
-      color: #94a3b8;
-      font-weight: 500;
+    .kop-title {
+      font-size: 11px;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.2;
       margin-top: 1px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      display: block;
+    }
+    .kop-subtitle {
+      font-size: 9px;
+      color: #94a3b8;
+      font-weight: 600;
+      margin-top: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
     }
 
-    /* MODE BACKGROUND HITAM FULLSCREEN (UJIAN SISWA) - SCREEN MOBILE FRIENDLY */
+    /* MODE BACKGROUND HITAM FULLSCREEN (UJIAN SISWA) - SCREEN MOBILE FRIENDLY ANTI-GESER */
     .student-exam-fullscreen {
       position: fixed;
       inset: 0;
@@ -164,10 +194,17 @@
       color: #f1f5f9;
       display: none;
       flex-direction: column;
+      width: 100vw;
+      max-width: 100vw;
+      height: 100%;
+      max-height: 100%;
       overflow-y: auto;
+      overflow-x: hidden !important;
+      touch-action: pan-y;
       user-select: none;
       -webkit-user-select: none;
       -webkit-overflow-scrolling: touch;
+      box-sizing: border-box;
     }
     .student-exam-fullscreen.active {
       display: flex;
@@ -175,36 +212,40 @@
     .exam-dark-subbar {
       background: #0f172a;
       border-bottom: 1px solid #1e293b;
-      padding: 8px 12px;
+      padding: 6px 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      position: sticky;
-      top: 56px;
-      z-index: 999;
+      width: 100%;
+      max-width: 100%;
       box-sizing: border-box;
+      overflow-x: hidden;
     }
     .exam-timer-pill {
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 800;
       color: #fbbf24;
       background: rgba(245, 158, 11, 0.15);
       border: 1px solid rgba(245, 158, 11, 0.3);
-      padding: 4px 10px;
+      padding: 3px 9px;
       border-radius: 20px;
       letter-spacing: 0.5px;
+      white-space: nowrap;
     }
     .anti-cheat-pill {
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      padding: 4px 10px;
+      padding: 3px 9px;
       background: rgba(239, 68, 68, 0.15);
       border: 1px solid rgba(239, 68, 68, 0.4);
       color: #fca5a5;
       border-radius: 20px;
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .anti-cheat-pill.safe {
       background: rgba(16, 185, 129, 0.15);
@@ -213,11 +254,14 @@
     }
     .exam-dark-body {
       flex: 1;
-      padding: 14px 16px 50px;
-      max-width: 480px;
+      padding: 12px 14px 60px;
+      max-width: 600px;
       width: 100%;
       margin: 0 auto;
       box-sizing: border-box;
+      overflow-x: hidden !important;
+      word-break: break-word;
+      overflow-wrap: break-word;
     }
     .exam-dark-card {
       background: #111827;
@@ -226,6 +270,17 @@
       padding: 14px;
       margin-bottom: 14px;
       box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+      word-break: break-word;
+      overflow-wrap: break-word;
+    }
+    .exam-dark-card img, .question-text img, .essay-box img, .essay-photo-box img {
+      max-width: 100% !important;
+      height: auto !important;
+      object-fit: contain;
       box-sizing: border-box;
     }
     .exam-dark-option {
@@ -243,6 +298,14 @@
       font-size: 13px;
       min-height: 44px;
       box-sizing: border-box;
+      width: 100%;
+      max-width: 100%;
+      overflow: hidden;
+    }
+    .exam-dark-option > div:last-child {
+      min-width: 0;
+      word-break: break-word;
+      overflow-wrap: break-word;
     }
     .exam-dark-option.selected {
       background: #0369a1;
@@ -250,6 +313,58 @@
       color: #ffffff;
       font-weight: 700;
       box-shadow: 0 0 10px rgba(56, 189, 248, 0.35);
+    }
+    .option-label {
+      width: 28px;
+      height: 28px;
+      min-width: 28px;
+      min-height: 28px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      flex-shrink: 0;
+      font-size: 12px;
+    }
+    .exam-dark-option.selected .option-label {
+      background: #ffffff;
+      color: #0284c7;
+    }
+    .exam-dark-body * {
+      box-sizing: border-box;
+    }
+    .exam-dark-card textarea,
+    .exam-dark-card input,
+    .exam-dark-card select,
+    .exam-dark-card audio,
+    .exam-dark-card video {
+      max-width: 100% !important;
+      box-sizing: border-box;
+    }
+    @media (max-width: 480px) {
+      .kop-banner-sticky {
+        padding: 5px 8px;
+        gap: 6px;
+      }
+      .kop-logo-left, .kop-logo-right {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        min-height: 32px;
+        max-width: 32px;
+        max-height: 32px;
+      }
+      .kop-school-name {
+        font-size: 9px;
+      }
+      .kop-title {
+        font-size: 10.5px;
+      }
+      .kop-subtitle {
+        font-size: 8.5px;
+      }
     }
 
     /* MODE MATERI (RUANG PEMBELAJARAN) - HEADER BERSIH TANPA KOP BANNER */
@@ -328,17 +443,45 @@
     }
 
     /* JENDELA MENGAMBANG PEMBERITAHUAN & KONFIRMASI (FLOATING IN-APP DIALOG) */
+    #app-floating-dialog-overlay {
+      position: fixed !important;
+      inset: 0 !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      width: 100vw !important;
+      height: 100% !important;
+      z-index: 2147483647 !important; /* Maximum 32-bit z-index */
+      background: rgba(15, 23, 42, 0.78) !important;
+      backdrop-filter: blur(6px) !important;
+      -webkit-backdrop-filter: blur(6px) !important;
+      display: none;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 16px !important;
+      box-sizing: border-box !important;
+    }
+    #app-floating-dialog-overlay.active {
+      display: flex !important;
+    }
+    #modal-cheat-alert {
+      z-index: 2147483646 !important;
+    }
     .floating-dialog-card {
       background: #ffffff;
       border-radius: 22px;
       padding: 22px 18px;
-      max-width: 350px;
+      max-width: 370px;
       width: 90%;
       text-align: center;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(2, 132, 199, 0.18);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(2, 132, 199, 0.25);
       animation: dialogPopIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
       box-sizing: border-box;
+      position: relative;
+      z-index: 2147483647 !important;
+      margin: auto;
     }
     @keyframes dialogPopIn {
       from { opacity: 0; transform: scale(0.9) translateY(12px); }
@@ -569,7 +712,7 @@
       from { transform: translate3d(0, 0, 0); }
       to { transform: translate3d(-50%, 0, 0); }
     }
-    /* Badge Logo Simpul Smandum: Kompak, Tulisan Tersusun, Hijau & Biru Laut */
+    /* Badge Logo Simpul Smandum: SIMPUL di Atas (Hijau), SMANDUM di Bawah (Biru Laut), Sama Panjang */
     .login-top-simpul-badge {
       position: absolute;
       top: 14px;
@@ -577,42 +720,53 @@
       z-index: 10;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      background: rgba(15, 23, 42, 0.75);
+      gap: 7px;
+      background: rgba(15, 23, 42, 0.82);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.22);
-      padding: 4px 10px 4px 6px;
+      padding: 5px 9px 5px 6px;
       border-radius: 12px;
       box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
-      max-width: 140px;
+      user-select: none;
     }
     .login-top-simpul-badge img {
       width: 26px;
       height: 26px;
       object-fit: contain;
       background: #ffffff;
-      border-radius: 6px;
+      border-radius: 50%;
       padding: 2px;
       flex-shrink: 0;
     }
     .login-top-simpul-text-col {
       display: flex;
       flex-direction: column;
-      line-height: 1.1;
-      text-align: left;
+      justify-content: center;
+      width: 58px; /* Lebar presisi agar SIMPUL dan SMANDUM sama panjang */
+      gap: 1px;
     }
     .login-top-simpul-text-col .txt-simpul {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
       font-size: 11px;
       font-weight: 900;
-      color: #10b981; /* Tulisan SIMPUL warna hijau */
-      letter-spacing: 0.8px;
+      color: #10b981; /* Tulisan SIMPUL warna hijau di atas */
+      line-height: 1.1;
+      letter-spacing: 0;
     }
     .login-top-simpul-text-col .txt-smandum {
-      font-size: 9.5px;
-      font-weight: 900;
-      color: #38bdf8; /* Tulisan SMANDUM warna biru laut */
-      letter-spacing: 0.8px;
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      font-size: 8.5px;
+      font-weight: 800;
+      color: #38bdf8; /* Tulisan SMANDUM warna biru laut di bawah */
+      line-height: 1.1;
+      letter-spacing: 0;
+      text-transform: uppercase;
+      opacity: 0.95;
     }
     .login-brand {
       position: relative;
@@ -1166,6 +1320,32 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.06);
     }
 
+    .schedule-filter-select {
+      width: 100%;
+      box-sizing: border-box;
+      background: #f8fafc;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 8px 24px 8px 10px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #0f172a;
+      outline: none;
+      text-overflow: ellipsis;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      background-size: 13px;
+    }
+    .schedule-filter-select:focus {
+      border-color: #0284c7;
+      background-color: #ffffff;
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+    }
+
     /* ACTION BUTTONS PRIMARY */
     .btn-action-primary {
       width: 100%;
@@ -1523,48 +1703,83 @@
       transform: translateX(-50%);
       width: 100%;
       max-width: 440px;
-      height: 70px;
+      height: 72px;
       background: #ffffff;
-      border-top: 1px solid #e2e8f0;
+      border-top: 1px solid rgba(226, 232, 240, 0.9);
+      border-radius: 24px 24px 0 0; /* Banner bawah tumpul sudut */
       display: flex;
       justify-content: space-around;
       align-items: center;
-      padding: 0 8px;
+      padding: 0 10px;
       z-index: 95;
-      box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.08);
+      box-shadow: 0 -8px 25px rgba(15, 23, 42, 0.08);
+      box-sizing: border-box;
     }
     .nav-item {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 3px;
+      justify-content: center;
+      gap: 2px;
       background: none;
       border: none;
       color: #64748b;
       cursor: pointer;
-      font-size: 10px;
+      font-size: 10.5px;
       font-weight: 700;
-      width: 58px;
-      transition: all 0.2s;
+      flex: 1;
+      max-width: 68px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
     }
     .nav-item.active {
       color: #0284c7;
     }
     .nav-bubble {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
-      transition: all 0.2s;
+      font-size: 22px; /* Ikon menu diperbesar */
+      transition: all 0.22s ease;
     }
     .nav-item.active .nav-bubble {
-      background: #0284c7;
+      background: #e0f2fe;
+      transform: translateY(-2px);
+    }
+
+    /* CENTER FAB (ACTION FOCUSED, BOLD & CREATIVE) */
+    .nav-item.nav-item-fab {
+      margin-top: -18px;
+      z-index: 99;
+    }
+    .nav-fab-circle {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
       color: #ffffff;
-      transform: translateY(-3px);
-      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px; /* FAB icon besar & bold */
+      box-shadow: 0 8px 20px rgba(2, 132, 199, 0.45);
+      border: 3.5px solid #ffffff;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .nav-item.nav-item-fab span {
+      font-size: 10px;
+      font-weight: 800;
+      color: #0284c7;
+      margin-top: 1px;
+    }
+    .nav-item.nav-item-fab.active .nav-fab-circle {
+      background: linear-gradient(135deg, #0369a1 0%, #1d4ed8 100%);
+      transform: scale(1.08);
+      box-shadow: 0 10px 25px rgba(2, 132, 199, 0.6);
+      border-color: #f0f9ff;
     }
 
     /* ============================================================ */
@@ -1637,11 +1852,11 @@
       border-radius: 12px;
       font-size: 12px;
       font-weight: 700;
-      z-index: 200;
+      z-index: 2147483647 !important;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
       text-align: center;
       max-width: 90%;
     }
@@ -2105,12 +2320,16 @@
         <div id="lpHeroBackdrop" class="lp-hero-backdrop" aria-hidden="true"></div>
         <div class="login-hero-overlay" aria-hidden="true"></div>
 
-        <!-- LOGO SIMPUL SMANDUM DI POJOK KIRI ATAS (SIMPUL HIJAU & SMANDUM BIRU LAUT TERSUSUN) -->
+        <!-- LOGO SIMPUL SMANDUM DI POJOK KIRI ATAS: SIMPUL DI ATAS (HIJAU), SMANDUM DI BAWAH (BIRU LAUT), SAMA PANJANG -->
         <div class="login-top-simpul-badge">
           <img src="simpul_symbol_clean.png" onerror="this.src='../simpul_symbol_clean.png'" alt="Logo Simpul Smandum">
           <div class="login-top-simpul-text-col">
-            <span class="txt-simpul">SIMPUL</span>
-            <span class="txt-smandum">SMANDUM</span>
+            <div class="txt-simpul">
+              <span>S</span><span>I</span><span>M</span><span>P</span><span>U</span><span>L</span>
+            </div>
+            <div class="txt-smandum">
+              <span>S</span><span>M</span><span>A</span><span>N</span><span>D</span><span>U</span><span>M</span>
+            </div>
           </div>
         </div>
 
@@ -2281,7 +2500,7 @@
           <div class="menu-card-title">Jadwal Mengajar</div>
         </div>
         <div class="menu-card" onclick="navTo('absen')">
-          <div class="menu-card-icon">📝</div>
+          <div class="menu-card-icon">📋</div>
           <div class="menu-card-title">Absen Siswa</div>
         </div>
         <div class="menu-card" onclick="navTo('ruang')">
@@ -2371,32 +2590,37 @@
         <span style="font-size:18px;">🗓️</span>
       </div>
 
-      <!-- Informasi Jadwal dari Admin Portal Sekolah -->
-      <div style="margin:0 20px 10px; background:#eff6ff; border:1px solid #bfdbfe; border-radius:12px; padding:10px 14px; display:flex; align-items:center; gap:10px;">
-        <span style="font-size:20px;">ℹ️</span>
-        <div style="font-size:11.5px; color:#1e40af; line-height:1.4;">
-          <strong>Jadwal Mengajar Resmi</strong> terintegrasi langsung dengan database Administrator di Web Portal Sekolah.
+      <!-- Filter Dropdown 3 Kolom Symmetrical: Kelas, Mapel, Guru -->
+      <div id="schedule-dropdown-filters" style="margin:0 20px 10px; display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;">
+        <div style="min-width:0;">
+          <select id="filter-schedule-class" onchange="onScheduleDropdownFilterChange()" class="schedule-filter-select" title="Filter Kelas">
+            <option value="all">Semua Kelas</option>
+          </select>
+        </div>
+        <div style="min-width:0;">
+          <select id="filter-schedule-subject" onchange="onScheduleDropdownFilterChange()" class="schedule-filter-select" title="Filter Mapel">
+            <option value="all">Semua Mapel</option>
+          </select>
+        </div>
+        <div style="min-width:0;">
+          <select id="filter-schedule-teacher" onchange="onScheduleDropdownFilterChange()" class="schedule-filter-select" title="Filter Guru">
+            <option value="all">Semua Guru</option>
+          </select>
         </div>
       </div>
 
-      <!-- Filter Tab untuk Jadwal: Jadwal Mengajar Saya vs Semua Jadwal -->
+      <!-- Filter Tab untuk Jadwal: Jadwal Mengajar Saya vs Semua Jadwal (Ringkas & Rapi di Android) -->
       <div class="filter-tab-bar" id="jadwal-filter-tabs" style="margin:0 20px 10px; display:flex;">
         <button class="filter-tab-btn active" id="tab-jadwal-mine" onclick="switchJadwalTab('mine')">
           📋 Jadwal Saya (<span id="count-jadwal-mine">0</span>)
         </button>
         <button class="filter-tab-btn" id="tab-jadwal-all" onclick="switchJadwalTab('all')">
-          🌐 Semua Jadwal (<span id="count-jadwal-all">0</span>)
+          🌐 Semua (<span id="count-jadwal-all">0</span>)
         </button>
       </div>
 
       <!-- Selector Pill Hari (Senin - Sabtu + Semua Hari) -->
       <div class="day-pill-bar" id="schedule-day-pills"></div>
-
-      <div class="schedule-date-filter" style="margin-top:0;">
-        <button onclick="changeScheduleDay(-1)" style="border:none; background:none; font-size:16px; font-weight:800; cursor:pointer;">‹</button>
-        <span id="schedule-active-day-label">Hari Ini</span>
-        <button onclick="changeScheduleDay(1)" style="border:none; background:none; font-size:16px; font-weight:800; cursor:pointer;">›</button>
-      </div>
 
       <div class="schedule-list" id="schedule-container">
         <!-- Render dinamis dari tabel Subjects -->
@@ -2918,6 +3142,45 @@
             </div>
           </div>
 
+          <!-- UPLOAD MODUL BELAJAR FILE PDF -->
+          <div class="form-group">
+            <label style="display:flex; justify-content:space-between; align-items:center;">
+              <span>📄 Upload Modul Belajar (File PDF)</span>
+              <span style="font-size:11px; font-weight:700; color:#0284c7;">Format .pdf</span>
+            </label>
+            <div style="background:#f8fafc; border:1.5px dashed #94a3b8; border-radius:12px; padding:12px; text-align:center;">
+              <input type="file" id="input-material-pdf-file" accept="application/pdf,.pdf" style="display:none;" onchange="handleMaterialPdfSelected(this)">
+              
+              <div id="material-pdf-preview-box" style="display:none; margin-bottom:8px; align-items:center; justify-content:space-between; background:#e0f2fe; border:1px solid #bae6fd; padding:8px 12px; border-radius:10px;">
+                <div style="display:flex; align-items:center; gap:8px; overflow:hidden; min-width:0; text-align:left;">
+                  <span style="font-size:22px; flex-shrink:0;">📕</span>
+                  <div style="min-width:0;">
+                    <div id="material-pdf-filename" style="font-size:12px; font-weight:800; color:#0369a1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">modul.pdf</div>
+                    <div id="material-pdf-filesize" style="font-size:10px; color:#64748b;">0 KB</div>
+                  </div>
+                </div>
+                <button type="button" onclick="removeMaterialPdf()" style="background:#ef4444; color:white; border:none; border-radius:6px; padding:4px 8px; font-size:11px; cursor:pointer; flex-shrink:0;" title="Hapus PDF">🗑️ Hapus</button>
+              </div>
+
+              <button type="button" onclick="document.getElementById('input-material-pdf-file').click()" style="padding:9px 16px; background:#0284c7; color:white; border:none; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+                <span>📁</span> <span id="btn-label-pick-pdf">Pilih File PDF Modul</span>
+              </button>
+              <input type="hidden" id="input-material-pdf-data" value="">
+              <input type="hidden" id="input-material-pdf-name" value="">
+              <div style="font-size:10.5px; color:#64748b; margin-top:6px;">
+                Modul PDF dapat dibaca langsung oleh siswa di sesi belajar tanpa berpindah browser.
+              </div>
+            </div>
+
+            <!-- Pengaturan Izin Download Siswa -->
+            <div style="margin-top:8px; display:flex; align-items:center; gap:8px; background:#f1f5f9; padding:8px 12px; border-radius:10px; border:1px solid #cbd5e1;">
+              <input type="checkbox" id="input-material-allow-download" checked style="width:16px; height:16px; accent-color:#0284c7; cursor:pointer;">
+              <label for="input-material-allow-download" style="font-size:12px; font-weight:700; color:#1e293b; margin:0; cursor:pointer;">
+                Izinkan Siswa Mengunduh File PDF Modul Ini
+              </label>
+            </div>
+          </div>
+
           <div class="form-group">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
               <label style="margin:0;">👥 Pembagian Kelompok Belajar (Opsional)</label>
@@ -3359,28 +3622,31 @@
     <!-- 1. FULLSCREEN EXAM MODE DENGAN KOP STICKY & ANTI-CURANG AKTIF -->
     <!-- ============================================================ -->
     <div id="student-exam-overlay" class="student-exam-fullscreen">
-      <!-- STICKY KOP BANNER UJIAN (TIDAK HILANG SAAT DI-SCROLL) -->
-      <div class="kop-banner-sticky">
-        <div class="kop-logo-left" title="Simpul Smandum">
-          <img src="simpul_symbol_clean.png" onerror="this.src='../simpul_symbol_clean.png'" alt="Simpul Smandum">
+      <!-- WRAPPER STICKY HEADER UJIAN (KOP & SUBBAR BERSATU RAPI ANTI-GESER) -->
+      <div class="exam-sticky-header">
+        <!-- STICKY KOP BANNER UJIAN -->
+        <div class="kop-banner-sticky">
+          <div class="kop-logo-left" title="Simpul Smandum">
+            <img src="simpul_symbol_clean.png" onerror="this.src='../simpul_symbol_clean.png'" alt="Simpul Smandum">
+          </div>
+          <div class="kop-text-center">
+            <div class="kop-school-name">SMA NEGERI 12 MUNA BARAT</div>
+            <div class="kop-title" id="exam-kop-title">LEMBAR UJIAN & ULANGAN SISWA</div>
+            <div class="kop-subtitle" id="exam-kop-sub">Mapel: - • Kelas: - • Peserta: -</div>
+          </div>
+          <div class="kop-logo-right" title="SMAN 12 Muna Barat">
+            <img src="logo-sman12-munabarat.png" onerror="this.src='../logo-sman12-munabarat.png'" alt="SMAN 12 Muna Barat">
+          </div>
         </div>
-        <div class="kop-text-center">
-          <div class="kop-school-name">SMA NEGERI 12 MUNA BARAT</div>
-          <div class="kop-title" id="exam-kop-title">LEMBAR UJIAN & ULANGAN SISWA</div>
-          <div class="kop-subtitle" id="exam-kop-sub">Mapel: - • Kelas: - • Peserta: -</div>
-        </div>
-        <div class="kop-logo-right" title="SMAN 12 Muna Barat">
-          <img src="logo-sman12-munabarat.png" onerror="this.src='../logo-sman12-munabarat.png'" alt="SMAN 12 Muna Barat">
-        </div>
-      </div>
 
-      <!-- EXAM SUB-BAR: TIMER & ANTI-CHEAT MONITOR (TIDAK ADA TOMBOL KELUAR) -->
-      <div class="exam-dark-subbar">
-        <div class="exam-timer-pill">
-          ⏳ <span id="student-exam-timer-clock">--:--</span>
-        </div>
-        <div id="exam-violation-indicator" class="anti-cheat-pill safe">
-          🛡️ Anti-Curang Aktif | ⚠️ Pelanggaran: <span id="violation-count-num">0</span>/3
+        <!-- EXAM SUB-BAR: TIMER & ANTI-CHEAT MONITOR -->
+        <div class="exam-dark-subbar">
+          <div class="exam-timer-pill">
+            ⏳ <span id="student-exam-timer-clock">--:--</span>
+          </div>
+          <div id="exam-violation-indicator" class="anti-cheat-pill safe">
+            🛡️ Anti-Curang Aktif | ⚠️ Pelanggaran: <span id="violation-count-num">0</span>/3
+          </div>
         </div>
       </div>
 
@@ -3491,11 +3757,15 @@
     let dbClasses = [];
     let dbSubjects = [];
     let dbStudents = [];
+    let dbTeachers = [];
     let dbAnnouncements = [];
     let dbExams = [];
     let dbLearnings = [];
     let dbGrades = [];
     let dbSettings = {};
+    let dbExamSessions = [];
+    let dbLearningAttendees = [];
+    let dbLearningTasks = [];
     let activeAttendanceRecords = {}; // NIS -> { status, idAbsen }
     let selectedAttendanceDate = new Date().toISOString().split('T')[0];
 
@@ -3563,6 +3833,15 @@
     function showToast(msg) {
       const t = document.getElementById('app-toast');
       if (!t) return;
+      const examOverlay = document.getElementById('student-exam-overlay');
+      const learningOverlay = document.getElementById('student-learning-overlay');
+      const activeContainer = document.fullscreenElement 
+        || (examOverlay && examOverlay.classList.contains('active') ? examOverlay : null)
+        || (learningOverlay && learningOverlay.classList.contains('active') ? learningOverlay : null)
+        || document.body;
+      if (t.parentElement !== activeContainer) {
+        activeContainer.appendChild(t);
+      }
       t.innerText = msg;
       t.classList.add('show');
       setTimeout(() => t.classList.remove('show'), 3000);
@@ -3582,6 +3861,24 @@
       const btnConfirm = document.getElementById('btn-dialog-confirm');
 
       if (!overlay) return Promise.resolve(false);
+
+      // KUNCI UTAMA: Pasang dialog ke dalam container aktif tertinggi (Fullscreen Element / Active Overlay)
+      // agar tidak muncul di belakang saat siswa ujian layar penuh atau sesi pembelajaran
+      const examOverlay = document.getElementById('student-exam-overlay');
+      const learningOverlay = document.getElementById('student-learning-overlay');
+      
+      let targetContainer = document.body;
+      if (document.fullscreenElement) {
+        targetContainer = document.fullscreenElement;
+      } else if (examOverlay && examOverlay.classList.contains('active')) {
+        targetContainer = examOverlay;
+      } else if (learningOverlay && learningOverlay.classList.contains('active')) {
+        targetContainer = learningOverlay;
+      }
+
+      if (overlay.parentElement !== targetContainer) {
+        targetContainer.appendChild(overlay);
+      }
 
       if (iconEl) iconEl.innerText = options.icon || 'ℹ️';
       if (titleEl) titleEl.innerText = options.title || 'Pemberitahuan';
@@ -3970,11 +4267,11 @@
         const lblU2 = document.getElementById('label-ujian-tab-2');
         if (lblU2) lblU2.innerText = '🕒 Riwayat Ujian Saya';
 
-        // Siswa DAPAT melihat tab 'Semua'
+        // Hapus/sembunyikan kolom riwayat 'Semua' pada akun siswa sesuai permintaan
         const tabRuangAll = document.getElementById('tab-ruang-all');
-        if (tabRuangAll) tabRuangAll.style.display = 'flex';
+        if (tabRuangAll) tabRuangAll.style.display = 'none';
         const tabUjianAll = document.getElementById('tab-ujian-all');
-        if (tabUjianAll) tabUjianAll.style.display = 'flex';
+        if (tabUjianAll) tabUjianAll.style.display = 'none';
       } else {
         // GURU & ADMIN: Tampilkan Menu, Monitoring di masing-masing menu
         if (teacherGrid) teacherGrid.style.display = 'grid';
@@ -4056,7 +4353,7 @@
       navEl.style.display = 'flex';
 
       if (!currentUser || currentUser.role !== 'siswa') {
-        // GURU: Beranda, Kelas, Jadwal, Nilai, Profil
+        // GURU: Beranda, Kelas, Jadwal (Center FAB), Absen, Profil
         navEl.innerHTML = `
           <button class="nav-item active" id="nav-btn-home" onclick="navTo('home')">
             <div class="nav-bubble">🏠</div>
@@ -4066,12 +4363,12 @@
             <div class="nav-bubble">👥</div>
             <span>Kelas</span>
           </button>
-          <button class="nav-item" id="nav-btn-jadwal" onclick="navTo('jadwal')">
-            <div class="nav-bubble">📅</div>
+          <button class="nav-item nav-item-fab" id="nav-btn-jadwal" onclick="navTo('jadwal')">
+            <div class="nav-fab-circle">📅</div>
             <span>Jadwal</span>
           </button>
           <button class="nav-item" id="nav-btn-absen" onclick="navTo('absen')">
-            <div class="nav-bubble">📝</div>
+            <div class="nav-bubble">📋</div>
             <span>Absen</span>
           </button>
           <button class="nav-item" id="nav-btn-profil" onclick="navTo('profil')">
@@ -4080,7 +4377,7 @@
           </button>
         `;
       } else {
-        // SISWA: Beranda, Ruang Belajar, Ulangan/Ujian, Profil
+        // SISWA: Beranda, Materi, Ulangan (Center FAB), Profil
         navEl.innerHTML = `
           <button class="nav-item active" id="nav-btn-home" onclick="navTo('home')">
             <div class="nav-bubble">🏠</div>
@@ -4090,8 +4387,8 @@
             <div class="nav-bubble">🏛️</div>
             <span>Materi</span>
           </button>
-          <button class="nav-item" id="nav-btn-ujian" onclick="navTo('ujian')">
-            <div class="nav-bubble">📝</div>
+          <button class="nav-item nav-item-fab" id="nav-btn-ujian" onclick="navTo('ujian')">
+            <div class="nav-fab-circle">📝</div>
             <span>Ulangan</span>
           </button>
           <button class="nav-item" id="nav-btn-profil" onclick="navTo('profil')">
@@ -4229,6 +4526,11 @@
         return;
       }
 
+      if (typeof isTeacherEditingModal === 'function' && isTeacherEditingModal()) {
+        console.log('Sinkronisasi data latar belakang ditunda karena guru sedang membuka form sesi ujian/pembelajaran.');
+        return;
+      }
+
       setSyncStatus(true, 'Sinkron Data...');
 
       // 1. Ambil Pengaturan Sekolah (Aman dari QuotaExceededError dengan mengabaikan base64 raksasa)
@@ -4289,12 +4591,24 @@
         console.warn('Sync students note:', eStudents);
       }
 
+      // 3b. Ambil Data Guru (Users) untuk filter dropdown jadwal & riwayat
+      try {
+        const { data: teachers, error: errTeach } = await supabaseClient.from('Users').select('*');
+        if (!errTeach && Array.isArray(teachers)) {
+          dbTeachers = teachers.filter(u => (u.Role || u.role) !== 'siswa');
+          try { localStorage.setItem('portal_teachers_data', JSON.stringify(dbTeachers)); } catch (e) {}
+        }
+      } catch (eTeach) {
+        console.warn('Sync teachers note:', eTeach);
+      }
+
       // 4. Ambil Jadwal Mata Pelajaran resmi dari Web Portal Sekolah
       try {
         const { data: subjects, error: errSubjects } = await supabaseClient.from('Subjects').select('*').order('Jam Mulai', { ascending: true });
         if (!errSubjects && Array.isArray(subjects) && subjects.length > 0) {
           dbSubjects = subjects;
           try { localStorage.setItem('portal_subjects_data', JSON.stringify(dbSubjects)); } catch (e) {}
+          populateScheduleFilterDropdowns();
           renderSchedules();
           renderClasses(document.getElementById('input-search-class')?.value || '');
         }
@@ -4314,21 +4628,61 @@
         console.warn('Sync announcements note:', eAnn);
       }
 
-      // 6. Ruang Pembelajaran (Learnings)
+      // 6. Ruang Pembelajaran (Learnings) & Peserta/Tugas
       try {
         await loadLearningsData();
+        // Ambil riwayat presensi & pengerjaan tugas ruang belajar
+        try {
+          let attendees = [];
+          const { data: setAtt } = await supabaseClient.from('Settings').select('Value').eq('Key', 'app_learning_attendees_data').maybeSingle();
+          if (setAtt && setAtt.Value) {
+            try { attendees = typeof setAtt.Value === 'string' ? JSON.parse(setAtt.Value) : setAtt.Value; } catch (e) {}
+          }
+          if (!Array.isArray(attendees)) attendees = [];
+
+          const { data: lrnSess } = await supabaseClient.from('LearningSessions').select('*');
+          if (Array.isArray(lrnSess)) {
+            lrnSess.forEach(ls => {
+              const lId = ls['ID Pembelajaran'] || ls.idPembelajaran;
+              const sN = ls['Nama Siswa'] || ls.namaSiswa;
+              if (!attendees.some(a => (a.idPembelajaran === lId || a['ID Pembelajaran'] === lId) && (a.namaSiswa === sN || a['Nama Siswa'] === sN))) {
+                attendees.push({
+                  idPembelajaran: lId,
+                  namaSiswa: sN,
+                  waktuMasuk: ls['Waktu Masuk'] || ls.waktuMasuk,
+                  tugasCatatan: ls['Catatan'] || ls.catatan,
+                  status: ls['Catatan'] ? 'tugas_dikumpulkan' : 'hadir'
+                });
+              }
+            });
+          }
+          dbLearningAttendees = attendees;
+          try { localStorage.setItem('portal_learning_attendees_data', JSON.stringify(dbLearningAttendees)); } catch (e) {}
+        } catch (eAttErr) {
+          console.warn('Sync learning attendees error:', eAttErr);
+        }
       } catch (eLearn) {
         console.warn('Sync learnings note:', eLearn);
       }
 
-      // 7. Ulangan/Ujian (Exams)
+      // 7. Ulangan/Ujian (Exams) & Sesi Pengerjaan (ExamSessions)
       try {
         await loadExamsData();
+        // Tarik semua ExamSessions untuk mendeteksi ulangan yang telah dikerjakan siswa
+        try {
+          const { data: sessData, error: sessErr } = await supabaseClient.from('ExamSessions').select('*');
+          if (!sessErr && Array.isArray(sessData)) {
+            dbExamSessions = sessData;
+            try { localStorage.setItem('portal_exam_sessions_data', JSON.stringify(dbExamSessions)); } catch (e) {}
+          }
+        } catch (eSessErr) {
+          console.warn('Sync exam sessions error:', eSessErr);
+        }
       } catch (eExam) {
         console.warn('Sync exams note:', eExam);
       }
 
-      // 8. Nilai
+      // 8. Nilai (Grades) & Penggabungan Hasil Pengerjaan Sesi
       try {
         let gradeQuery = supabaseClient.from('Grades').select('*');
         if (currentUser && currentUser.role === 'siswa') {
@@ -4337,9 +4691,64 @@
         const { data: grades } = await gradeQuery;
         if (grades && Array.isArray(grades)) {
           dbGrades = grades;
-          try { localStorage.setItem('portal_grades_data', JSON.stringify(dbGrades)); } catch (e) {}
-          renderGrades();
         }
+
+        // Sinkronisasi Sempurna: Gabungkan sesi dari ExamSessions yang berstatus selesai ke dbGrades
+        if (Array.isArray(dbExamSessions)) {
+          dbExamSessions.filter(s => {
+            const st = (s['Status Sesi'] || '').toLowerCase();
+            return st === 'finished' || st === 'selesai' || !!s['Waktu Selesai'];
+          }).forEach(s => {
+            const exId = s['ID Ujian'] || s.idUjian;
+            const sNis = s['NIS Siswa'] || s.nisSiswa;
+            const sName = s['Nama Siswa'] || s.namaSiswa;
+            const exists = dbGrades.some(g => (g['ID Ujian'] === exId || g.idUjian === exId) && (g['NIS Siswa'] === sNis || g.nisSiswa === sNis));
+            if (!exists) {
+              const exObj = (dbExams || []).find(e => (e['ID Ujian'] === exId || e.id === exId)) || {};
+              let sScore = 0;
+              let sCorrect = 0;
+              let sTotal = exObj['Jumlah Soal'] || exObj.jumlahSoal || 1;
+              try {
+                const ans = typeof s['Jawaban JSON'] === 'string' ? JSON.parse(s['Jawaban JSON']) : s['Jawaban JSON'];
+                if (ans && ans._score !== undefined) {
+                  sScore = ans._score;
+                  sCorrect = ans._correct || 0;
+                  sTotal = ans._total || sTotal;
+                }
+              } catch (eAns) {}
+
+              dbGrades.unshift({
+                'ID Nilai': s['ID Sesi'] || s.id || generateUniqueId('GRD'),
+                'ID Ujian': exId,
+                'Judul Ujian': s['Judul Ujian'] || exObj['Judul Ujian'] || exObj.judul || 'Ulangan Siswa',
+                'ID Mapel': exObj['ID Mapel'] || exObj.idMapel || '',
+                'Nama Mapel': exObj['Nama Mapel'] || exObj.namaMapel || '',
+                'ID Kelas': s['ID Kelas'] || exObj['ID Kelas'] || exObj.idKelas || '',
+                'Nama Kelas': s['Nama Kelas'] || exObj['Nama Kelas'] || exObj.namaKelas || '',
+                'NIS Siswa': sNis,
+                'Nama Siswa': sName,
+                'Nilai': sScore,
+                'Jumlah Benar': sCorrect,
+                'Jumlah Salah': Math.max(0, sTotal - sCorrect),
+                'Total Soal': sTotal,
+                'Waktu Mulai': s['Waktu Masuk'] || s['Waktu Selesai'] || '',
+                'Waktu Selesai': s['Waktu Selesai'] || '',
+                'Durasi Mengerjakan': 'Selesai',
+                'ID Guru': exObj['ID Guru'] || exObj.idGuru || '',
+                'Nama Guru': exObj['Nama Guru'] || exObj.namaGuru || '',
+                'Nilai Akhir': sScore,
+                'Tanggal Input': s['Waktu Selesai'] || new Date().toISOString(),
+                'Status': 'Selesai',
+                'Jawaban JSON': s['Jawaban JSON'] || '{}'
+              });
+            }
+          });
+        }
+
+        try { localStorage.setItem('portal_grades_data', JSON.stringify(dbGrades)); } catch (e) {}
+        renderGrades();
+        renderExams();
+        renderRooms();
       } catch (eGrades) {
         console.warn('Sync grades note:', eGrades);
       }
@@ -4347,7 +4756,10 @@
       // 9. Dropdown Absensi, Select Form & Refresh Tampilan Keseluruhan
       try {
         populateAttendanceDropdowns();
-        populateSubjectAndClassSelects();
+        if (!isTeacherEditingModal()) {
+          populateSubjectAndClassSelects();
+        }
+        populateScheduleFilterDropdowns();
         renderClasses(document.getElementById('input-search-class')?.value || '');
         renderSchedules();
       } catch (eUI) {
@@ -4441,6 +4853,10 @@
 
             const hasTaskVal = (it.hasTask === 'yes' || it['Ada Tugas'] === 'yes' || it.adaTugas === 'yes' || !!(it.taskInstructions || it['Instruksi Tugas'] || it.tugas)) ? 'yes' : 'no';
             const taskInstVal = it.taskInstructions || it['Instruksi Tugas'] || it.tugas || it.instruksiTugas || '';
+            const pdfUrl = it['PDF URL'] || it.pdfUrl || '';
+            const pdfName = it['PDF Name'] || it.pdfName || '';
+            const allowDownloadPdf = it['Izinkan Download PDF'] || it.allowDownloadPdf || 'yes';
+            const hasPdf = !!(it.hasPdf || it['Has PDF'] || pdfUrl || pdfName);
 
             return {
               'ID': finalId, id: finalId,
@@ -4459,6 +4875,10 @@
               'Groups': groupsArr, groups: groupsArr,
               'Ada Tugas': hasTaskVal, hasTask: hasTaskVal,
               'Instruksi Tugas': taskInstVal, taskInstructions: taskInstVal, tugas: taskInstVal,
+              'PDF URL': pdfUrl, pdfUrl: pdfUrl,
+              'PDF Name': pdfName, pdfName: pdfName,
+              'Izinkan Download PDF': allowDownloadPdf, allowDownloadPdf: allowDownloadPdf,
+              'Has PDF': hasPdf, hasPdf: hasPdf,
               'Status': status, status: status,
               'Tanggal Buat': tgl, tanggalBuat: tgl
             };
@@ -4490,14 +4910,37 @@
         .replace(/'/g, '&#039;');
     }
 
+    function checkLearningHasStudentWork(learningId) {
+      if (!learningId) return false;
+      // 1. Cek di dbLearningAttendees (presensi atau tugas terkumpul)
+      const inAtt = (dbLearningAttendees || []).some(a => 
+        (String(a.idPembelajaran || a['ID Pembelajaran']) === String(learningId)) &&
+        (a.status === 'tugas_dikumpulkan' || !!a.tugasFile || !!a.tugasCatatan || !!a.waktuMasuk)
+      );
+      if (inAtt) return true;
+
+      // 2. Cek localStorage untuk rekaman pengumpulan tugas siswa
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('student_task_' + learningId + '_') || key.startsWith('learning_task_' + learningId + '_'))) {
+          return true;
+        }
+      }
+      return false;
+    }
+
     function switchRuangTab(tabName) {
+      if (tabName === 'all') tabName = 'mine';
       activeRuangTab = tabName;
       const tabMine = document.getElementById('tab-ruang-mine');
       const tabHist = document.getElementById('tab-ruang-history');
       const tabAll = document.getElementById('tab-ruang-all');
       if (tabMine) tabMine.classList.toggle('active', tabName === 'mine' || tabName === 'available');
       if (tabHist) tabHist.classList.toggle('active', tabName === 'history');
-      if (tabAll) tabAll.classList.toggle('active', tabName === 'all');
+      if (tabAll) {
+        tabAll.classList.toggle('active', tabName === 'all');
+        tabAll.style.display = 'none';
+      }
       renderRooms();
     }
 
@@ -4514,15 +4957,33 @@
           const authorName = (item['Nama Guru'] || item.namaGuru || '').toLowerCase();
           return authorId === currentUser.id || authorName.includes(currentUser.name.toLowerCase());
         });
+
+        const activeRooms = [];
+        const historyRooms = [];
+
+        myItems.forEach(item => {
+          const id = item['ID'] || item.id;
+          const st = (item['Status'] || item.status || 'active').toLowerCase();
+          const hasWork = checkLearningHasStudentWork(id);
+          if (hasWork || st === 'closed' || st === 'ditutup' || st === 'selesai') {
+            historyRooms.push(item);
+          } else {
+            activeRooms.push(item);
+          }
+        });
+
         const cntMine = document.getElementById('count-ruang-mine');
         const cntHist = document.getElementById('count-ruang-history');
-        if (cntMine) cntMine.innerText = myItems.length;
-        if (cntHist) cntHist.innerText = myItems.length;
+        if (cntMine) cntMine.innerText = activeRooms.length;
+        if (cntHist) cntHist.innerText = historyRooms.length;
 
-        // Guru HANYA dapat melihat ruang / materi pembelajaran milik mereka sendiri
-        list = myItems;
+        if (activeRuangTab === 'history') {
+          list = historyRooms;
+        } else {
+          list = activeRooms;
+        }
       } else if (currentUser && currentUser.role === 'siswa') {
-        // Siswa: tab materi tersedia vs riwayat belajar saya vs semua
+        // Siswa: materi untuk kelas siswa
         const classItems = list.filter(item => {
           const kls = item['Nama Kelas'] || item.namaKelas || '';
           const klsId = item['ID Kelas'] || item.idKelas || '';
@@ -4534,21 +4995,36 @@
         let learnedHistory = [];
         try { learnedHistory = JSON.parse(localStorage.getItem(histKey) || '[]'); } catch (e) {}
 
+        const activeRooms = [];
+        const historyRooms = [];
+
+        classItems.forEach(item => {
+          const id = item['ID'] || item.id;
+          const userTask = JSON.parse(localStorage.getItem('student_task_' + id + '_' + currentUser.nis) || 'null');
+          const hasTask = item['Ada Tugas'] === 'yes' || item.hasTask === 'yes' || !!(item['Instruksi Tugas'] || item.tugas);
+          const histItem = learnedHistory.find(h => h.id === id);
+          const inRemoteAtt = (dbLearningAttendees || []).some(a => 
+            (String(a.idPembelajaran || a['ID Pembelajaran']) === String(id)) &&
+            (a.nisSiswa === currentUser.nis || a.namaSiswa === currentUser.name)
+          );
+
+          const isCompleted = !!userTask || (histItem && (histItem.taskSubmitted || !hasTask)) || inRemoteAtt;
+          if (isCompleted) {
+            historyRooms.push(item);
+          } else {
+            activeRooms.push(item);
+          }
+        });
+
         const cntMine = document.getElementById('count-ruang-mine');
         const cntHist = document.getElementById('count-ruang-history');
-        const cntAll = document.getElementById('count-ruang-all');
-        if (cntMine) cntMine.innerText = classItems.length;
-        if (cntHist) cntHist.innerText = learnedHistory.length;
-        if (cntAll) cntAll.innerText = list.length;
+        if (cntMine) cntMine.innerText = activeRooms.length;
+        if (cntHist) cntHist.innerText = historyRooms.length;
 
-        if (activeRuangTab === 'all') {
-          list = list;
-        } else if (activeRuangTab === 'history') {
-          // Tampilkan materi dari riwayat belajar siswa
-          const learnedIds = new Set(learnedHistory.map(h => h.id));
-          list = list.filter(item => learnedIds.has(item['ID'] || item.id));
+        if (activeRuangTab === 'history') {
+          list = historyRooms;
         } else {
-          list = classItems;
+          list = activeRooms;
         }
       }
 
@@ -4565,7 +5041,7 @@
         container.innerHTML = `
           <div class="empty-state-card">
             <span>🏛️</span>
-            <p>Belum ada ruang pembelajaran / materi ${activeRuangTab === 'history' ? 'di riwayat belajar Anda' : (activeRuangTab === 'mine' ? 'yang Anda buat' : 'tersedia')}.</p>
+            <p>Belum ada ruang pembelajaran / materi ${activeRuangTab === 'history' ? 'di riwayat belajar Anda' : (currentUser && currentUser.role === 'siswa' ? 'aktif yang perlu dikerjakan' : 'aktif yang belum dikerjakan siswa')}.</p>
           </div>
         `;
         return;
@@ -4749,6 +5225,132 @@
       if (txt && groups.length > 0) txt.value = groups.join('\n');
     }
 
+    // ============================================================
+    // MODUL BELAJAR PDF: INDEXEDDB STORAGE & FILE HANDLERS
+    // ============================================================
+    const IDB_DOC_NAME = 'PortalSekolahDocDB';
+    const IDB_DOC_STORE = 'learning_pdfs';
+
+    function getPdfDb() {
+      return new Promise((resolve, reject) => {
+        try {
+          const req = indexedDB.open(IDB_DOC_NAME, 1);
+          req.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(IDB_DOC_STORE)) {
+              db.createObjectStore(IDB_DOC_STORE, { keyPath: 'id' });
+            }
+          };
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        } catch (err) {
+          reject(err);
+        }
+      });
+    }
+
+    async function saveLearningPdfToIdb(id, dataUrl, fileName) {
+      if (!id || !dataUrl) return false;
+      try {
+        const db = await getPdfDb();
+        const tx = db.transaction(IDB_DOC_STORE, 'readwrite');
+        tx.objectStore(IDB_DOC_STORE).put({ id: String(id), dataUrl, fileName: fileName || 'Modul_Belajar.pdf', updatedAt: Date.now() });
+        return new Promise(res => { tx.oncomplete = () => res(true); tx.onerror = () => res(false); });
+      } catch (e) {
+        console.warn('IDB save PDF note:', e);
+        return false;
+      }
+    }
+
+    async function getLearningPdfFromIdb(id) {
+      if (!id) return null;
+      try {
+        const db = await getPdfDb();
+        const tx = db.transaction(IDB_DOC_STORE, 'readonly');
+        const req = tx.objectStore(IDB_DOC_STORE).get(String(id));
+        return new Promise(res => {
+          req.onsuccess = () => res(req.result ? req.result.dataUrl : null);
+          req.onerror = () => res(null);
+        });
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function handleMaterialPdfSelected(input) {
+      if (!input.files || !input.files[0]) return;
+      const file = input.files[0];
+      if (!file.name.toLowerCase().endsWith('.pdf') && file.type !== 'application/pdf') {
+        appAlert('File yang dipilih harus berupa dokumen berformat PDF (.pdf)!', 'Format Tidak Didukung', '⚠️');
+        input.value = '';
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64Data = e.target.result;
+        const dataInput = document.getElementById('input-material-pdf-data');
+        const nameInput = document.getElementById('input-material-pdf-name');
+        if (dataInput) dataInput.value = base64Data;
+        if (nameInput) nameInput.value = file.name;
+
+        const previewBox = document.getElementById('material-pdf-preview-box');
+        const nameEl = document.getElementById('material-pdf-filename');
+        const sizeEl = document.getElementById('material-pdf-filesize');
+        const btnLabel = document.getElementById('btn-label-pick-pdf');
+
+        if (previewBox) previewBox.style.display = 'flex';
+        if (nameEl) nameEl.innerText = file.name;
+        if (sizeEl) sizeEl.innerText = `${(file.size / 1024).toFixed(1)} KB`;
+        if (btnLabel) btnLabel.innerText = 'Ganti File PDF';
+
+        showToast(`✅ File PDF "${file.name}" siap diterbitkan.`);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeMaterialPdf() {
+      const input = document.getElementById('input-material-pdf-file');
+      if (input) input.value = '';
+      const dataEl = document.getElementById('input-material-pdf-data');
+      if (dataEl) dataEl.value = '';
+      const nameEl = document.getElementById('input-material-pdf-name');
+      if (nameEl) nameEl.value = '';
+      const previewBox = document.getElementById('material-pdf-preview-box');
+      if (previewBox) previewBox.style.display = 'none';
+      const btnLabel = document.getElementById('btn-label-pick-pdf');
+      if (btnLabel) btnLabel.innerText = 'Pilih File PDF Modul';
+      showToast('File PDF dibatalkan.');
+    }
+
+    async function downloadLearningPdfDirect(learningId, fileName) {
+      let item = (dbLearnings || []).find(it => (it['ID'] || it.id) === learningId) || {};
+      let dataUrl = item.pdfUrl || item['PDF URL'];
+
+      if (!dataUrl) {
+        dataUrl = await getLearningPdfFromIdb(learningId);
+      }
+
+      if (!dataUrl) {
+        showToast('⚠️ File PDF belum tersedia di penyimpanan lokal.');
+        return;
+      }
+
+      const finalName = fileName || item.pdfName || item['PDF Name'] || 'Modul_Belajar.pdf';
+
+      try {
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = finalName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast(`✅ Mengunduh: ${finalName}`);
+      } catch (err) {
+        window.open(dataUrl, '_blank');
+      }
+    }
+
     function openCreateMaterialModal() {
       const isGuru = currentUser && currentUser.role === 'guru';
       const mySubjects = isGuru ? dbSubjects.filter(s => matchesTeacherSchedule(s, currentUser)) : dbSubjects;
@@ -4774,6 +5376,10 @@
       if (taskInst) taskInst.value = '';
       document.getElementById('input-material-status').value = 'active';
 
+      removeMaterialPdf();
+      const allowDlEl = document.getElementById('input-material-allow-download');
+      if (allowDlEl) allowDlEl.checked = true;
+
       document.getElementById('modal-material-form').classList.add('active');
     }
 
@@ -4791,6 +5397,43 @@
       document.getElementById('input-material-content').value = item['Konten'] || item.konten || '';
       document.getElementById('input-material-media').value = item['Media URL'] || item.mediaUrl || '';
       document.getElementById('input-material-groups').value = item['Pembagian Kelompok'] || item.kelompok || '';
+
+      // Muat data Modul PDF jika ada
+      const pdfData = item['PDF URL'] || item.pdfUrl || '';
+      const pdfName = item['PDF Name'] || item.pdfName || '';
+      const allowDl = item['Izinkan Download PDF'] || item.allowDownloadPdf;
+      const dataInput = document.getElementById('input-material-pdf-data');
+      const nameInput = document.getElementById('input-material-pdf-name');
+      const allowDlInput = document.getElementById('input-material-allow-download');
+      if (dataInput) dataInput.value = pdfData;
+      if (nameInput) nameInput.value = pdfName;
+      if (allowDlInput) allowDlInput.checked = (allowDl !== 'no' && allowDl !== false);
+
+      const previewBox = document.getElementById('material-pdf-preview-box');
+      const nameEl = document.getElementById('material-pdf-filename');
+      const sizeEl = document.getElementById('material-pdf-filesize');
+      const btnLabel = document.getElementById('btn-label-pick-pdf');
+
+      if (pdfName || pdfData) {
+        if (previewBox) previewBox.style.display = 'flex';
+        if (nameEl) nameEl.innerText = pdfName || 'Modul_Belajar.pdf';
+        if (sizeEl) sizeEl.innerText = pdfData ? `${Math.round(pdfData.length * 0.75 / 1024)} KB` : 'Tersimpan';
+        if (btnLabel) btnLabel.innerText = 'Ganti File PDF';
+      } else {
+        getLearningPdfFromIdb(id).then(storedData => {
+          if (storedData) {
+            if (dataInput) dataInput.value = storedData;
+            if (nameInput) nameInput.value = pdfName || 'Modul_Belajar.pdf';
+            if (previewBox) previewBox.style.display = 'flex';
+            if (nameEl) nameEl.innerText = pdfName || 'Modul_Belajar.pdf';
+            if (sizeEl) sizeEl.innerText = `${Math.round(storedData.length * 0.75 / 1024)} KB`;
+            if (btnLabel) btnLabel.innerText = 'Ganti File PDF';
+          } else {
+            if (previewBox) previewBox.style.display = 'none';
+            if (btnLabel) btnLabel.innerText = 'Pilih File PDF Modul';
+          }
+        });
+      }
 
       const bld = document.getElementById('material-groups-builder');
       if (bld) {
@@ -4843,6 +5486,9 @@
       const sumVal = document.getElementById('input-material-summary').value.trim();
       const contentVal = document.getElementById('input-material-content').value.trim();
       const mediaVal = document.getElementById('input-material-media').value.trim();
+      const pdfDataVal = document.getElementById('input-material-pdf-data')?.value || '';
+      const pdfNameVal = document.getElementById('input-material-pdf-name')?.value || '';
+      const allowDownloadVal = document.getElementById('input-material-allow-download')?.checked ? 'yes' : 'no';
       let groupsVal = document.getElementById('input-material-groups').value.trim();
       const hasTaskVal = document.getElementById('input-material-has-task').value;
       const taskInstVal = document.getElementById('input-material-task-instructions') ? document.getElementById('input-material-task-instructions').value.trim() : '';
@@ -4905,6 +5551,10 @@
         'Ringkasan': sumVal, ringkasan: sumVal,
         'Konten': contentVal, konten: contentVal,
         'Media URL': mediaVal, mediaUrl: mediaVal,
+        'PDF URL': pdfDataVal, pdfUrl: pdfDataVal,
+        'PDF Name': pdfNameVal, pdfName: pdfNameVal,
+        'Izinkan Download PDF': allowDownloadVal, allowDownloadPdf: allowDownloadVal,
+        'Has PDF': !!(pdfDataVal || pdfNameVal), hasPdf: !!(pdfDataVal || pdfNameVal),
         'Pembagian Kelompok': groupsVal, kelompok: groupsVal,
         'Groups': groupsArray, groups: groupsArray,
         'Ada Tugas': hasTaskVal, hasTask: hasTaskVal,
@@ -4919,13 +5569,27 @@
       btn.disabled = true;
 
       try {
+        if (pdfDataVal) {
+          await saveLearningPdfToIdb(finalId, pdfDataVal, pdfNameVal);
+        }
+
         if (isEdit) {
           const idx = dbLearnings.findIndex(it => (it['ID'] || it.id) === finalId);
           if (idx !== -1) dbLearnings[idx] = newRecord;
         } else {
           dbLearnings.unshift(newRecord);
         }
-        localStorage.setItem('portal_learnings_data', JSON.stringify(dbLearnings));
+
+        try {
+          localStorage.setItem('portal_learnings_data', JSON.stringify(dbLearnings));
+        } catch (eQuota) {
+          const lightLearnings = dbLearnings.map(l => ({
+            ...l,
+            'PDF URL': (l['PDF URL'] && l['PDF URL'].length > 100000 ? '' : l['PDF URL']),
+            pdfUrl: (l.pdfUrl && l.pdfUrl.length > 100000 ? '' : l.pdfUrl)
+          }));
+          try { localStorage.setItem('portal_learnings_data', JSON.stringify(lightLearnings)); } catch (e2) {}
+        }
 
         if (supabaseClient) {
           try {
@@ -5097,6 +5761,113 @@
           <iframe src="${url}" style="width:100%; height:440px; border:none;" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
         </div>
       `;
+    }
+
+    // ============================================================
+    // RENDER KARTU MODUL BELAJAR PDF (IN-APP VIEWER & DOWNLOAD)
+    // ============================================================
+    function renderLearningPdfCard(item, isStudent = false) {
+      if (!item) return '';
+      const id = item['ID'] || item.id;
+      const pdfData = item['PDF URL'] || item.pdfUrl || '';
+      const pdfName = item['PDF Name'] || item.pdfName || 'Modul_Belajar.pdf';
+      const allowDlRaw = item['Izinkan Download PDF'] !== undefined ? item['Izinkan Download PDF'] : item.allowDownloadPdf;
+      const allowDownload = allowDlRaw !== 'no' && allowDlRaw !== false;
+      const hasPdf = !!(pdfData || pdfName || item.hasPdf || item['Has PDF']);
+
+      if (!hasPdf) return '';
+
+      if (isStudent) {
+        return `
+          <div class="learning-dark-card" style="border-color:#0284c7; background:linear-gradient(135deg, rgba(2,132,199,0.08) 0%, rgba(15,23,42,0.95) 100%);">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+              <div style="font-size:13.5px; font-weight:800; color:#38bdf8; display:flex; align-items:center; gap:8px;">
+                <span style="font-size:18px;">📕</span>
+                <span>Modul Belajar (File PDF):</span>
+              </div>
+              <div id="pdf-action-bar-${id}">
+                ${allowDownload ? `
+                  <button type="button" onclick="downloadLearningPdfDirect('${id}', '${escapeHtml(pdfName)}')" style="display:inline-flex; align-items:center; gap:6px; padding:7px 14px; background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:white; border:none; border-radius:10px; font-size:12px; font-weight:800; cursor:pointer; box-shadow:0 3px 10px rgba(2,132,199,0.3);">
+                    <span>⬇️</span> Unduh Modul PDF
+                  </button>
+                ` : `
+                  <span style="font-size:11px; color:#94a3b8; background:rgba(255,255,255,0.06); padding:4px 10px; border-radius:8px; border:1px solid #334155;">
+                    🔒 Pengunduhan Dinonaktifkan oleh Guru
+                  </span>
+                `}
+              </div>
+            </div>
+
+            <div style="font-size:12px; color:#cbd5e1; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">
+              <span>Dokumen: <strong style="color:#f8fafc;">${escapeHtml(pdfName)}</strong></span>
+              <span style="font-size:11px; color:#38bdf8;">👁️ Terbuka langsung di sesi belajar</span>
+            </div>
+
+            <div id="pdf-viewer-wrap-${id}" style="width:100%; border-radius:12px; overflow:hidden; border:1.5px solid #334155; background:#ffffff; box-shadow:0 4px 14px rgba(0,0,0,0.4);">
+              ${pdfData ? `
+                <iframe src="${pdfData}#toolbar=0" style="width:100%; height:460px; border:none; display:block;" title="Modul PDF"></iframe>
+              ` : `
+                <div style="padding:30px; text-align:center; color:#64748b; font-size:12px;" id="pdf-loading-${id}">
+                  ⏳ Memuat dokumen PDF dari penyimpanan...
+                </div>
+              `}
+            </div>
+          </div>
+        `;
+      } else {
+        return `
+          <div style="margin-bottom:14px; background:#f8fafc; border:1.5px solid #bae6fd; border-radius:14px; padding:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
+              <div style="font-size:13px; font-weight:800; color:#0369a1; display:flex; align-items:center; gap:6px;">
+                <span>📕</span> Modul Belajar (File PDF):
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:11px; font-weight:700; color:${allowDownload ? '#10b981' : '#ef4444'}; background:${allowDownload ? '#dcfce7' : '#fee2e2'}; padding:3px 8px; border-radius:6px;">
+                  ${allowDownload ? '✅ Siswa Diizinkan Mengunduh' : '🔒 Pengunduhan Dinonaktifkan'}
+                </span>
+                <button type="button" onclick="downloadLearningPdfDirect('${id}', '${escapeHtml(pdfName)}')" style="padding:6px 12px; background:#0284c7; color:white; border:none; border-radius:8px; font-size:11.5px; font-weight:700; cursor:pointer;">
+                  ⬇️ Unduh PDF
+                </button>
+              </div>
+            </div>
+            <div style="font-size:12px; color:#475569; margin-bottom:8px;">
+              Nama File: <strong>${escapeHtml(pdfName)}</strong>
+            </div>
+            <div id="pdf-viewer-wrap-${id}" style="width:100%; border-radius:10px; overflow:hidden; border:1px solid #cbd5e1; background:#ffffff;">
+              ${pdfData ? `
+                <iframe src="${pdfData}#toolbar=0" style="width:100%; height:420px; border:none; display:block;" title="Modul PDF"></iframe>
+              ` : `
+                <div style="padding:20px; text-align:center; color:#64748b; font-size:12px;" id="pdf-loading-${id}">
+                  ⏳ Memuat dokumen PDF...
+                </div>
+              `}
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function initPdfViewerAsync(item, isStudent) {
+      if (!item) return;
+      const id = item['ID'] || item.id;
+      const pdfData = item['PDF URL'] || item.pdfUrl || '';
+      const hasPdf = !!(pdfData || item.hasPdf || item['Has PDF'] || item.pdfName || item['PDF Name']);
+
+      if (!pdfData && hasPdf) {
+        getLearningPdfFromIdb(id).then(idbData => {
+          if (idbData) {
+            item.pdfUrl = idbData;
+            item['PDF URL'] = idbData;
+            const wrap = document.getElementById(`pdf-viewer-wrap-${id}`);
+            if (wrap) {
+              wrap.innerHTML = `<iframe src="${idbData}#toolbar=0" style="width:100%; height:${isStudent ? '460px' : '420px'}; border:none; display:block;" title="Modul PDF"></iframe>`;
+            }
+          } else {
+            const loading = document.getElementById(`pdf-loading-${id}`);
+            if (loading) loading.innerText = 'Dokumen PDF tersimpan.';
+          }
+        });
+      }
     }
 
     // ============================================================
@@ -5306,6 +6077,8 @@
           </div>
         ` : ''}
 
+        ${renderLearningPdfCard(item, true)}
+
         ${groupHtml}
         ${taskHtml}
         ${discussionHtml}
@@ -5318,6 +6091,7 @@
       `;
 
       if (overlay) overlay.classList.add('active');
+      initPdfViewerAsync(item, true);
       renderLearningDiscussionsUI(id);
     }
 
@@ -5381,6 +6155,8 @@
           </div>
         ` : ''}
 
+        ${renderLearningPdfCard(item, false)}
+
         ${rawGroups ? `
           <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px; margin-bottom:12px;">
             <div style="font-size:12px; font-weight:800; color:#0284c7; margin-bottom:6px;">👥 Pembagian Kelompok Belajar:</div>
@@ -5410,6 +6186,7 @@
       `;
 
       document.getElementById('modal-material-detail').classList.add('active');
+      initPdfViewerAsync(item, false);
       renderLearningDiscussionsUI(id);
     }
 
@@ -5419,6 +6196,18 @@
 
     async function markMaterialAsStudied(id, judul) {
       if (!currentUser) return;
+
+      const cleanTitle = (judul || 'materi ini').replace(/["\\]/g, '');
+      const ok = await appConfirm(
+        `Apakah Anda yakin sudah selesai mempelajari materi "${cleanTitle}"? Kehadiran dan status belajar Anda akan resmi dicatat dan dikirimkan ke Guru Pengampu.`,
+        'Konfirmasi Selesai Belajar',
+        'Ya, Selesai Belajar ➔',
+        'Lanjut Belajar',
+        false,
+        '📚'
+      );
+      if (!ok) return;
+
       try {
         const nowISO = new Date().toISOString();
 
@@ -5480,6 +6269,7 @@
         }
 
         showToast('✅ Berhasil dicatat! Anda telah menyelesaikan materi ini.');
+        await appAlert(`Selamat ${currentUser.name}! Anda telah berhasil menyelesaikan materi "${cleanTitle}". Catatan kehadiran belajar Anda telah tersimpan dan terkirim ke Guru.`, 'Selesai Belajar', '🎉');
         closeMaterialDetailModal();
         closeStudentLearningOverlay();
         renderRooms();
@@ -6156,14 +6946,41 @@
       }
     }
 
+    function checkExamHasStudentWork(examId) {
+      if (!examId) return false;
+      // 1. Cek di dbGrades
+      const inGrades = (dbGrades || []).some(g => (String(g['ID Ujian'] || g.idUjian) === String(examId)));
+      if (inGrades) return true;
+
+      // 2. Cek di dbExamSessions (sesi selesai)
+      const inSessions = (dbExamSessions || []).some(s => 
+        (String(s['ID Ujian'] || s.idUjian) === String(examId)) &&
+        ((s['Status Sesi'] || '').toLowerCase() === 'finished' || (s['Status Sesi'] || '').toLowerCase() === 'selesai' || !!s['Waktu Selesai'] || !!s['Jawaban JSON'])
+      );
+      if (inSessions) return true;
+
+      // 3. Cek di localStorage untuk siswa yang selesai
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('exam_finished_' + examId + '_')) {
+          return true;
+        }
+      }
+      return false;
+    }
+
     function switchUjianTab(tabName) {
+      if (tabName === 'all') tabName = 'mine';
       activeUjianTab = tabName;
       const tabMine = document.getElementById('tab-ujian-mine');
       const tabHist = document.getElementById('tab-ujian-history');
       const tabAll = document.getElementById('tab-ujian-all');
       if (tabMine) tabMine.classList.toggle('active', tabName === 'mine' || tabName === 'available');
       if (tabHist) tabHist.classList.toggle('active', tabName === 'history');
-      if (tabAll) tabAll.classList.toggle('active', tabName === 'all');
+      if (tabAll) {
+        tabAll.classList.toggle('active', tabName === 'all');
+        tabAll.style.display = 'none';
+      }
       renderExams();
     }
 
@@ -6281,22 +7098,29 @@
           return authorId === currentUser.id || authorName.includes(currentUser.name.toLowerCase());
         });
 
-        // Riwayat Ujian Guru: ulangan yang dibuat guru yang sudah selesai / closed atau memiliki riwayat peserta
-        const myHistoryExams = myItems.filter(item => {
+        const activeExams = [];
+        const historyExams = [];
+
+        myItems.forEach(item => {
+          const id = item['ID Ujian'] || item.id;
           const st = (item['Status'] || item.status || 'active').toLowerCase();
-          const hasGrades = dbGrades.some(g => (g['ID Ujian'] === (item['ID Ujian'] || item.id) || g.idUjian === (item['ID Ujian'] || item.id)));
-          return st === 'closed' || st === 'ditutup' || hasGrades;
+          const hasWork = checkExamHasStudentWork(id);
+          if (hasWork || st === 'closed' || st === 'ditutup' || st === 'selesai') {
+            historyExams.push(item);
+          } else {
+            activeExams.push(item);
+          }
         });
 
         const cntMine = document.getElementById('count-ujian-mine');
         const cntHist = document.getElementById('count-ujian-history');
-        if (cntMine) cntMine.innerText = myItems.length;
-        if (cntHist) cntHist.innerText = myHistoryExams.length;
+        if (cntMine) cntMine.innerText = activeExams.length;
+        if (cntHist) cntHist.innerText = historyExams.length;
 
         if (activeUjianTab === 'history') {
-          list = myHistoryExams.length > 0 ? myHistoryExams : myItems;
+          list = historyExams;
         } else {
-          list = myItems; // Guru HANYA melihat ulangan / ujian buatan mereka sendiri
+          list = activeExams;
         }
       } else if (currentUser && currentUser.role === 'siswa') {
         let unlockedTokens = [];
@@ -6311,24 +7135,24 @@
           return matchClass || matchUnlocked;
         });
 
-        // Ambil Riwayat Ujian Siswa dari LocalStorage dan tabel Grades
+        // Ambil Riwayat Ujian Siswa dari LocalStorage dan tabel Grades / ExamSessions
         let studentExamHistory = [];
         try {
           studentExamHistory = JSON.parse(localStorage.getItem('student_exam_history_' + currentUser.nis) || '[]');
         } catch (e) {}
 
-        // Gabungkan juga dari dbGrades jika ada data yang belum tercatat di local storage
-        dbGrades.forEach(g => {
+        // Gabungkan juga dari dbGrades & dbExamSessions
+        (dbGrades || []).forEach(g => {
           const sNis = g['NIS Siswa'] || g.nisSiswa;
           if (sNis === currentUser.nis) {
             const exId = g['ID Ujian'] || g.idUjian;
-            if (!studentExamHistory.some(h => h.examId === exId || h.id === exId)) {
+            if (!studentExamHistory.some(h => (h.examId === exId || h.id === exId))) {
               studentExamHistory.push({
                 examId: exId,
                 judul: g['Judul Ujian'] || g.judulUjian || 'Ulangan Selesai',
                 mapel: g['Nama Mapel'] || g.namaMapel || '-',
                 kelas: g['Nama Kelas'] || g.namaKelas || currentUser.className || '-',
-                nilai: g.Nilai || g['Nilai Akhir'] || 0,
+                nilai: g.Nilai !== undefined ? g.Nilai : (g['Nilai Akhir'] || 0),
                 jumlahBenar: g['Jumlah Benar'] || 0,
                 totalSoal: g['Total Soal'] || 0,
                 waktuSelesai: g['Waktu Selesai'] || g.waktuSelesai || '',
@@ -6338,12 +7162,26 @@
           }
         });
 
+        const activeStudentExams = [];
+        const finishedStudentExams = [];
+
+        classItems.forEach(item => {
+          const id = item['ID Ujian'] || item.id;
+          const localFin = localStorage.getItem('exam_finished_' + id + '_' + currentUser.nis) === 'true';
+          const gradeFin = (dbGrades || []).some(g => (String(g['ID Ujian'] || g.idUjian) === String(id)) && (g['NIS Siswa'] === currentUser.nis || g.nisSiswa === currentUser.nis));
+          const sessFin = (dbExamSessions || []).some(s => (String(s['ID Ujian'] || s.idUjian) === String(id)) && (s['NIS Siswa'] === currentUser.nis || s.nisSiswa === currentUser.nis) && ((s['Status Sesi'] || '').toLowerCase() === 'finished' || !!s['Waktu Selesai']));
+          const isDone = localFin || gradeFin || sessFin;
+          if (isDone) {
+            finishedStudentExams.push(item);
+          } else {
+            activeStudentExams.push(item);
+          }
+        });
+
         const cntMine = document.getElementById('count-ujian-mine');
         const cntHist = document.getElementById('count-ujian-history');
-        const cntAll = document.getElementById('count-ujian-all');
-        if (cntMine) cntMine.innerText = classItems.length;
+        if (cntMine) cntMine.innerText = activeStudentExams.length;
         if (cntHist) cntHist.innerText = studentExamHistory.length;
-        if (cntAll) cntAll.innerText = list.length;
 
         if (activeUjianTab === 'history') {
           // ==========================================
@@ -6398,10 +7236,8 @@
             `;
           }).join('');
           return;
-        } else if (activeUjianTab === 'all') {
-          list = list;
         } else {
-          list = classItems;
+          list = activeStudentExams;
         }
       }
 
@@ -6418,7 +7254,7 @@
         container.innerHTML = `
           <div class="empty-state-card">
             <span>📝</span>
-            <p>Belum ada jadwal ulangan / ujian ${activeUjianTab === 'history' ? 'di riwayat Anda' : (activeUjianTab === 'mine' ? 'yang Anda ampu' : 'tersedia')}.</p>
+            <p>Belum ada jadwal ulangan / ujian ${activeUjianTab === 'history' ? 'di riwayat Anda' : (currentUser && currentUser.role === 'siswa' ? 'aktif yang perlu dikerjakan' : 'aktif yang belum dikerjakan siswa')}.</p>
           </div>
         `;
         return;
@@ -6924,45 +7760,126 @@
       }
     }
 
-    // TAMPILKAN HASIL NILAI SISWA DARI TABEL GRADES BESERTA LEMBAR JAWABAN
-    function openExamResultsModal(examId, judul) {
-      const results = dbGrades.filter(g => (g['ID Ujian'] === examId || g.idUjian === examId) || (g['Judul Ujian'] === judul || g.judulUjian === judul));
-      
+    // TAMPILKAN HASIL NILAI SISWA DARI TABEL GRADES & EXAM SESSIONS BESERTA LEMBAR JAWABAN
+    async function openExamResultsModal(examId, judul) {
       const modal = document.getElementById('modal-material-detail');
       const body = document.getElementById('detail-material-body');
-      
+      if (!modal || !body) return;
+
+      body.innerHTML = `
+        <h3 style="font-size:16px; font-weight:800; color:#0f172a; margin-bottom:4px;">📊 Rekap Nilai &amp; Lembar Jawaban</h3>
+        <p style="font-size:12px; color:#64748b; margin-bottom:14px;">${escapeHtml(judul)}</p>
+        <div style="text-align:center; padding:30px; color:#64748b; font-size:12px;">⏳ Mengambil data riwayat pengerjaan siswa...</div>
+      `;
+      modal.classList.add('active');
+
+      let results = (dbGrades || []).filter(g => 
+        (String(g['ID Ujian'] || g.idUjian) === String(examId)) || 
+        (judul && (g['Judul Ujian'] || g.judulUjian || '').trim().toLowerCase() === judul.trim().toLowerCase())
+      );
+
+      // Tarik data langsung dari Supabase Grades & ExamSessions untuk keakuratan 100%
+      if (supabaseClient) {
+        try {
+          const { data: remoteGrades } = await supabaseClient.from('Grades').select('*').eq('ID Ujian', examId);
+          if (Array.isArray(remoteGrades) && remoteGrades.length > 0) {
+            remoteGrades.forEach(rg => {
+              const rId = rg['ID Nilai'] || rg.id;
+              const rNis = rg['NIS Siswa'] || rg.nisSiswa;
+              const exIdx = results.findIndex(x => (x['ID Nilai'] || x.id) === rId || (rNis && (x['NIS Siswa'] || x.nisSiswa) === rNis));
+              if (exIdx !== -1) results[exIdx] = rg;
+              else results.push(rg);
+
+              const globIdx = dbGrades.findIndex(x => (x['ID Nilai'] || x.id) === rId || (rNis && (x['NIS Siswa'] || x.nisSiswa) === rNis && (x['ID Ujian'] || x.idUjian) === examId));
+              if (globIdx !== -1) dbGrades[globIdx] = rg;
+              else dbGrades.unshift(rg);
+            });
+          }
+
+          const { data: remoteSessions } = await supabaseClient.from('ExamSessions').select('*').eq('ID Ujian', examId);
+          if (Array.isArray(remoteSessions)) {
+            remoteSessions.filter(s => {
+              const st = (s['Status Sesi'] || '').toLowerCase();
+              return st === 'finished' || st === 'selesai' || !!s['Waktu Selesai'];
+            }).forEach(s => {
+              const sNis = s['NIS Siswa'] || s.nisSiswa;
+              const sName = s['Nama Siswa'] || s.namaSiswa;
+              const sClass = s['Nama Kelas'] || s.namaKelas || '';
+              if (!results.some(r => (r['NIS Siswa'] || r.nisSiswa) === sNis || (r['Nama Siswa'] || r.namaSiswa) === sName)) {
+                let parsedScore = 0;
+                let parsedCorrect = 0;
+                let parsedTotal = 0;
+                try {
+                  const ansObj = typeof s['Jawaban JSON'] === 'string' ? JSON.parse(s['Jawaban JSON']) : s['Jawaban JSON'];
+                  if (ansObj && ansObj._score !== undefined) {
+                    parsedScore = ansObj._score;
+                    parsedCorrect = ansObj._correct;
+                    parsedTotal = ansObj._total;
+                  }
+                } catch (e) {}
+
+                results.push({
+                  'ID Nilai': s['ID Sesi'] || s.id,
+                  'ID Ujian': examId,
+                  'Judul Ujian': judul,
+                  'Nama Siswa': sName,
+                  'NIS Siswa': sNis,
+                  'Nama Kelas': sClass,
+                  'Nilai': parsedScore,
+                  'Nilai Akhir': parsedScore,
+                  'Jumlah Benar': parsedCorrect,
+                  'Total Soal': parsedTotal,
+                  'Waktu Selesai': s['Waktu Selesai'] || s['Waktu Masuk'] || new Date().toISOString(),
+                  'Jawaban JSON': s['Jawaban JSON'] || '{}'
+                });
+              }
+            });
+          }
+        } catch (eLive) {
+          console.warn('Live fetch exam results:', eLive);
+        }
+      }
+
+      let totalNilai = 0;
+      results.forEach(r => totalNilai += Number(r.Nilai !== undefined ? r.Nilai : (r['Nilai Akhir'] || 0)));
+      const rataRata = results.length > 0 ? (totalNilai / results.length).toFixed(1) : '0';
+
       body.innerHTML = `
         <h3 style="font-size:16px; font-weight:800; color:#0f172a; margin-bottom:4px;">📊 Rekap Nilai &amp; Lembar Jawaban</h3>
         <p style="font-size:12px; color:#64748b; margin-bottom:14px;">${escapeHtml(judul)}</p>
 
-        <div style="display:flex; justify-content:space-between; background:#e0f2fe; padding:10px 14px; border-radius:12px; font-weight:800; font-size:12px; color:#0369a1; margin-bottom:12px;">
-          <span>Total Peserta Mengerjakan:</span>
-          <span>${results.length} Siswa</span>
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#e0f2fe; padding:10px 14px; border-radius:12px; font-weight:800; font-size:12px; color:#0369a1; margin-bottom:12px;">
+          <span>Total Peserta: <strong>${results.length} Siswa</strong></span>
+          <span>Rata-rata: <strong>${rataRata}</strong></span>
         </div>
 
         <div style="max-height:360px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;">
           ${results.length === 0 ? `
-            <div style="text-align:center; padding:20px; color:#94a3b8; font-size:12px;">
-              Belum ada siswa yang menyelesaikan ulangan ini.
+            <div style="text-align:center; padding:30px 16px; color:#94a3b8; font-size:12px; background:#f8fafc; border-radius:12px; border:1px dashed #cbd5e1;">
+              Belum ada siswa yang menyelesaikan ulangan ini.<br>
+              <span style="font-size:11px; color:#64748b;">Ketika siswa menyelesaikan ulangan, hasil pengerjaan akan otomatis tampil di sini.</span>
             </div>
           ` : results.map((r, i) => {
             const rId = r['ID Nilai'] || r.id;
             const sName = r['Nama Siswa'] || r.namaSiswa || 'Siswa';
             const sNis = r['NIS Siswa'] || r.nisSiswa || '-';
+            const sKelas = r['Nama Kelas'] || r.namaKelas || '';
             const score = r.Nilai !== undefined ? r.Nilai : (r['Nilai Akhir'] || 0);
-            const wkt = r['Waktu Selesai'] ? r['Waktu Selesai'].replace('T', ' ').substring(0, 16) : '-';
+            const wkt = r['Waktu Selesai'] ? new Date(r['Waktu Selesai']).toLocaleString('id-ID', { dateStyle:'medium', timeStyle:'short' }) : '-';
+            const badgeColor = score >= 75 ? '#15803d' : (score >= 60 ? '#0284c7' : '#dc2626');
+            const badgeBg = score >= 75 ? '#dcfce7' : (score >= 60 ? '#e0f2fe' : '#fee2e2');
 
             return `
-              <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; border:1px solid #e2e8f0; padding:10px 12px; border-radius:12px; gap:8px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; background:#ffffff; border:1px solid #e2e8f0; padding:10px 12px; border-radius:12px; gap:8px; box-shadow:0 1px 4px rgba(0,0,0,0.03);">
                 <div style="flex:1;">
                   <div style="font-size:13px; font-weight:800; color:#0f172a;">${i + 1}. ${escapeHtml(sName)}</div>
-                  <div style="font-size:11px; color:#64748b; margin-top:2px;">NIS: ${escapeHtml(sNis)} &bull; Selesai: ${wkt}</div>
+                  <div style="font-size:11px; color:#64748b; margin-top:2px;">NIS: ${escapeHtml(sNis)} ${sKelas ? '• ' + escapeHtml(sKelas) : ''} • Selesai: ${wkt}</div>
                 </div>
                 <div style="display:flex; align-items:center; gap:8px;">
-                  <div style="font-size:16px; font-weight:800; color:#10b981;">
+                  <span style="font-size:15px; font-weight:800; color:${badgeColor}; background:${badgeBg}; padding:4px 10px; border-radius:8px;">
                     ${score}
-                  </div>
-                  <button type="button" onclick="viewStudentExamSubmissionDetails('${rId}', '${examId}')" style="background:#0284c7; color:white; border:none; padding:6px 10px; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;">
+                  </span>
+                  <button type="button" onclick="viewStudentExamSubmissionDetails('${rId}', '${examId}')" style="background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:white; border:none; padding:7px 12px; border-radius:8px; font-size:11px; font-weight:800; cursor:pointer; white-space:nowrap; box-shadow:0 2px 8px rgba(2,132,199,0.25);">
                     👁️ Jawaban
                   </button>
                 </div>
@@ -6971,8 +7888,6 @@
           }).join('')}
         </div>
       `;
-
-      modal.classList.add('active');
     }
 
     // ============================================================
@@ -7107,13 +8022,25 @@
               const masukTime = sess['Waktu Masuk'] ? sess['Waktu Masuk'].split('T')[1]?.substring(0, 5) : '-';
               const violCount = Number(sess['Pelanggaran'] || 0);
 
+              const studentGrade = (dbGrades || []).find(g => 
+                (String(g['ID Ujian'] || g.idUjian) === String(currentMonitorExamId)) && 
+                (g['NIS Siswa'] === sNis || g.nisSiswa === sNis)
+              );
+              let scoreVal = studentGrade ? (studentGrade.Nilai !== undefined ? studentGrade.Nilai : studentGrade['Nilai Akhir']) : null;
+              if (scoreVal === null && sess['Jawaban JSON']) {
+                try {
+                  const a = typeof sess['Jawaban JSON'] === 'string' ? JSON.parse(sess['Jawaban JSON']) : sess['Jawaban JSON'];
+                  if (a && a._score !== undefined) scoreVal = a._score;
+                } catch (e) {}
+              }
+
               let statusBadge = '';
               if (isExamActive) {
                 statusBadge = '<span style="display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:800; background:#dcfce7; color:#15803d; padding:2px 8px; border-radius:10px;"><span class="live-dot-pulse"></span> Mengerjakan</span>';
               } else if (isDisqualified) {
                 statusBadge = '<span style="font-size:10px; font-weight:800; background:#fee2e2; color:#b91c1c; padding:2px 8px; border-radius:10px;">⛔ Diskualifikasi</span>';
               } else {
-                statusBadge = '<span style="font-size:10px; font-weight:800; background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:10px;">✅ Selesai</span>';
+                statusBadge = `<span style="font-size:10px; font-weight:800; background:#dcfce7; color:#15803d; padding:2px 8px; border-radius:10px;">✅ Selesai${scoreVal !== null ? ' • Nilai: ' + scoreVal : ''}</span>`;
               }
 
               return `
@@ -7133,7 +8060,11 @@
                       <button type="button" onclick="disqualifyStudentSessionFromPortal('${sessId}', '${sName}', '${sNis}')" style="background:#fee2e2; color:#b91c1c; border:1px solid #fecaca; border-radius:8px; padding:6px 10px; font-size:11px; font-weight:800; cursor:pointer;" title="Keluarkan / Hentikan Siswa Ini">
                         🚫 Hentikan
                       </button>
-                    ` : ''}
+                    ` : `
+                      <button type="button" onclick="viewStudentExamSubmissionDetails('${studentGrade ? (studentGrade['ID Nilai'] || studentGrade.id) : sessId}', '${currentMonitorExamId}')" style="background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:white; border:none; border-radius:8px; padding:6px 10px; font-size:11px; font-weight:800; cursor:pointer; box-shadow:0 2px 6px rgba(2,132,199,0.25);" title="Lihat Lembar Jawaban Siswa">
+                        👁️ Jawaban
+                      </button>
+                    `}
                   </div>
                 </div>
               `;
@@ -7226,7 +8157,7 @@
       // Render Token Form inside dark body
       const content = document.getElementById('student-exam-content');
       content.innerHTML = `
-        <div class="exam-dark-card" style="max-width:540px; margin:20px auto; border-color:#334155;">
+        <div class="exam-dark-card" style="width:100%; max-width:540px; margin:20px auto; border-color:#334155; box-sizing:border-box;">
           <div style="text-align:center; margin-bottom:16px;">
             <div style="font-size:36px; margin-bottom:6px;">📝</div>
             <div style="font-size:18px; font-weight:800; color:#f8fafc;">${judul}</div>
@@ -7462,7 +8393,7 @@
 
       const qList = currentExamSession.questions;
       content.innerHTML = `
-        <div style="max-width:760px; margin:0 auto; padding-bottom:50px;">
+        <div style="width:100%; max-width:760px; margin:0 auto; padding-bottom:50px; box-sizing:border-box; overflow-x:hidden;">
           ${qList.map((item, idx) => {
             const qNum = idx + 1;
             const isEssay = item.tipeSoal === 'essay' || item['Tipe Soal'] === 'essay' || (!item.options && (!item.opsi || Object.keys(item.opsi).length === 0));
@@ -7992,7 +8923,14 @@
         const modalMsg = document.getElementById('cheat-alert-msg');
         if (modalCnt) modalCnt.innerText = vCount;
         if (modalMsg) modalMsg.innerText = `Terdeteksi: ${reason}. Ini adalah pelanggaran ke-${vCount} dari maksimal ${maxV}x. Tetap fokus di halaman ujian!`;
-        if (modalAlert) modalAlert.classList.add('active');
+        if (modalAlert) {
+          const examOverlay = document.getElementById('student-exam-overlay');
+          const targetCont = document.fullscreenElement || examOverlay || document.body;
+          if (modalAlert.parentElement !== targetCont) {
+            targetCont.appendChild(modalAlert);
+          }
+          modalAlert.classList.add('active');
+        }
       }
     }
 
@@ -8092,43 +9030,57 @@
         localStorage.setItem('student_exam_history_' + currentUser.nis, JSON.stringify(stHist));
 
         // 3. Update ExamSessions di Supabase (Terkirim di Riwayat Guru)
+        const answersPayload = {
+          ...(session.answers || {}),
+          _score: finalScore,
+          _correct: pgCorrect,
+          _total: totalQ,
+          _finishedAt: nowISO
+        };
+
         if (supabaseClient && session.sessionId) {
           const finalStatus = isAutoSubmit && reason.toLowerCase().includes('diskualifikasi') ? 'disqualified' : 'finished';
           supabaseClient.from('ExamSessions').update({
             'Status Sesi': finalStatus,
             'Waktu Selesai': nowISO,
-            'Jawaban JSON': JSON.stringify(session.answers || {}),
+            'Jawaban JSON': JSON.stringify(answersPayload),
             'Pelanggaran': session.violations || 0
           }).eq('ID Sesi', session.sessionId).then(() => {}).catch(e => console.warn('Update final session:', e));
         }
 
         // 4. Simpan ke tabel Grades (Terkirim di Rekap Nilai Guru)
+        const newGradeRow = {
+          'ID Nilai': generateUniqueId('GRD'),
+          'ID Ujian': session.examId,
+          'Judul Ujian': ex['Judul Ujian'] || ex.judul || 'Ulangan Siswa',
+          'ID Mapel': ex['ID Mapel'] || ex.idMapel || '',
+          'Nama Mapel': ex['Nama Mapel'] || ex.namaMapel || '',
+          'ID Kelas': currentUser ? (currentUser.classId || ex['ID Kelas'] || ex.idKelas || '') : '',
+          'Nama Kelas': currentUser ? (currentUser.className || ex['Nama Kelas'] || ex.namaKelas || '') : '',
+          'NIS Siswa': currentUser ? currentUser.nis : '001',
+          'Nama Siswa': currentUser ? currentUser.name : 'Siswa',
+          'Nilai': finalScore,
+          'Jumlah Benar': pgCorrect,
+          'Jumlah Salah': Math.max(0, pgTotal - pgCorrect),
+          'Total Soal': totalQ,
+          'Waktu Mulai': session.startTimeISO || nowISO,
+          'Waktu Selesai': nowISO,
+          'Durasi Mengerjakan': `${Math.max(1, Math.round((Date.now() - session.startTime) / 60000))} Menit`,
+          'ID Guru': ex['ID Guru'] || ex.idGuru || '',
+          'Nama Guru': ex['Nama Guru'] || ex.namaGuru || '',
+          'Catatan Guru': isAutoSubmit ? `Auto-submit: ${reason}` : '',
+          'Nilai Akhir': finalScore,
+          'Tanggal Input': nowISO,
+          'Status': isAutoSubmit ? `Selesai Otomatis (${reason})` : 'Selesai',
+          'Jawaban JSON': JSON.stringify(session.answers || {})
+        };
+
+        // Simpan langsung ke memori dan cache lokal
+        dbGrades = [newGradeRow, ...dbGrades.filter(g => (g['ID Ujian'] || g.idUjian) !== session.examId || (g['NIS Siswa'] || g.nisSiswa) !== (currentUser ? currentUser.nis : '001'))];
+        try { localStorage.setItem('portal_grades_data', JSON.stringify(dbGrades)); } catch (e) {}
+
         if (supabaseClient) {
-          await supabaseClient.from('Grades').insert([{
-            'ID Nilai': generateUniqueId('GRD'),
-            'ID Ujian': session.examId,
-            'Judul Ujian': ex['Judul Ujian'] || 'Ulangan Siswa',
-            'ID Mapel': ex['ID Mapel'] || '',
-            'Nama Mapel': ex['Nama Mapel'] || '',
-            'ID Kelas': currentUser ? currentUser.classId : '',
-            'Nama Kelas': currentUser ? (currentUser.className || ex['Nama Kelas']) : '',
-            'NIS Siswa': currentUser ? currentUser.nis : '001',
-            'Nama Siswa': currentUser ? currentUser.name : 'Siswa',
-            'Nilai': finalScore,
-            'Jumlah Benar': pgCorrect,
-            'Jumlah Salah': Math.max(0, pgTotal - pgCorrect),
-            'Total Soal': totalQ,
-            'Waktu Mulai': session.startTimeISO || nowISO,
-            'Waktu Selesai': nowISO,
-            'Durasi Mengerjakan': `${Math.max(1, Math.round((Date.now() - session.startTime) / 60000))} Menit`,
-            'ID Guru': ex['ID Guru'] || '',
-            'Nama Guru': ex['Nama Guru'] || '',
-            'Catatan Guru': isAutoSubmit ? `Auto-submit: ${reason}` : '',
-            'Nilai Akhir': finalScore,
-            'Tanggal Input': nowISO,
-            'Status': isAutoSubmit ? `Selesai Otomatis (${reason})` : 'Selesai',
-            'Jawaban JSON': JSON.stringify(session.answers || {})
-          }]);
+          await supabaseClient.from('Grades').insert([newGradeRow]);
         }
 
         const alertText = isAutoSubmit 
@@ -8622,12 +9574,24 @@
       });
     }
 
+    function isTeacherEditingModal() {
+      const mExm = document.getElementById('modal-exam-form');
+      const mMat = document.getElementById('modal-material-form');
+      return !!((mExm && mExm.classList.contains('active')) || (mMat && mMat.classList.contains('active')));
+    }
+
     function populateSubjectAndClassSelects() {
       // Dropdown Mapel di form
       const selSubjMat = document.getElementById('input-material-subject');
       const selSubjExm = document.getElementById('input-exam-subject');
       const selClassMat = document.getElementById('input-material-class');
       const selClassExm = document.getElementById('input-exam-class');
+
+      // Simpan nilai pilihan guru saat ini agar TIDAK TER-RESET saat auto-sync atau perpindahan focus
+      const prevSubjMat = selSubjMat ? selSubjMat.value : '';
+      const prevSubjExm = selSubjExm ? selSubjExm.value : '';
+      const prevClassMat = selClassMat ? selClassMat.value : '';
+      const prevClassExm = selClassExm ? selClassExm.value : '';
 
       const isGuru = currentUser && currentUser.role === 'guru';
       const mySubjects = isGuru ? dbSubjects.filter(s => matchesTeacherSchedule(s, currentUser)) : dbSubjects;
@@ -8666,6 +9630,7 @@
 
       if (selSubjMat) {
         selSubjMat.innerHTML = subjHtml;
+        if (prevSubjMat) selSubjMat.value = prevSubjMat;
         selSubjMat.onchange = function() {
           const opt = selSubjMat.options[selSubjMat.selectedIndex];
           if (opt && opt.getAttribute('data-class') && selClassMat) {
@@ -8676,6 +9641,7 @@
       }
       if (selSubjExm) {
         selSubjExm.innerHTML = subjHtml;
+        if (prevSubjExm) selSubjExm.value = prevSubjExm;
         selSubjExm.onchange = function() {
           const opt = selSubjExm.options[selSubjExm.selectedIndex];
           if (opt && opt.getAttribute('data-class') && selClassExm) {
@@ -8684,8 +9650,14 @@
         };
       }
 
-      if (selClassMat) selClassMat.innerHTML = classHtml;
-      if (selClassExm) selClassExm.innerHTML = classHtml;
+      if (selClassMat) {
+        selClassMat.innerHTML = classHtml;
+        if (prevClassMat) selClassMat.value = prevClassMat;
+      }
+      if (selClassExm) {
+        selClassExm.innerHTML = classHtml;
+        if (prevClassExm) selClassExm.value = prevClassExm;
+      }
     }
 
     // ============================================================
@@ -9090,6 +10062,77 @@
       renderSchedules();
     }
 
+    function populateScheduleFilterDropdowns() {
+      const selClass = document.getElementById('filter-schedule-class');
+      const selSubject = document.getElementById('filter-schedule-subject');
+      const selTeacher = document.getElementById('filter-schedule-teacher');
+      if (!selClass || !selSubject || !selTeacher) return;
+
+      const currentClassVal = selClass.value || 'all';
+      const currentSubjectVal = selSubject.value || 'all';
+      const currentTeacherVal = selTeacher.value || 'all';
+
+      // 1. Opsi Kelas
+      const classesSet = new Set();
+      (dbClasses || []).forEach(c => {
+        const name = c['Nama Kelas'] || c.namaKelas;
+        if (name) classesSet.add(name.trim());
+      });
+      (dbSubjects || []).forEach(s => {
+        const name = s['Nama Kelas'] || s.namaKelas;
+        if (name && name.toLowerCase() !== 'semua kelas') classesSet.add(name.trim());
+      });
+      const sortedClasses = Array.from(classesSet).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+      selClass.innerHTML = '<option value="all">Semua Kelas</option>' + sortedClasses.map(c => `
+        <option value="${escapeHtml(c)}" ${c === currentClassVal ? 'selected' : ''}>${escapeHtml(c)}</option>
+      `).join('');
+
+      // 2. Opsi Mapel
+      const subjectsSet = new Set();
+      (dbSubjects || []).forEach(s => {
+        const name = s['Nama Mapel'] || s.namaMapel;
+        if (name) subjectsSet.add(name.trim());
+      });
+      const sortedSubjects = Array.from(subjectsSet).sort((a, b) => a.localeCompare(b));
+      selSubject.innerHTML = '<option value="all">Semua Mapel</option>' + sortedSubjects.map(m => `
+        <option value="${escapeHtml(m)}" ${m === currentSubjectVal ? 'selected' : ''}>${escapeHtml(m)}</option>
+      `).join('');
+
+      // 3. Opsi Guru
+      const teachersSet = new Set();
+      (dbTeachers || []).forEach(t => {
+        const name = t['Nama Lengkap'] || t.namaLengkap || t.name;
+        if (name) teachersSet.add(name.trim());
+      });
+      (dbSubjects || []).forEach(s => {
+        const name = s['Nama Guru'] || s.namaGuru;
+        if (name) teachersSet.add(name.trim());
+      });
+      const sortedTeachers = Array.from(teachersSet).sort((a, b) => a.localeCompare(b));
+      selTeacher.innerHTML = '<option value="all">Semua Guru</option>' + sortedTeachers.map(g => `
+        <option value="${escapeHtml(g)}" ${g === currentTeacherVal ? 'selected' : ''}>${escapeHtml(g)}</option>
+      `).join('');
+    }
+
+    function onScheduleDropdownFilterChange() {
+      const selTeacher = document.getElementById('filter-schedule-teacher');
+      if (selTeacher && selTeacher.value !== 'all' && activeJadwalTab === 'mine') {
+        const isMe = currentUser && (
+          selTeacher.value.toLowerCase() === currentUser.name.toLowerCase() ||
+          selTeacher.value.toLowerCase().includes(currentUser.name.toLowerCase()) ||
+          currentUser.name.toLowerCase().includes(selTeacher.value.toLowerCase())
+        );
+        if (!isMe) {
+          activeJadwalTab = 'all';
+          const tabMine = document.getElementById('tab-jadwal-mine');
+          const tabAll = document.getElementById('tab-jadwal-all');
+          if (tabMine) tabMine.classList.remove('active');
+          if (tabAll) tabAll.classList.add('active');
+        }
+      }
+      renderSchedules();
+    }
+
     function switchJadwalTab(tabName) {
       activeJadwalTab = tabName;
       const tabMine = document.getElementById('tab-jadwal-mine');
@@ -9104,13 +10147,40 @@
       if (!container) return;
 
       const isGuru = currentUser && currentUser.role !== 'siswa';
-      const myAllSubjects = isGuru ? dbSubjects.filter(s => matchesTeacherSchedule(s, currentUser)) : [];
+      const myAllSubjectsRaw = isGuru ? dbSubjects.filter(s => matchesTeacherSchedule(s, currentUser)) : [];
+
+      // Filter dropdown Kelas, Mapel, Guru
+      const filterClass = (document.getElementById('filter-schedule-class')?.value || 'all').toLowerCase().trim();
+      const filterSubj = (document.getElementById('filter-schedule-subject')?.value || 'all').toLowerCase().trim();
+      const filterTeacher = (document.getElementById('filter-schedule-teacher')?.value || 'all').toLowerCase().trim();
+
+      function matchesDropdownFilters(s) {
+        if (filterClass !== 'all') {
+          const cName = (s['Nama Kelas'] || s.namaKelas || '').toLowerCase().trim();
+          const cId = (s['ID Kelas'] || s.idKelas || '').toLowerCase().trim();
+          if (cName !== filterClass && cId !== filterClass && !cName.includes(filterClass)) return false;
+        }
+        if (filterSubj !== 'all') {
+          const mName = (s['Nama Mapel'] || s.namaMapel || '').toLowerCase().trim();
+          const mId = (s['ID Mapel'] || s.idMapel || '').toLowerCase().trim();
+          if (mName !== filterSubj && mId !== filterSubj && !mName.includes(filterSubj)) return false;
+        }
+        if (filterTeacher !== 'all') {
+          const tName = (s['Nama Guru'] || s.namaGuru || '').toLowerCase().trim();
+          const tId = (s['ID Guru'] || s.idGuru || '').toLowerCase().trim();
+          if (tName !== filterTeacher && tId !== filterTeacher && !tName.includes(filterTeacher)) return false;
+        }
+        return true;
+      }
+
+      const myAllSubjects = myAllSubjectsRaw.filter(matchesDropdownFilters);
+      const allSubjects = dbSubjects.filter(matchesDropdownFilters);
 
       // Update counters tab
       const cntMine = document.getElementById('count-jadwal-mine');
       const cntAll = document.getElementById('count-jadwal-all');
-      if (cntMine) cntMine.innerText = `${myAllSubjects.length} Jadwal`;
-      if (cntAll) cntAll.innerText = `${dbSubjects.length} Jadwal`;
+      if (cntMine) cntMine.innerText = myAllSubjects.length;
+      if (cntAll) cntAll.innerText = allSubjects.length;
 
       // Render Day Pill Selector bar
       const pillBar = document.getElementById('schedule-day-pills');
@@ -9128,10 +10198,10 @@
         pillBar.innerHTML = days.map(d => {
           let count = 0;
           if (d.idx === -1) {
-            count = (isGuru && activeJadwalTab === 'mine') ? myAllSubjects.length : dbSubjects.length;
+            count = (isGuru && activeJadwalTab === 'mine') ? myAllSubjects.length : allSubjects.length;
           } else {
             const hName = HARI_INDO[d.idx].toLowerCase();
-            const pool = (isGuru && activeJadwalTab === 'mine') ? myAllSubjects : dbSubjects;
+            const pool = (isGuru && activeJadwalTab === 'mine') ? myAllSubjects : allSubjects;
             count = pool.filter(s => (s.Hari || '').trim().toLowerCase() === hName).length;
           }
           const isActive = activeDayIndex === d.idx;
@@ -9149,16 +10219,16 @@
 
       if (activeDayIndex === -1) {
         if (dayLabel) dayLabel.innerText = 'Semua Hari (Pekan Ini)';
-        displayedSubjects = (isGuru && activeJadwalTab === 'mine') ? myAllSubjects : dbSubjects;
+        displayedSubjects = (isGuru && activeJadwalTab === 'mine') ? myAllSubjects : allSubjects;
       } else {
         const namaHari = HARI_INDO[activeDayIndex];
         const isHariIni = activeDayIndex === (new Date().getDay());
         if (dayLabel) dayLabel.innerText = `${namaHari} ${isHariIni ? '(Hari Ini)' : ''}`;
 
-        let daySubjects = dbSubjects.filter(s => (s.Hari || '').trim().toLowerCase() === namaHari.toLowerCase());
+        let daySubjects = allSubjects.filter(s => (s.Hari || '').trim().toLowerCase() === namaHari.toLowerCase());
         
         if (isGuru && activeJadwalTab === 'mine') {
-          displayedSubjects = daySubjects.filter(s => matchesTeacherSchedule(s, currentUser));
+          displayedSubjects = myAllSubjects.filter(s => (s.Hari || '').trim().toLowerCase() === namaHari.toLowerCase());
         } else if (currentUser && currentUser.role === 'siswa' && currentUser.className) {
           const myClass = currentUser.className.toLowerCase().trim();
           displayedSubjects = daySubjects.filter(s => {
@@ -9183,15 +10253,15 @@
         const hariNama = activeDayIndex === -1 ? 'Pekan Ini' : HARI_INDO[activeDayIndex];
         let tipMsg = '';
         if (activeJadwalTab === 'mine' && isGuru && myAllSubjects.length === 0) {
-          tipMsg = `<p style="margin-top:6px; font-size:11px; color:#0284c7;">Tips: Klik tab <strong>"Semua Jadwal"</strong> untuk melihat seluruh jadwal mata pelajaran sekolah.</p>`;
+          tipMsg = `<p style="margin-top:6px; font-size:11px; color:#0284c7;">Tips: Klik tab <strong>"Semua Jadwal"</strong> atau reset filter untuk melihat jadwal lainnya.</p>`;
         } else if (activeDayIndex >= 0) {
-          tipMsg = `<p style="margin-top:6px; font-size:11px; color:#64748b;">Pilih hari lain pada tombol di atas atau pilih <strong>Semua</strong> untuk melihat seluruh jadwal mengajar.</p>`;
+          tipMsg = `<p style="margin-top:6px; font-size:11px; color:#64748b;">Pilih hari lain pada tombol di atas atau pilih <strong>Semua</strong> untuk melihat jadwal mengajar.</p>`;
         }
         
         container.innerHTML = `
           <div class="empty-state-card" style="padding:24px 16px; max-width:100%; box-sizing:border-box;">
             <span style="font-size:32px;">📅</span>
-            <p style="margin-top:6px; font-size:12px; color:#475569; word-break:break-word;">Tidak ada jadwal pada <strong>${hariNama}</strong></p>
+            <p style="margin-top:6px; font-size:12px; color:#475569; word-break:break-word;">Tidak ada jadwal pada <strong>${hariNama}</strong> yang sesuai filter</p>
             ${activeJadwalTab === 'mine' && isGuru && myAllSubjects.length === 0 ? `<button type="button" onclick="switchJadwalTab('all')" style="margin-top:10px; padding:6px 14px; background:#e0f2fe; color:#0284c7; border:none; border-radius:10px; font-size:11.5px; font-weight:700; cursor:pointer;">Lihat Semua Jadwal Sekolah (${dbSubjects.length})</button>` : tipMsg}
           </div>
         `;
@@ -9227,7 +10297,7 @@
               <div class="schedule-time-box">📖</div>
               <div class="schedule-detail" style="flex:1;">
                 <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:4px;">
-                  <div class="schedule-time-range">📅 ${s.Hari || 'Hari'} • ${s['Jam Mulai'] || '-'} - ${s['Jam Selesai'] || '-'}</div>
+                  <div class="schedule-time-range">⏰ ${s['Jam Mulai'] || '-'} - ${s['Jam Selesai'] || '-'}${activeDayIndex === -1 ? ' • ' + (s.Hari || '') : ''}</div>
                   <div>${statusBadge}</div>
                 </div>
                 <div class="schedule-title" style="margin-top:2px;">${s['Nama Kelas']} • <span style="color:#0284c7;">${s['Nama Mapel']}</span></div>
@@ -9848,20 +10918,39 @@
       // Filter khusus guru: hanya ulangan/ujian buatannya
       if (currentUser && currentUser.role === 'guru') {
         const myExamIds = new Set((dbExams || [])
-          .filter(e => (e['ID Guru'] && e['ID Guru'] === currentUser.id) || 
-                       (e['Nama Guru'] && e['Nama Guru'].toLowerCase().includes(currentUser.name.toLowerCase())))
-          .map(e => e['ID Ujian'] || e.id));
-        
+          .filter(e => {
+            const eTid = e['ID Guru'] || e.idGuru;
+            const eTname = (e['Nama Guru'] || e.namaGuru || '').toLowerCase();
+            return (eTid && eTid === currentUser.id) || (eTname && eTname.includes(currentUser.name.toLowerCase()));
+          })
+          .map(e => String(e['ID Ujian'] || e.id)));
+
+        const myExamTitles = new Set((dbExams || [])
+          .filter(e => {
+            const eTid = e['ID Guru'] || e.idGuru;
+            const eTname = (e['Nama Guru'] || e.namaGuru || '').toLowerCase();
+            return (eTid && eTid === currentUser.id) || (eTname && eTname.includes(currentUser.name.toLowerCase()));
+          })
+          .map(e => (e['Judul Ujian'] || e.judul || '').toLowerCase().trim()));
+
         list = list.filter(g => {
-          const examMatch = g['ID Ujian'] && myExamIds.has(g['ID Ujian']);
-          const teacherIdMatch = g['ID Guru'] && g['ID Guru'] === currentUser.id;
-          const teacherNameMatch = g['Nama Guru'] && g['Nama Guru'].toLowerCase().includes(currentUser.name.toLowerCase());
-          return examMatch || teacherIdMatch || teacherNameMatch;
+          const gExId = String(g['ID Ujian'] || g.idUjian || '');
+          const gTid = g['ID Guru'] || g.idGuru;
+          const gTname = (g['Nama Guru'] || g.namaGuru || '').toLowerCase();
+          const gTitle = (g['Judul Ujian'] || g.judulUjian || '').toLowerCase().trim();
+
+          const examMatch = gExId && myExamIds.has(gExId);
+          const teacherIdMatch = gTid && gTid === currentUser.id;
+          const teacherNameMatch = gTname && gTname.includes(currentUser.name.toLowerCase());
+          const titleMatch = gTitle && myExamTitles.has(gTitle);
+          return examMatch || teacherIdMatch || teacherNameMatch || titleMatch;
         });
       } else if (currentUser && currentUser.role === 'siswa') {
         list = list.filter(g => {
-          return (g['NIS Siswa'] && g['NIS Siswa'] === currentUser.nis) ||
-                 (g['Nama Siswa'] && g['Nama Siswa'].toLowerCase() === currentUser.name.toLowerCase());
+          const gNis = String(g['NIS Siswa'] || g.nisSiswa || '');
+          const gName = (g['Nama Siswa'] || g.namaSiswa || '').toLowerCase();
+          return (gNis && gNis === String(currentUser.nis)) ||
+                 (gName && gName === currentUser.name.toLowerCase());
         });
       }
 
@@ -10229,6 +11318,7 @@
       }
 
       if (screenName === 'jadwal') {
+        populateScheduleFilterDropdowns();
         renderSchedules();
       }
 
@@ -10280,6 +11370,7 @@
 
       // Auto sync berkala tiap 30 detik
       autoSyncTimer = setInterval(() => {
+        if (typeof isTeacherEditingModal === 'function' && isTeacherEditingModal()) return; // JANGAN refresh data saat guru sedang mengisi form/memilih kelas
         if (navigator.onLine && !document.hidden && !isSyncingData && currentUser) {
           loadAllSupabaseData();
         }
@@ -10287,6 +11378,7 @@
 
       // Sinkron otomatis saat tab/jendela kembali aktif (Window Focus)
       window.addEventListener('focus', () => {
+        if (typeof isTeacherEditingModal === 'function' && isTeacherEditingModal()) return; // JANGAN refresh data saat form sedang diisi / dropdown aktif
         if (navigator.onLine && !isSyncingData && currentUser) {
           loadAllSupabaseData();
         }
