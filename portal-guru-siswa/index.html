@@ -2339,7 +2339,7 @@
             <img src="logo-sman12-munabarat.png" onerror="this.src='../logo-sman12-munabarat.png'" alt="Logo SMAN 12 Muna Barat">
           </div>
           <h1 id="login-portal-title">SMAN 12 MUNA BARAT</h1>
-          <p class="simpul-tagline-text">Portal Pembelajaran &amp; Ujian Terpadu</p>
+          <p class="simpul-tagline-text">One Step &bull; One Goal &bull; One Spirit</p>
         </div>
 
         <!-- Pembatas Gradasi Ombak Laut (4 Lapis Gelombang Animasi Persis Web Portal Sekolah) -->
@@ -3410,7 +3410,7 @@
         </div>
 
         <div style="margin-top:12px; padding-top:8px; border-top:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-size:11px; color:#94a3b8;" id="mon-auto-refresh-label">● Auto-refresh aktif (10 dtk)</span>
+          <span style="font-size:11px; color:#64748b;" id="mon-auto-refresh-label">● Mode Stabil (Gunakan tombol Segarkan untuk update)</span>
           <button type="button" onclick="closeExamMonitorModal()" style="padding:8px 16px; background:#f1f5f9; border:1px solid #cbd5e1; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer;">
             Tutup
           </button>
@@ -4527,18 +4527,44 @@
       }
 
       if (typeof isTeacherEditingModal === 'function' && isTeacherEditingModal()) {
-        console.log('Sinkronisasi data latar belakang ditunda karena guru sedang membuka form sesi ujian/pembelajaran.');
         return;
       }
 
       setSyncStatus(true, 'Sinkron Data...');
 
-      // 1. Ambil Pengaturan Sekolah (Aman dari QuotaExceededError dengan mengabaikan base64 raksasa)
       try {
-        const { data: settings } = await supabaseClient.from('Settings').select('Key, Value');
-        if (settings && Array.isArray(settings)) {
-          settings.forEach(row => {
-            // Hindari data base64 >50KB masuk ke localStorage (karena batas kuota browser 5MB)
+        let gradeQuery = supabaseClient.from('Grades').select('*');
+        if (currentUser && currentUser.role === 'siswa') {
+          gradeQuery = gradeQuery.eq('NIS Siswa', currentUser.nis);
+        }
+
+        const [
+          settRes,
+          classRes,
+          studRes,
+          teachRes,
+          subjRes,
+          annRes,
+          attRes,
+          lrnSessRes,
+          examSessRes,
+          gradeRes
+        ] = await Promise.allSettled([
+          supabaseClient.from('Settings').select('Key, Value'),
+          supabaseClient.from('Classes').select('*').order('Nama Kelas', { ascending: true }),
+          supabaseClient.from('Students').select('*').order('Nama Siswa', { ascending: true }),
+          supabaseClient.from('Users').select('*'),
+          supabaseClient.from('Subjects').select('*').order('Jam Mulai', { ascending: true }),
+          supabaseClient.from('Announcements').select('*').eq('Status', 'active').order('Tanggal Buat', { ascending: false }),
+          supabaseClient.from('Settings').select('Value').eq('Key', 'app_learning_attendees_data').maybeSingle(),
+          supabaseClient.from('LearningSessions').select('*'),
+          supabaseClient.from('ExamSessions').select('*'),
+          gradeQuery
+        ]);
+
+        // 1. Process Settings
+        if (settRes.status === 'fulfilled' && Array.isArray(settRes.value?.data)) {
+          settRes.value.data.forEach(row => {
             if (row.Value && typeof row.Value === 'string' && row.Value.startsWith('data:image') && row.Value.length > 50000) return;
             dbSettings[row.Key] = row.Value;
           });
@@ -4556,144 +4582,83 @@
           }
           applySchoolBackground();
         }
-      } catch (eSettings) {
-        console.warn('Sync settings note:', eSettings);
-      }
 
-      // 2. Ambil Kelas
-      try {
-        const { data: classes, error: errClasses } = await supabaseClient.from('Classes').select('*').order('Nama Kelas', { ascending: true });
-        if (!errClasses && Array.isArray(classes) && classes.length > 0) {
-          dbClasses = classes;
+        // 2. Process Classes
+        if (classRes.status === 'fulfilled' && Array.isArray(classRes.value?.data) && classRes.value.data.length > 0) {
+          dbClasses = classRes.value.data;
           try { localStorage.setItem('portal_classes_data', JSON.stringify(dbClasses)); } catch (e) {}
-          renderClasses(document.getElementById('input-search-class')?.value || '');
         }
-      } catch (eClasses) {
-        console.warn('Sync classes note:', eClasses);
-      }
 
-      // 3. Ambil Siswa
-      try {
-        const { data: students, error: errStudents } = await supabaseClient.from('Students').select('*').order('Nama Siswa', { ascending: true });
-        if (!errStudents && Array.isArray(students) && students.length > 0) {
-          dbStudents = students;
+        // 3. Process Students
+        if (studRes.status === 'fulfilled' && Array.isArray(studRes.value?.data) && studRes.value.data.length > 0) {
+          dbStudents = studRes.value.data;
           try { localStorage.setItem('portal_students_data', JSON.stringify(dbStudents)); } catch (e) {}
           if (currentUser && currentUser.role === 'siswa') {
-            const freshMe = students.find(s => String(s.NIS) === String(currentUser.nis) || s['ID Siswa'] === currentUser.id);
+            const freshMe = dbStudents.find(s => String(s.NIS) === String(currentUser.nis) || s['ID Siswa'] === currentUser.id);
             if (freshMe && freshMe.Status) {
               currentUser.status = freshMe.Status;
               try { localStorage.setItem('smandum_active_user', JSON.stringify(currentUser)); } catch (e) {}
-              renderProfileScreen();
             }
           }
         }
-      } catch (eStudents) {
-        console.warn('Sync students note:', eStudents);
-      }
 
-      // 3b. Ambil Data Guru (Users) untuk filter dropdown jadwal & riwayat
-      try {
-        const { data: teachers, error: errTeach } = await supabaseClient.from('Users').select('*');
-        if (!errTeach && Array.isArray(teachers)) {
-          dbTeachers = teachers.filter(u => (u.Role || u.role) !== 'siswa');
+        // 4. Process Teachers
+        if (teachRes.status === 'fulfilled' && Array.isArray(teachRes.value?.data)) {
+          dbTeachers = teachRes.value.data.filter(u => (u.Role || u.role) !== 'siswa');
           try { localStorage.setItem('portal_teachers_data', JSON.stringify(dbTeachers)); } catch (e) {}
         }
-      } catch (eTeach) {
-        console.warn('Sync teachers note:', eTeach);
-      }
 
-      // 4. Ambil Jadwal Mata Pelajaran resmi dari Web Portal Sekolah
-      try {
-        const { data: subjects, error: errSubjects } = await supabaseClient.from('Subjects').select('*').order('Jam Mulai', { ascending: true });
-        if (!errSubjects && Array.isArray(subjects) && subjects.length > 0) {
-          dbSubjects = subjects;
+        // 5. Process Subjects
+        if (subjRes.status === 'fulfilled' && Array.isArray(subjRes.value?.data) && subjRes.value.data.length > 0) {
+          dbSubjects = subjRes.value.data;
           try { localStorage.setItem('portal_subjects_data', JSON.stringify(dbSubjects)); } catch (e) {}
-          populateScheduleFilterDropdowns();
-          renderSchedules();
-          renderClasses(document.getElementById('input-search-class')?.value || '');
         }
-      } catch (eSubjects) {
-        console.warn('Sync subjects note:', eSubjects);
-      }
 
-      // 5. Ambil Pengumuman
-      try {
-        const { data: announcements, error: errAnn } = await supabaseClient.from('Announcements').select('*').eq('Status', 'active').order('Tanggal Buat', { ascending: false });
-        if (!errAnn && Array.isArray(announcements)) {
-          dbAnnouncements = announcements;
+        // 6. Process Announcements
+        if (annRes.status === 'fulfilled' && Array.isArray(annRes.value?.data)) {
+          dbAnnouncements = annRes.value.data;
           try { localStorage.setItem('portal_announcements_data', JSON.stringify(dbAnnouncements)); } catch (e) {}
-          renderAnnouncements();
-        }
-      } catch (eAnn) {
-        console.warn('Sync announcements note:', eAnn);
-      }
-
-      // 6. Ruang Pembelajaran (Learnings) & Peserta/Tugas
-      try {
-        await loadLearningsData();
-        // Ambil riwayat presensi & pengerjaan tugas ruang belajar
-        try {
-          let attendees = [];
-          const { data: setAtt } = await supabaseClient.from('Settings').select('Value').eq('Key', 'app_learning_attendees_data').maybeSingle();
-          if (setAtt && setAtt.Value) {
-            try { attendees = typeof setAtt.Value === 'string' ? JSON.parse(setAtt.Value) : setAtt.Value; } catch (e) {}
-          }
-          if (!Array.isArray(attendees)) attendees = [];
-
-          const { data: lrnSess } = await supabaseClient.from('LearningSessions').select('*');
-          if (Array.isArray(lrnSess)) {
-            lrnSess.forEach(ls => {
-              const lId = ls['ID Pembelajaran'] || ls.idPembelajaran;
-              const sN = ls['Nama Siswa'] || ls.namaSiswa;
-              if (!attendees.some(a => (a.idPembelajaran === lId || a['ID Pembelajaran'] === lId) && (a.namaSiswa === sN || a['Nama Siswa'] === sN))) {
-                attendees.push({
-                  idPembelajaran: lId,
-                  namaSiswa: sN,
-                  waktuMasuk: ls['Waktu Masuk'] || ls.waktuMasuk,
-                  tugasCatatan: ls['Catatan'] || ls.catatan,
-                  status: ls['Catatan'] ? 'tugas_dikumpulkan' : 'hadir'
-                });
-              }
-            });
-          }
-          dbLearningAttendees = attendees;
-          try { localStorage.setItem('portal_learning_attendees_data', JSON.stringify(dbLearningAttendees)); } catch (e) {}
-        } catch (eAttErr) {
-          console.warn('Sync learning attendees error:', eAttErr);
-        }
-      } catch (eLearn) {
-        console.warn('Sync learnings note:', eLearn);
-      }
-
-      // 7. Ulangan/Ujian (Exams) & Sesi Pengerjaan (ExamSessions)
-      try {
-        await loadExamsData();
-        // Tarik semua ExamSessions untuk mendeteksi ulangan yang telah dikerjakan siswa
-        try {
-          const { data: sessData, error: sessErr } = await supabaseClient.from('ExamSessions').select('*');
-          if (!sessErr && Array.isArray(sessData)) {
-            dbExamSessions = sessData;
-            try { localStorage.setItem('portal_exam_sessions_data', JSON.stringify(dbExamSessions)); } catch (e) {}
-          }
-        } catch (eSessErr) {
-          console.warn('Sync exam sessions error:', eSessErr);
-        }
-      } catch (eExam) {
-        console.warn('Sync exams note:', eExam);
-      }
-
-      // 8. Nilai (Grades) & Penggabungan Hasil Pengerjaan Sesi
-      try {
-        let gradeQuery = supabaseClient.from('Grades').select('*');
-        if (currentUser && currentUser.role === 'siswa') {
-          gradeQuery = gradeQuery.eq('NIS Siswa', currentUser.nis);
-        }
-        const { data: grades } = await gradeQuery;
-        if (grades && Array.isArray(grades)) {
-          dbGrades = grades;
         }
 
-        // Sinkronisasi Sempurna: Gabungkan sesi dari ExamSessions yang berstatus selesai ke dbGrades
+        // 7. Process Learnings & Exams in parallel
+        await Promise.allSettled([loadLearningsData(), loadExamsData()]);
+
+        // 8. Process Learning Attendees
+        let attendees = [];
+        if (attRes.status === 'fulfilled' && attRes.value?.data && attRes.value.data.Value) {
+          try {
+            const parsed = typeof attRes.value.data.Value === 'string' ? JSON.parse(attRes.value.data.Value) : attRes.value.data.Value;
+            if (Array.isArray(parsed)) attendees = parsed;
+          } catch (e) {}
+        }
+        if (lrnSessRes.status === 'fulfilled' && Array.isArray(lrnSessRes.value?.data)) {
+          lrnSessRes.value.data.forEach(ls => {
+            const lId = ls['ID Pembelajaran'] || ls.idPembelajaran;
+            const sN = ls['Nama Siswa'] || ls.namaSiswa;
+            if (!attendees.some(a => (a.idPembelajaran === lId || a['ID Pembelajaran'] === lId) && (a.namaSiswa === sN || a['Nama Siswa'] === sN))) {
+              attendees.push({
+                idPembelajaran: lId,
+                namaSiswa: sN,
+                waktuMasuk: ls['Waktu Masuk'] || ls.waktuMasuk,
+                tugasCatatan: ls['Catatan'] || ls.catatan,
+                status: ls['Catatan'] ? 'tugas_dikumpulkan' : 'hadir'
+              });
+            }
+          });
+        }
+        dbLearningAttendees = attendees;
+        try { localStorage.setItem('portal_learning_attendees_data', JSON.stringify(dbLearningAttendees)); } catch (e) {}
+
+        // 9. Process Exam Sessions
+        if (examSessRes.status === 'fulfilled' && Array.isArray(examSessRes.value?.data)) {
+          dbExamSessions = examSessRes.value.data;
+          try { localStorage.setItem('portal_exam_sessions_data', JSON.stringify(dbExamSessions)); } catch (e) {}
+        }
+
+        // 10. Process Grades
+        if (gradeRes.status === 'fulfilled' && Array.isArray(gradeRes.value?.data)) {
+          dbGrades = gradeRes.value.data;
+        }
         if (Array.isArray(dbExamSessions)) {
           dbExamSessions.filter(s => {
             const st = (s['Status Sesi'] || '').toLowerCase();
@@ -4744,37 +4709,35 @@
             }
           });
         }
-
         try { localStorage.setItem('portal_grades_data', JSON.stringify(dbGrades)); } catch (e) {}
-        renderGrades();
-        renderExams();
-        renderRooms();
-      } catch (eGrades) {
-        console.warn('Sync grades note:', eGrades);
-      }
 
-      // 9. Dropdown Absensi, Select Form & Refresh Tampilan Keseluruhan
-      try {
+        // Smart UI Rendering: Update dropdowns and selectively re-render only the active view
         populateAttendanceDropdowns();
         if (!isTeacherEditingModal()) {
           populateSubjectAndClassSelects();
         }
         populateScheduleFilterDropdowns();
-        renderClasses(document.getElementById('input-search-class')?.value || '');
-        renderSchedules();
-      } catch (eUI) {
-        console.warn('Sync UI refresh note:', eUI);
+
+        const activeScreenEl = document.querySelector('.screen.active') || document.querySelector('.app-screen.active');
+        const activeId = activeScreenEl ? activeScreenEl.id : '';
+        if (activeId === 'screen-schedule') renderSchedules();
+        else if (activeId === 'screen-learning') renderRooms();
+        else if (activeId === 'screen-exam') renderExams();
+        else if (activeId === 'screen-classes') renderClasses(document.getElementById('input-search-class')?.value || '');
+        else if (activeId === 'screen-grades') renderGrades();
+        else if (activeId === 'screen-announcements') renderAnnouncements();
+        else if (activeId === 'screen-profile') renderProfileScreen();
+
+        if (currentUser && currentUser.role !== 'siswa') {
+          try { checkUpcomingClassReminder(); } catch (eRem) {}
+        }
+        try { updateProfileStats(); } catch (eProf) {}
+
+        setSyncStatus(true, 'Supabase Live');
+      } catch (errSync) {
+        console.warn('Sync warning:', errSync);
+        setSyncStatus(true, 'Data Lokal');
       }
-
-      // 10. Periksa jadwal mendesak 20 menit (Khusus Guru)
-      if (currentUser && currentUser.role !== 'siswa') {
-        try { checkUpcomingClassReminder(); } catch (eRem) {}
-      }
-
-      // 11. Perbarui statistik profil
-      try { updateProfileStats(); } catch (eProf) {}
-
-      setSyncStatus(true, 'Supabase Live');
     }
 
     // ============================================================
@@ -5495,15 +5458,26 @@
       const statusVal = document.getElementById('input-material-status').value;
 
       const isGuru = currentUser && currentUser.role === 'guru';
-      if (isGuru) {
-        const mySubjects = dbSubjects.filter(s => matchesTeacherSchedule(s, currentUser));
-        const isAllowed = mySubjects.some(s => 
-          (s['Nama Mapel'] || '').trim().toLowerCase() === subjVal.trim().toLowerCase() &&
-          (s['Nama Kelas'] || '').trim().toLowerCase() === classVal.trim().toLowerCase()
-        );
-        if (!isAllowed) {
-          appAlert(`Anda hanya diperbolehkan membuat atau memperbarui ruang pembelajaran untuk mata pelajaran dan kelas penugasan Anda sendiri (${currentUser.name}).`, 'Penugasan Tidak Sesuai', '⚠️');
-          return;
+      if (isGuru && dbSubjects && dbSubjects.length > 0) {
+        const mySubjects = dbSubjects.filter(s => {
+          if (typeof matchesTeacherSchedule === 'function') {
+            return matchesTeacherSchedule(s, currentUser);
+          }
+          const sTid = String(s['ID Guru'] || s.idGuru || '').trim().toLowerCase();
+          const sTname = String(s['Nama Guru'] || s.namaGuru || '').trim().toLowerCase();
+          const uId = String(currentUser.id || '').trim().toLowerCase();
+          const uName = String(currentUser.name || '').trim().toLowerCase();
+          return (uId && sTid === uId) || (uName && sTname.includes(uName)) || (uName && sTname === uName);
+        });
+
+        if (mySubjects.length > 0) {
+          const teachThisSubject = mySubjects.some(s => 
+            (s['Nama Mapel'] || s.namaMapel || '').trim().toLowerCase() === subjVal.trim().toLowerCase()
+          );
+          if (!teachThisSubject) {
+            appAlert(`Anda hanya diperbolehkan membuat atau memperbarui ruang pembelajaran untuk mata pelajaran penugasan Anda sendiri (${currentUser.name}).`, 'Penugasan Tidak Sesuai', '⚠️');
+            return;
+          }
         }
       }
 
@@ -5592,23 +5566,55 @@
         }
 
         if (supabaseClient) {
+          // Hanya kolom yang valid di schema tabel SQL Learnings
+          const cleanSqlRecord = {
+            'ID': finalId,
+            'Judul': titleVal,
+            'ID Mapel': idMapelVal,
+            'Nama Mapel': subjVal,
+            'ID Kelas': idKelasVal,
+            'Nama Kelas': classVal,
+            'ID Guru': currentUser ? currentUser.id : '',
+            'Nama Guru': currentUser ? currentUser.name : 'Guru',
+            'Token': tokenVal,
+            'Ringkasan': sumVal,
+            'Konten': contentVal,
+            'Media URL': mediaVal,
+            'Status': statusVal,
+            'Tanggal Update': nowISO
+          };
+          if (!isEdit) {
+            cleanSqlRecord['Tanggal Buat'] = nowISO;
+          }
+
           try {
             if (isEdit) {
-              await supabaseClient.from('Learnings').update(newRecord).eq('ID', finalId);
+              await supabaseClient.from('Learnings').update(cleanSqlRecord).eq('ID', finalId);
             } else {
-              await supabaseClient.from('Learnings').insert([newRecord]);
+              await supabaseClient.from('Learnings').insert([cleanSqlRecord]);
             }
           } catch (eTbl) {
             console.warn('Learnings table insert note:', eTbl);
           }
 
+          // Sinkronkan ke Settings app_learnings_data (strip PDF base64 besar untuk cegah HTTP 413)
           try {
+            const strippedList = dbLearnings.map(item => {
+              const copy = { ...item };
+              if (copy['PDF URL'] && copy['PDF URL'].length > 100000) copy['PDF URL'] = '';
+              if (copy.pdfUrl && copy.pdfUrl.length > 100000) copy.pdfUrl = '';
+              return copy;
+            });
             await supabaseClient.from('Settings').upsert([{
               Key: 'app_learnings_data',
-              Value: JSON.stringify(dbLearnings),
+              Value: JSON.stringify(strippedList),
+              Label: 'Data Ruang Pembelajaran',
+              Keterangan: 'Sync modul ruang pembelajaran mandiri',
               Diupdate: nowISO
             }]);
-          } catch (eSet) {}
+          } catch (eSet) {
+            console.warn('Settings app_learnings_data upsert note:', eSet);
+          }
         }
 
         showToast(`✅ Ruang Pembelajaran berhasil ${isEdit ? 'diperbarui' : 'dibuat'}!`);
@@ -5639,9 +5645,17 @@
             await supabaseClient.from('Learnings').delete().eq('ID', id);
           } catch (eTbl) {}
           try {
+            const strippedList = dbLearnings.map(item => {
+              const copy = { ...item };
+              if (copy['PDF URL'] && copy['PDF URL'].length > 100000) copy['PDF URL'] = '';
+              if (copy.pdfUrl && copy.pdfUrl.length > 100000) copy.pdfUrl = '';
+              return copy;
+            });
             await supabaseClient.from('Settings').upsert([{
               Key: 'app_learnings_data',
-              Value: JSON.stringify(dbLearnings),
+              Value: JSON.stringify(strippedList),
+              Label: 'Data Ruang Pembelajaran',
+              Keterangan: 'Sync modul ruang pembelajaran mandiri',
               Diupdate: new Date().toISOString()
             }]);
           } catch (eSet) {}
@@ -6592,9 +6606,17 @@
     function openActiveRoomMonitorPicker() {
       if (!currentUser || currentUser.role === 'siswa') return;
       const myRooms = (dbLearnings || []).filter(item => {
-        const authorId = item['ID Guru'] || item.idGuru || '';
-        const authorName = (item['Nama Guru'] || item.namaGuru || '').toLowerCase();
-        return authorId === currentUser.id || authorName.includes(currentUser.name.toLowerCase());
+        if (currentUser.role === 'admin') return true;
+        const authorId = String(item['ID Guru'] || item.idGuru || '').trim().toLowerCase();
+        const authorName = String(item['Nama Guru'] || item.namaGuru || '').trim().toLowerCase();
+        const uId = String(currentUser.id || '').trim().toLowerCase();
+        const uName = String(currentUser.name || '').trim().toLowerCase();
+        if (uId && authorId === uId) return true;
+        if (uName && (authorName.includes(uName) || uName.includes(authorName))) return true;
+        if (typeof matchesTeacherSchedule === 'function') {
+          return matchesTeacherSchedule({ 'Nama Mapel': item['Nama Mapel'] || item.namaMapel, 'Nama Kelas': item['Nama Kelas'] || item.namaKelas }, currentUser);
+        }
+        return false;
       });
 
       if (myRooms.length === 0) {
@@ -6635,9 +6657,17 @@
     function openActiveExamMonitorPicker() {
       if (!currentUser || currentUser.role === 'siswa') return;
       const myExams = (dbExams || []).filter(item => {
-        const authorId = item['ID Guru'] || item.idGuru || '';
-        const authorName = (item['Nama Guru'] || item.namaGuru || '').toLowerCase();
-        return authorId === currentUser.id || authorName.includes(currentUser.name.toLowerCase());
+        if (currentUser.role === 'admin') return true;
+        const authorId = String(item['ID Guru'] || item.idGuru || '').trim().toLowerCase();
+        const authorName = String(item['Nama Guru'] || item.namaGuru || '').trim().toLowerCase();
+        const uId = String(currentUser.id || '').trim().toLowerCase();
+        const uName = String(currentUser.name || '').trim().toLowerCase();
+        if (uId && authorId === uId) return true;
+        if (uName && (authorName.includes(uName) || uName.includes(authorName))) return true;
+        if (typeof matchesTeacherSchedule === 'function') {
+          return matchesTeacherSchedule({ 'Nama Mapel': item['Nama Mapel'] || item.namaMapel, 'Nama Kelas': item['Nama Kelas'] || item.namaKelas }, currentUser);
+        }
+        return false;
       });
 
       if (myExams.length === 0) {
@@ -6765,6 +6795,21 @@
             }
           } catch (eTasks) {}
         }
+
+        // Gabungkan juga dari fallback localStorage jika offline atau database lambat
+        try {
+          const locAtt = localStorage.getItem('portal_learning_attendees_data');
+          if (locAtt) {
+            const parsedLoc = JSON.parse(locAtt);
+            if (Array.isArray(parsedLoc)) {
+              parsedLoc.filter(a => a.idPembelajaran === learningId || a['ID Pembelajaran'] === learningId).forEach(item => {
+                if (!attendees.some(ex => (ex.namaSiswa || ex['Nama Siswa']) === (item.namaSiswa || item['Nama Siswa']))) {
+                  attendees.push(item);
+                }
+              });
+            }
+          }
+        } catch (eLoc) {}
 
         _currentAttendeesList = attendees;
         const taskSubmissions = attendees.filter(a => a.status === 'tugas_dikumpulkan' || !!a.tugasFile || !!a.tugasCatatan);
@@ -7901,20 +7946,13 @@
 
       if (modal) modal.classList.add('active');
 
-      // Ambil data langsung
-      await refreshExamMonitorData(false);
+      if (examMonitorPollTimer) {
+        clearInterval(examMonitorPollTimer);
+        examMonitorPollTimer = null;
+      }
 
-      // Setup 10-second auto refresh saat modal terbuka
-      if (examMonitorPollTimer) clearInterval(examMonitorPollTimer);
-      examMonitorPollTimer = setInterval(() => {
-        const m = document.getElementById('modal-exam-monitor');
-        if (m && m.classList.contains('active')) {
-          refreshExamMonitorData(true);
-        } else {
-          clearInterval(examMonitorPollTimer);
-          examMonitorPollTimer = null;
-        }
-      }, 10000);
+      // Ambil data langsung saat modal dibuka (refresh otomatis polling dihilangkan)
+      await refreshExamMonitorData(false);
     }
 
     function closeExamMonitorModal() {
@@ -8073,7 +8111,7 @@
         }
 
         if (refreshLabel) {
-          refreshLabel.innerText = `● Auto-refresh aktif (10 dtk) • Update: ${new Date().toLocaleTimeString()}`;
+          refreshLabel.innerText = `● Data termuat • Klik 🔄 Segarkan untuk memperbarui (Pukul ${new Date().toLocaleTimeString()})`;
         }
       } catch (err) {
         console.warn('refreshExamMonitorData error:', err);
@@ -9664,9 +9702,9 @@
     // SISTEM PENGINGAT 20 MENIT REAL-TIME (FITUR GURU)
     // ============================================================
     function startReminderDaemon() {
-      setInterval(() => {
-        checkUpcomingClassReminder();
-      }, 30000);
+      // Refresh otomatis berkala 30 detik dihilangkan agar tidak mengganggu aktivitas guru
+      // Jalankan pengecekan sekali saat inisialisasi tanpa polling berulang di latar belakang
+      checkUpcomingClassReminder();
     }
 
     async function checkUpcomingClassReminder() {
@@ -11366,23 +11404,13 @@
     }
 
     function startAutoSyncDaemon() {
-      if (autoSyncTimer) clearInterval(autoSyncTimer);
-
-      // Auto sync berkala tiap 30 detik
-      autoSyncTimer = setInterval(() => {
-        if (typeof isTeacherEditingModal === 'function' && isTeacherEditingModal()) return; // JANGAN refresh data saat guru sedang mengisi form/memilih kelas
-        if (navigator.onLine && !document.hidden && !isSyncingData && currentUser) {
-          loadAllSupabaseData();
-        }
-      }, 30000);
-
-      // Sinkron otomatis saat tab/jendela kembali aktif (Window Focus)
-      window.addEventListener('focus', () => {
-        if (typeof isTeacherEditingModal === 'function' && isTeacherEditingModal()) return; // JANGAN refresh data saat form sedang diisi / dropdown aktif
-        if (navigator.onLine && !isSyncingData && currentUser) {
-          loadAllSupabaseData();
-        }
-      });
+      if (autoSyncTimer) {
+        clearInterval(autoSyncTimer);
+        autoSyncTimer = null;
+      }
+      // Refresh otomatis berkala dan refresh saat focus dihilangkan sepenuhnya
+      // agar tidak mengganggu aktivitas guru atau siswa yang sedang membaca, mengetik, atau mengisi form.
+      // Data diperbarui saat aksi simpan/buat/hapus atau ketika pengguna menekan tombol Sinkron.
     }
 
     function updateClock() {
