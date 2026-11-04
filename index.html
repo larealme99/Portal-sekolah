@@ -88,10 +88,38 @@
             color: #475569 !important;
         }
 
-        body.light-theme .sidebar-item:hover,
+        body.light-theme .sidebar-item:hover {
+            background: linear-gradient(90deg, rgba(2, 132, 199, 0.14), rgba(14, 165, 233, 0.05)) !important;
+            color: #0284c7 !important;
+            border-left: 3.5px solid #0284c7 !important;
+            padding-left: 14px !important;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.12) !important;
+            transform: translateX(4px);
+        }
+
+        body.light-theme .sidebar-item:hover i {
+            color: #0284c7 !important;
+            transform: scale(1.15);
+            transition: transform 0.2s ease, color 0.2s ease;
+        }
+
+        body.light-theme .sidebar-item:hover span {
+            color: #0369a1 !important;
+            font-weight: 600 !important;
+        }
+
         body.light-theme .sidebar-item.active {
-            background: rgba(16, 185, 129, 0.12) !important;
-            color: #059669 !important;
+            background: linear-gradient(90deg, rgba(2, 132, 199, 0.16), rgba(14, 165, 233, 0.08)) !important;
+            color: #0284c7 !important;
+            border-left: 3.5px solid #0284c7 !important;
+            border-top: 1px solid rgba(2, 132, 199, 0.25) !important;
+            border-right: 1px solid rgba(2, 132, 199, 0.25) !important;
+            border-bottom: 1px solid rgba(2, 132, 199, 0.25) !important;
+            padding-left: 14px !important;
+        }
+
+        body.light-theme .sidebar-item.active i {
+            color: #0284c7 !important;
         }
 
         body.light-theme .sidebar-section-label {
@@ -182,6 +210,44 @@
         .btn-theme-topbar:hover {
             transform: translateY(-1px);
             border-color: var(--primary);
+        }
+
+        /* ── TOMBOL SIMBOL/EMOT MODE TERANG & GELAP DISAMPING NAMA ADMINISTRATOR ── */
+        .btn-theme-emot {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(245, 158, 11, 0.16);
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            color: #f59e0b;
+            cursor: pointer;
+            font-size: 15px;
+            line-height: 1;
+            transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease, background 0.28s ease, border-color 0.28s ease;
+            vertical-align: middle;
+            padding: 0;
+            margin-left: 6px;
+            outline: none;
+        }
+        .btn-theme-emot:hover {
+            transform: scale(1.22) rotate(14deg);
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.45);
+            background: rgba(245, 158, 11, 0.28);
+            border-color: #f59e0b;
+        }
+        body.light-theme .btn-theme-emot {
+            background: rgba(2, 132, 199, 0.12);
+            border-color: rgba(2, 132, 199, 0.38);
+            color: #0284c7;
+        }
+        body.light-theme .btn-theme-emot:hover {
+            transform: scale(1.22) rotate(-14deg);
+            box-shadow: 0 4px 16px rgba(2, 132, 199, 0.35);
+            background: rgba(2, 132, 199, 0.22);
+            border-color: #0284c7;
         }
 
         *,
@@ -863,12 +929,22 @@
             display: flex;
             align-items: center;
             gap: 16px;
-            transition: var(--transition)
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease !important;
+            cursor: pointer;
+            will-change: transform, box-shadow;
         }
 
+        /* Efek Timbul Box Kontainer Dashboard Admin (seperti Hamburger Menu) */
         .stat-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-2px)
+            border-color: #0284c7 !important;
+            transform: translateY(-5px) scale(1.025) !important;
+            box-shadow: 0 14px 32px rgba(2, 132, 199, 0.28), 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+            z-index: 2;
+        }
+
+        .stat-card:hover .stat-icon {
+            transform: scale(1.14) rotate(4deg);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .stat-icon {
@@ -2393,14 +2469,37 @@
         }
 
         .sidebar-item:hover {
-            background: var(--bg3);
-            color: var(--text)
+            background: linear-gradient(90deg, rgba(14, 165, 233, 0.18), rgba(2, 132, 199, 0.08)) !important;
+            color: #38bdf8 !important;
+            border-left: 3.5px solid #0ea5e9 !important;
+            padding-left: 14px !important;
+            box-shadow: 0 4px 14px rgba(14, 165, 233, 0.18) !important;
+            transform: translateX(4px);
+        }
+
+        .sidebar-item:hover i {
+            color: #38bdf8 !important;
+            transform: scale(1.15);
+            transition: transform 0.2s ease, color 0.2s ease;
+        }
+
+        .sidebar-item:hover span {
+            color: #e0f2fe !important;
+            font-weight: 600 !important;
         }
 
         .sidebar-item.active {
-            background: linear-gradient(135deg, rgba(26, 115, 232, .2), rgba(26, 115, 232, .1));
-            color: var(--primary);
-            border: 1px solid rgba(26, 115, 232, .2)
+            background: linear-gradient(90deg, rgba(14, 165, 233, 0.22), rgba(2, 132, 199, 0.12)) !important;
+            color: #38bdf8 !important;
+            border-left: 3.5px solid #0ea5e9 !important;
+            border-top: 1px solid rgba(14, 165, 233, 0.28) !important;
+            border-right: 1px solid rgba(14, 165, 233, 0.28) !important;
+            border-bottom: 1px solid rgba(14, 165, 233, 0.28) !important;
+            padding-left: 14px !important;
+        }
+
+        .sidebar-item.active i {
+            color: #38bdf8 !important;
         }
 
         .sidebar-item i {
@@ -2444,11 +2543,14 @@
             border: 1px solid var(--border);
             border-radius: 14px;
             padding: 20px;
-            transition: border-color .2s;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease !important;
+            will-change: transform, box-shadow;
         }
 
         .guru-bento-card:hover {
-            border-color: rgba(56, 189, 248, 0.4);
+            transform: translateY(-4px) scale(1.015) !important;
+            box-shadow: 0 14px 32px rgba(2, 132, 199, 0.22), 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+            border-color: rgba(14, 165, 233, 0.5) !important;
         }
 
         .live-dot {
@@ -7570,17 +7672,17 @@
                     class="fas fa-bars"></i></button>
             <h2 id="topbarTitle">Dashboard</h2>
             <div style="flex:1"></div>
-            <!-- Tombol Pengalih Mode Terang / Gelap Dashboard -->
-            <button type="button" class="btn btn-outline btn-sm" id="btnTopThemeToggle" onclick="toggleAdminTheme()" title="Ganti Mode Tampilan (Terang / Gelap)" style="display:inline-flex;align-items:center;gap:6px;margin-right:10px">
-                <i class="fas fa-sun" id="topThemeIcon" style="color:#f59e0b"></i>
-                <span id="topThemeLabel">Mode Terang</span>
-            </button>
             <div class="topbar-user" onclick="openProfileModal()">
                 <div id="topbarAvatarWrap">
                     <div class="topbar-avatar-placeholder" id="topbarAvatarInitial">A</div>
                 </div>
                 <div class="topbar-info">
-                    <strong id="topbarUserName">—</strong>
+                    <div style="display:flex;align-items:center;gap:4px">
+                        <strong id="topbarUserName">—</strong>
+                        <button type="button" class="btn-theme-emot" id="btnTopThemeToggle" onclick="event.stopPropagation();toggleAdminTheme()" title="Ganti Mode Terang / Gelap (Matahari / Setengah Bintang)" style="width:26px;height:26px;font-size:12px;margin-left:4px">
+                            <i class="fas fa-sun" id="topThemeIcon" style="color:#f59e0b"></i>
+                        </button>
+                    </div>
                     <span id="topbarUserRole">—</span>
                 </div>
             </div>
@@ -7596,8 +7698,6 @@
             <aside class="sidebar" id="adminSidebar" style="display:none">
                 <div class="sidebar-mobile-header">
                     <span class="school-title"><i class="fas fa-university"></i> Portal Admin</span>
-                    <button class="btn-close-sidebar" onclick="closeMobileSidebar()"><i
-                            class="fas fa-times"></i></button>
                 </div>
                 <div class="sidebar-section">
                     <div class="sidebar-item" onclick="loadPage('dashboardAdmin')" id="menu-dashboardAdmin"><i
@@ -11100,24 +11200,29 @@
         window.updateThemeButtonsUI = function (theme) {
             var current = theme || (typeof localStorage !== 'undefined' ? (localStorage.getItem('portal_theme_mode') || 'dark') : 'dark');
             var isLight = current === 'light';
-            var btn = document.getElementById('btnThemeToggleAdmin');
-            var icon = document.getElementById('themeIconAdmin');
-            var label = document.getElementById('themeLabelAdmin');
+
+            // Simbol/Emot disamping nama Administrator di Hero Dashboard
+            var heroIcon = document.getElementById('heroThemeIcon');
+            var heroBtn = document.getElementById('heroThemeEmotBtn');
+            if (heroIcon) {
+                // Setengah Bintang (fas fa-star-half-alt) untuk mode terang, Matahari (fas fa-sun) untuk mode gelap
+                heroIcon.className = isLight ? 'fas fa-star-half-alt' : 'fas fa-sun';
+                heroIcon.style.color = isLight ? '#0284c7' : '#f59e0b';
+            }
+            if (heroBtn) {
+                heroBtn.title = isLight ? 'Beralih ke Mode Gelap (Setengah Bintang)' : 'Beralih ke Mode Terang (Matahari)';
+            }
+
+            // Simbol/Emot disamping nama Administrator di Topbar
             var topbarIcon = document.getElementById('topThemeIcon');
-            var topbarLabel = document.getElementById('topThemeLabel');
-
-            if (icon) {
-                icon.className = isLight ? 'fas fa-moon' : 'fas fa-sun';
-                icon.style.color = isLight ? '#0ea5e9' : '#f59e0b';
-            }
-            if (label) label.textContent = isLight ? 'Mode Gelap' : 'Mode Terang';
-            if (btn) btn.title = isLight ? 'Beralih ke Mode Gelap' : 'Beralih ke Mode Terang';
-
+            var topbarBtn = document.getElementById('btnTopThemeToggle');
             if (topbarIcon) {
-                topbarIcon.className = isLight ? 'fas fa-moon' : 'fas fa-sun';
-                topbarIcon.style.color = isLight ? '#0ea5e9' : '#f59e0b';
+                topbarIcon.className = isLight ? 'fas fa-star-half-alt' : 'fas fa-sun';
+                topbarIcon.style.color = isLight ? '#0284c7' : '#f59e0b';
             }
-            if (topbarLabel) topbarLabel.textContent = isLight ? 'Mode Gelap' : 'Mode Terang';
+            if (topbarBtn) {
+                topbarBtn.title = isLight ? 'Beralih ke Mode Gelap (Setengah Bintang)' : 'Beralih ke Mode Terang (Matahari)';
+            }
         };
 
         (function initAdminTheme() {
@@ -11129,6 +11234,9 @@
                 } else {
                     document.body.classList.add('dark-theme');
                 }
+                setTimeout(function () {
+                    updateThemeButtonsUI(saved);
+                }, 50);
             } catch (e) { }
         })();
 
@@ -16556,6 +16664,12 @@
 
                 var alamatBadge = '<span id="dashAdminAlamatText" style="color:var(--text);font-weight:600">' + esc(adminAlamatDisplay) + '</span>';
 
+                var currentThemeMode = (typeof localStorage !== 'undefined' && localStorage.getItem('portal_theme_mode')) || 'dark';
+                var isThemeLight = currentThemeMode === 'light';
+                var heroThemeIconClass = isThemeLight ? 'fas fa-star-half-alt' : 'fas fa-sun';
+                var heroThemeIconColor = isThemeLight ? '#0284c7' : '#f59e0b';
+                var heroThemeTitle = isThemeLight ? 'Beralih ke Mode Gelap (Setengah Bintang)' : 'Beralih ke Mode Terang (Matahari)';
+
                 var html =
                     '<div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px">' +
                     '<div>' +
@@ -16563,10 +16677,6 @@
                     '<p style="margin:4px 0 0;color:var(--text2)">Pusat Kendali Sistem Informasi &amp; Akademik SMAN 12 Muna Barat</p>' +
                     '</div>' +
                     '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
-                    '<button class="btn btn-outline btn-sm" id="btnThemeToggleAdmin" onclick="toggleAdminTheme()" style="display:inline-flex;align-items:center;gap:6px;font-weight:600;padding:6px 14px;border-radius:8px" title="Ganti Mode Terang / Gelap">' +
-                    '<i class="fas fa-sun" id="themeIconAdmin" style="color:#f59e0b"></i>' +
-                    '<span id="themeLabelAdmin">Mode Terang</span>' +
-                    '</button>' +
                     '<span class="badge badge-success" style="padding:6px 12px;font-size:12px;display:inline-flex;align-items:center;gap:6px"><i class="fas fa-check-circle"></i> Supabase Cloud Aktif (100% Sinkron)</span>' +
                     '<button class="btn btn-outline btn-sm" onclick="renderDashboardAdmin()" title="Muat ulang data"><i class="fas fa-sync-alt"></i> Segarkan</button>' +
                     '</div>' +
@@ -16577,7 +16687,11 @@
                     adminAvatar +
                     '<div class="guru-dash-info" style="flex:1">' +
                     '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">' +
-                    '<h2 style="margin:0;font-size:22px">' + esc(u.namaLengkap || 'Administrator') + '</h2>' +
+                    '<h2 style="margin:0;font-size:22px;display:inline-flex;align-items:center;gap:8px">' + esc(u.namaLengkap || 'Administrator') +
+                    '<button type="button" class="btn-theme-emot" id="heroThemeEmotBtn" onclick="toggleAdminTheme()" title="' + heroThemeTitle + '">' +
+                    '<i class="' + heroThemeIconClass + '" id="heroThemeIcon" style="color:' + heroThemeIconColor + '"></i>' +
+                    '</button>' +
+                    '</h2>' +
                     '<span class="badge badge-purple" style="font-size:11px"><i class="fas fa-shield-alt"></i> Super Admin</span>' +
                     '</div>' +
                     '<p><i class="fas fa-id-badge" style="width:20px;color:#10b981"></i> <strong>NIP:</strong> ' + esc(u.nip || '-') + ' &bull; <strong>Username:</strong> ' + esc(u.username || 'admin') + ' &bull; <strong>No. HP:</strong> ' + esc(u.telepon || '-') + '</p>' +
