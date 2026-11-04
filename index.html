@@ -59,6 +59,131 @@
             --transition: all .25s cubic-bezier(.4, 0, .2, 1);
         }
 
+        body.light-theme,
+        [data-theme="light"] {
+            --primary: #059669;
+            --primary-dark: #047857;
+            --secondary: #10b981;
+            --accent: #d97706;
+            --danger: #ef4444;
+            --purple: #7c3aed;
+            --bg: #f8fafc;
+            --bg2: #ffffff;
+            --bg3: #f1f5f9;
+            --card: #ffffff;
+            --border: #e2e8f0;
+            --text: #0f172a;
+            --text2: #64748b;
+            --text3: #334155;
+            --shadow: 0 4px 20px rgba(0, 0, 0, .06);
+        }
+
+        body.light-theme .dash-sidebar,
+        body.light-theme .sidebar {
+            background: #ffffff !important;
+            border-right: 1px solid #e2e8f0 !important;
+        }
+
+        body.light-theme .sidebar-item {
+            color: #475569 !important;
+        }
+
+        body.light-theme .sidebar-item:hover,
+        body.light-theme .sidebar-item.active {
+            background: rgba(16, 185, 129, 0.12) !important;
+            color: #059669 !important;
+        }
+
+        body.light-theme .sidebar-section-label {
+            color: #94a3b8 !important;
+        }
+
+        body.light-theme .dash-topbar {
+            background: #ffffff !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+        }
+
+        body.light-theme .topbar-user {
+            background: #f8fafc !important;
+            border: 1px solid #e2e8f0 !important;
+        }
+
+        body.light-theme .topbar-info strong {
+            color: #0f172a !important;
+        }
+
+        body.light-theme .topbar-info span {
+            color: #64748b !important;
+        }
+
+        body.light-theme .guru-bento-card,
+        body.light-theme .card,
+        body.light-theme .stat-card,
+        body.light-theme .modal-box {
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        body.light-theme .form-control {
+            background: #ffffff !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+
+        body.light-theme .form-control:focus {
+            border-color: #10b981 !important;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15) !important;
+        }
+
+        body.light-theme .data-table th {
+            background: #f8fafc !important;
+            color: #475569 !important;
+            border-bottom: 2px solid #e2e8f0 !important;
+        }
+
+        body.light-theme .data-table td {
+            border-bottom: 1px solid #f1f5f9 !important;
+            color: #1e293b !important;
+        }
+
+        body.light-theme .guru-dash-hero {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(240, 253, 250, 0.95)) !important;
+            border: 1px solid rgba(16, 185, 129, 0.3) !important;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.06) !important;
+        }
+
+        body.light-theme .btn-outline {
+            background: #ffffff !important;
+            border-color: #cbd5e1 !important;
+            color: #334155 !important;
+        }
+
+        body.light-theme .btn-outline:hover {
+            background: #f1f5f9 !important;
+            border-color: #94a3b8 !important;
+            color: #0f172a !important;
+        }
+
+        .btn-theme-topbar {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            color: #f59e0b;
+            padding: 6px 12px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .btn-theme-topbar:hover {
+            transform: translateY(-1px);
+            border-color: var(--primary);
+        }
+
         *,
         *::before,
         *::after {
@@ -7445,6 +7570,11 @@
                     class="fas fa-bars"></i></button>
             <h2 id="topbarTitle">Dashboard</h2>
             <div style="flex:1"></div>
+            <!-- Tombol Pengalih Mode Terang / Gelap Dashboard -->
+            <button type="button" class="btn btn-outline btn-sm" id="btnTopThemeToggle" onclick="toggleAdminTheme()" title="Ganti Mode Tampilan (Terang / Gelap)" style="display:inline-flex;align-items:center;gap:6px;margin-right:10px">
+                <i class="fas fa-sun" id="topThemeIcon" style="color:#f59e0b"></i>
+                <span id="topThemeLabel">Mode Terang</span>
+            </button>
             <div class="topbar-user" onclick="openProfileModal()">
                 <div id="topbarAvatarWrap">
                     <div class="topbar-avatar-placeholder" id="topbarAvatarInitial">A</div>
@@ -10949,6 +11079,59 @@
             loadLandingData();
         }
 
+        // ── PENGATURAN MODE TAMPILAN DASHBOARD (TERANG / GELAP) ──
+        window.toggleAdminTheme = function () {
+            var isLight = document.body.classList.contains('light-theme') || document.documentElement.getAttribute('data-theme') === 'light';
+            var newTheme = isLight ? 'dark' : 'light';
+            if (newTheme === 'light') {
+                document.body.classList.add('light-theme');
+                document.body.classList.remove('dark-theme');
+                document.documentElement.setAttribute('data-theme', 'light');
+            } else {
+                document.body.classList.add('dark-theme');
+                document.body.classList.remove('light-theme');
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+            try { localStorage.setItem('portal_theme_mode', newTheme); } catch (e) { }
+            updateThemeButtonsUI(newTheme);
+            showToast('Beralih ke ' + (newTheme === 'light' ? 'Mode Terang' : 'Mode Gelap'), 'info');
+        };
+
+        window.updateThemeButtonsUI = function (theme) {
+            var current = theme || (typeof localStorage !== 'undefined' ? (localStorage.getItem('portal_theme_mode') || 'dark') : 'dark');
+            var isLight = current === 'light';
+            var btn = document.getElementById('btnThemeToggleAdmin');
+            var icon = document.getElementById('themeIconAdmin');
+            var label = document.getElementById('themeLabelAdmin');
+            var topbarIcon = document.getElementById('topThemeIcon');
+            var topbarLabel = document.getElementById('topThemeLabel');
+
+            if (icon) {
+                icon.className = isLight ? 'fas fa-moon' : 'fas fa-sun';
+                icon.style.color = isLight ? '#0ea5e9' : '#f59e0b';
+            }
+            if (label) label.textContent = isLight ? 'Mode Gelap' : 'Mode Terang';
+            if (btn) btn.title = isLight ? 'Beralih ke Mode Gelap' : 'Beralih ke Mode Terang';
+
+            if (topbarIcon) {
+                topbarIcon.className = isLight ? 'fas fa-moon' : 'fas fa-sun';
+                topbarIcon.style.color = isLight ? '#0ea5e9' : '#f59e0b';
+            }
+            if (topbarLabel) topbarLabel.textContent = isLight ? 'Mode Gelap' : 'Mode Terang';
+        };
+
+        (function initAdminTheme() {
+            try {
+                var saved = localStorage.getItem('portal_theme_mode') || 'dark';
+                document.documentElement.setAttribute('data-theme', saved);
+                if (saved === 'light') {
+                    document.body.classList.add('light-theme');
+                } else {
+                    document.body.classList.add('dark-theme');
+                }
+            } catch (e) { }
+        })();
+
         // ═══════════════════════════════════════════════════
         // DASHBOARD INIT
         // ═══════════════════════════════════════════════════
@@ -10959,6 +11142,7 @@
             document.getElementById('landingPage').style.display = 'none';
             document.getElementById('dashboardPage').style.display = 'flex';
             document.getElementById('dashboardPage').classList.add('active');
+            updateThemeButtonsUI();
             document.getElementById('topbarUserName').textContent = u.namaLengkap || u.username;
             document.getElementById('topbarUserRole').textContent = (role === 'admin' ? 'Administrator' : 'Guru Pengajar');
             document.getElementById('topbarAvatarInitial').textContent = (u.namaLengkap ? u.namaLengkap[0].toUpperCase() : 'U');
@@ -15049,12 +15233,12 @@
                         if (rawU) curAdmin = JSON.parse(rawU);
                     } catch (e) { }
                 }
-                var admNama = (curAdmin && curAdmin.namaLengkap) || 'DZULKIFLI, S.Pd';
-                var admAlamat = (curAdmin && curAdmin.alamat) || 'Desa Lagadi, Kec. Lawa, Kab. Muna Barat';
-                var admNip = (curAdmin && curAdmin.nip) || '';
-                var admTelp = (curAdmin && curAdmin.telepon) || '';
-                var admEmail = (curAdmin && curAdmin.email) || 'dzulkifli@sman12munabarat.sch.id';
-                var admFoto = (curAdmin && (curAdmin.fotoProfil || curAdmin['Foto Profil URL'] || curAdmin.foto)) || '';
+                var admNama = (curAdmin && curAdmin.namaLengkap) || (s && s.admin_name) || 'DZULKIFLI, S.Pd';
+                var admAlamat = (curAdmin && curAdmin.alamat) || (s && s.admin_address) || localStorage.getItem('portal_admin_address') || 'Desa Lagadi, Kec. Lawa, Kab. Muna Barat';
+                var admNip = (curAdmin && curAdmin.nip) || (s && s.admin_nip) || '';
+                var admTelp = (curAdmin && curAdmin.telepon) || (s && s.admin_phone) || '082292169010';
+                var admEmail = (curAdmin && curAdmin.email) || (s && s.admin_email) || 'dzulkifli@gmail.com';
+                var admFoto = (curAdmin && (curAdmin.fotoProfil || curAdmin['Foto Profil URL'] || curAdmin.foto)) || (s && s.admin_photo) || localStorage.getItem('portal_admin_photo') || 'cloud-media/teachers/admin-avatar.jpg';
                 var admUsername = (curAdmin && curAdmin.username) || 'DZULKIFLI';
 
                 var cloudStats = (window.PortalCloudStorage && typeof window.PortalCloudStorage.getVaultStats === 'function')
@@ -15675,6 +15859,12 @@
                 school_phone: v('stTelp'), school_email: v('stEmail'), school_accreditation: v('stAkred'),
                 academic_year: v('stTahun'), semester: v('stSemester'), principal_name: v('stKepsek'),
                 principal_photo: kepsekPhotoVal,
+                admin_address: v('stAdminAlamat'),
+                admin_name: v('stAdminNama'),
+                admin_nip: v('stAdminNip'),
+                admin_phone: v('stAdminTelp'),
+                admin_email: v('stAdminEmail'),
+                admin_photo: v('stAdminPhoto'),
                 school_vision: v('stVisi'), school_mission: v('stMisi'), footer_text: v('stFooter'),
                 school_logo_url: v('stLogoUrl'), school_background_url: bgVal,
                 spmb_active: v('stSpmbActive'),
@@ -15698,6 +15888,13 @@
             var adminTelp = v('stAdminTelp');
             var adminEmail = v('stAdminEmail');
             var adminPhoto = v('stAdminPhoto');
+
+            if (adminAlamat) {
+                try { localStorage.setItem('portal_admin_address', adminAlamat); } catch (e) { }
+            }
+            if (adminPhoto) {
+                try { localStorage.setItem('portal_admin_photo', adminPhoto); } catch (e) { }
+            }
 
             var curAdmin = APP.currentUser || {};
             var adminId = curAdmin.id || curAdmin.ID || 'USRMVOW3VFZ8LCZ';
@@ -16240,7 +16437,7 @@
             showWaiting('Memuat Dashboard Admin...', 'Mengambil rekapitulasi data akademik & portal');
             var u = APP.currentUser || {};
             var pUsers = new Promise(function (resolve) {
-                google.script.run.withSuccessHandler(resolve).withFailureHandler(function () { resolve({ success: false, data: [] }); }).getUsers();
+                google.script.run.withSuccessHandler(resolve).withFailureHandler(function () { resolve({ success: false, data: [] }); }).getAllUsers();
             });
             var pStudents = new Promise(function (resolve) {
                 google.script.run.withSuccessHandler(resolve).withFailureHandler(function () { resolve({ success: false, data: [] }); }).getStudents();
@@ -16281,10 +16478,10 @@
 
                 // Ambil data admin terbaru dari tabel Users jika ada
                 var currentAdminRecord = allUsers.find(function (x) {
-                    return (x.ID || x.id) === (u.id || u.ID) || (x.Username || '').toUpperCase() === 'DZULKIFLI';
+                    return (x.ID || x.id) === (u.id || u.ID) || (x.Username || '').toUpperCase() === 'DZULKIFLI' || (x.Role || '').toLowerCase() === 'admin';
                 });
                 if (currentAdminRecord) {
-                    if (currentAdminRecord['Alamat'] !== undefined) {
+                    if (currentAdminRecord['Alamat']) {
                         u.alamat = currentAdminRecord['Alamat'];
                         u['Alamat'] = currentAdminRecord['Alamat'];
                     }
@@ -16331,7 +16528,7 @@
                     todaySubjects = allSubjects.slice(0, 6);
                 }
 
-                // Avatar Admin Interaktif
+                // Avatar Admin Resmi (Bersih & Elegan, pengaturan dipusatkan di Menu Pengaturan)
                 var adminAvatarImg = u.fotoProfil
                     ? '<img src="' + esc(u.fotoProfil) + '" class="guru-dash-avatar" id="dashAdminAvatarImg" onclick="previewFotoGuru(esc(APP.currentUser.namaLengkap), APP.currentUser.fotoProfil)" style="cursor:pointer;border:2.5px solid #10b981;object-fit:cover" title="Klik untuk lihat foto profil penuh">'
                     : '<div class="guru-dash-avatar-placeholder" id="dashAdminAvatarImg" style="background:linear-gradient(135deg,#059669,#10b981);font-size:28px">' + (u.namaLengkap ? u.namaLengkap[0] : 'A') + '</div>';
@@ -16339,16 +16536,25 @@
                 var adminAvatar =
                     '<div style="position:relative;display:inline-block">' +
                     adminAvatarImg +
-                    '<label for="dashAdminPhotoInput" style="position:absolute;bottom:2px;right:2px;background:#10b981;color:#fff;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:2.5px solid #fff;box-shadow:0 3px 8px rgba(0,0,0,0.35);cursor:pointer;transition:transform 0.15s ease" title="Ganti Foto Profil">' +
-                    '<i class="fas fa-camera" style="font-size:12px"></i>' +
-                    '</label>' +
-                    '<input type="file" id="dashAdminPhotoInput" accept="image/*" style="display:none" onchange="handleAdminDashPhoto(this)"/>' +
                     '</div>';
 
-                var adminAlamatDisplay = (u.alamat || u['Alamat'] || '').trim();
-                var alamatBadge = adminAlamatDisplay
-                    ? '<span id="dashAdminAlamatText" style="color:var(--text);font-weight:600">' + esc(adminAlamatDisplay) + '</span>'
-                    : '<span id="dashAdminAlamatText" style="color:var(--text2);font-style:italic">Belum diatur (Klik Ubah Alamat)</span>';
+                // Resolusi Alamat Admin dengan fallback sinkronisasi lintas perangkat
+                var adminAlamatDisplay = (
+                    (currentAdminRecord && (currentAdminRecord['Alamat'] || currentAdminRecord.alamat)) ||
+                    u.alamat ||
+                    u['Alamat'] ||
+                    (APP.settings && APP.settings.admin_address) ||
+                    localStorage.getItem('portal_admin_address') ||
+                    'Desa Lagadi, Kec. Lawa, Kab. Muna Barat'
+                ).trim();
+                u.alamat = adminAlamatDisplay;
+                u['Alamat'] = adminAlamatDisplay;
+                try {
+                    localStorage.setItem('portal_admin_address', adminAlamatDisplay);
+                    localStorage.setItem('portal_current_user', JSON.stringify(u));
+                } catch (e) { }
+
+                var alamatBadge = '<span id="dashAdminAlamatText" style="color:var(--text);font-weight:600">' + esc(adminAlamatDisplay) + '</span>';
 
                 var html =
                     '<div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px">' +
@@ -16356,7 +16562,11 @@
                     '<h1 style="display:flex;align-items:center;gap:10px;margin:0"><i class="fas fa-tachometer-alt" style="color:#10b981"></i> Dashboard Administrator</h1>' +
                     '<p style="margin:4px 0 0;color:var(--text2)">Pusat Kendali Sistem Informasi &amp; Akademik SMAN 12 Muna Barat</p>' +
                     '</div>' +
-                    '<div style="display:flex;align-items:center;gap:8px">' +
+                    '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
+                    '<button class="btn btn-outline btn-sm" id="btnThemeToggleAdmin" onclick="toggleAdminTheme()" style="display:inline-flex;align-items:center;gap:6px;font-weight:600;padding:6px 14px;border-radius:8px" title="Ganti Mode Terang / Gelap">' +
+                    '<i class="fas fa-sun" id="themeIconAdmin" style="color:#f59e0b"></i>' +
+                    '<span id="themeLabelAdmin">Mode Terang</span>' +
+                    '</button>' +
                     '<span class="badge badge-success" style="padding:6px 12px;font-size:12px;display:inline-flex;align-items:center;gap:6px"><i class="fas fa-check-circle"></i> Supabase Cloud Aktif (100% Sinkron)</span>' +
                     '<button class="btn btn-outline btn-sm" onclick="renderDashboardAdmin()" title="Muat ulang data"><i class="fas fa-sync-alt"></i> Segarkan</button>' +
                     '</div>' +
@@ -16371,19 +16581,16 @@
                     '<span class="badge badge-purple" style="font-size:11px"><i class="fas fa-shield-alt"></i> Super Admin</span>' +
                     '</div>' +
                     '<p><i class="fas fa-id-badge" style="width:20px;color:#10b981"></i> <strong>NIP:</strong> ' + esc(u.nip || '-') + ' &bull; <strong>Username:</strong> ' + esc(u.username || 'admin') + ' &bull; <strong>No. HP:</strong> ' + esc(u.telepon || '-') + '</p>' +
-                    '<p style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:4px 0"><i class="fas fa-map-marker-alt" style="width:20px;color:#10b981"></i> <strong>Alamat Domisili:</strong> ' + alamatBadge + ' ' +
-                    '<button type="button" class="btn btn-outline btn-xs" onclick="openEditAdminAddressModal()" style="margin-left:6px;padding:2px 8px;font-size:11px;border-radius:6px;display:inline-flex;align-items:center;gap:4px;cursor:pointer"><i class="fas fa-edit"></i> Ubah Alamat</button></p>' +
+                    '<p style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:4px 0"><i class="fas fa-map-marker-alt" style="width:20px;color:#10b981"></i> <strong>Alamat Domisili:</strong> ' + alamatBadge + '</p>' +
                     '<p><i class="fas fa-school" style="width:20px;color:#10b981"></i> <strong>Institusi:</strong> SMAN 12 MUNA BARAT &bull; ' + esc((APP.settings && APP.settings.school_address) || 'Jl. Poros Lagadi - Tondasi, Tiworo Tengah, Muna Barat') + '</p>' +
                     '<p><i class="fas fa-clock" style="width:20px;color:#10b981"></i> Sesi Aktif: <strong>' + esc(todayDateStr) + '</strong></p>' +
                     '</div>' +
                     '<div style="display:flex;flex-direction:column;gap:8px;min-width:180px">' +
-                    '<button class="btn btn-primary btn-sm" onclick="openEditAdminProfileModal()"><i class="fas fa-user-edit"></i> Edit Profil &amp; Alamat</button>' +
-                    '<label class="btn btn-outline btn-sm" for="dashAdminPhotoInput" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;justify-content:center"><i class="fas fa-camera"></i> Ganti Foto Profil</label>' +
+                    '<button class="btn btn-primary btn-sm" onclick="loadPage(\'settingsAdmin\')"><i class="fas fa-cog"></i> Pengaturan Akun &amp; Web</button>' +
                     '<button class="btn btn-outline btn-sm" onclick="openAddUserModal()"><i class="fas fa-user-plus"></i> Tambah Guru</button>' +
                     '<button class="btn btn-outline btn-sm" onclick="openStudentModal(null)"><i class="fas fa-user-graduate"></i> Tambah Siswa</button>' +
                     '<button class="btn btn-outline btn-sm" onclick="openKelasModal(null,\'' + encGuru + '\')"><i class="fas fa-school"></i> Tambah Kelas</button>' +
                     '<button class="btn btn-outline btn-sm" onclick="openMapelModal(null,\'' + encClass + '\',\'' + encGuru + '\')"><i class="fas fa-calendar-plus"></i> Tambah Jadwal</button>' +
-                    '<button class="btn btn-outline btn-sm" onclick="loadPage(\'settingsAdmin\')"><i class="fas fa-cog"></i> Pengaturan Web</button>' +
                     '</div>' +
                     '</div>' +
 

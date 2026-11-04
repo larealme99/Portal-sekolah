@@ -446,6 +446,12 @@
         "school_vision": "Menjadi sekolah terbaik yang menghasilkan generasi unggul berkarakter dan berdaya saing global.",
         "school_mission": "1. Melaksanakan pembelajaran berkualitas\\n2. Mengembangkan potensi siswa\\n3. Membangun karakter bangsa",
         "principal_photo": "cloud-media/settings/principal-photo.jpg",
+        "admin_address": "Desa Lagadi, Kec. Lawa, Kab. Muna Barat",
+        "admin_name": "DZULKIFLI, S.Pd",
+        "admin_phone": "082292169010",
+        "admin_email": "dzulkifli@gmail.com",
+        "admin_nip": "",
+        "admin_photo": "cloud-media/teachers/admin-avatar.jpg",
         "cloud_drive_account": "larealme99@gmail.com",
         "cloud_github_repo": "larealme99/Portal-sekolah"
     },
@@ -851,12 +857,12 @@
             "Email": "dzulkifli@gmail.com",
             "Role": "admin",
             "Status": "active",
-            "Foto Profil URL": "",
+            "Foto Profil URL": "cloud-media/teachers/admin-avatar.jpg",
             "Tanggal Daftar": "2026-10-26T06:42:59.183Z",
             "Tanggal Approve": "2026-10-26T06:42:59.183Z",
             "NIP": "",
             "Telepon": "082292169010",
-            "Alamat": "",
+            "Alamat": "Desa Lagadi, Kec. Lawa, Kab. Muna Barat",
             "Jenis Kelamin": "Laki-laki",
             "Jenis PTK": "Tenaga Kependidikan"
         },
@@ -5594,6 +5600,16 @@
         if ((!combined['Foto Profil URL'] || !combined['Foto Profil URL'].trim()) && KNOWN_TEACHER_PHOTO_MAP[uId]) {
           combined['Foto Profil URL'] = KNOWN_TEACHER_PHOTO_MAP[uId];
         }
+        if (combined.Username === 'DZULKIFLI' || combined.ID === 'USRMVOW3VFZ8LCZ' || (combined.Role || '').toLowerCase() === 'admin') {
+          const savedAdminAlamat = (typeof localStorage !== 'undefined' && localStorage.getItem('portal_admin_address')) || (base && base['Alamat']) || 'Desa Lagadi, Kec. Lawa, Kab. Muna Barat';
+          if (!combined['Alamat'] || !String(combined['Alamat']).trim()) {
+            combined['Alamat'] = savedAdminAlamat;
+          }
+          const savedAdminPhoto = (typeof localStorage !== 'undefined' && localStorage.getItem('portal_admin_photo')) || (base && base['Foto Profil URL']) || 'cloud-media/teachers/admin-avatar.jpg';
+          if (!combined['Foto Profil URL'] || !String(combined['Foto Profil URL']).trim()) {
+            combined['Foto Profil URL'] = savedAdminPhoto;
+          }
+        }
         if (!combined['Jenis Kelamin'] && base['Jenis Kelamin']) {
           combined['Jenis Kelamin'] = base['Jenis Kelamin'];
         }
@@ -6085,7 +6101,7 @@
     try {
       if (typeof localStorage === 'undefined') return;
 
-      const SNAPSHOT_VERSION = '2026-11-03-v6';
+      const SNAPSHOT_VERSION = '2026-11-04-v7';
       const currentVer = localStorage.getItem('portal_snapshot_version');
 
       // 1. Hapus sesi login apabila yang tersimpan adalah akun dummy (USR001 / admin / Administrator)
@@ -6224,10 +6240,10 @@
           namaLengkap: u['Nama Lengkap'] || u.namaLengkap || uname,
           email: u['Email'] || u.email || '',
           role: isAdminRole ? 'admin' : (rawRole || 'guru'),
-          fotoProfil: u['Foto Profil URL'] || u.fotoProfil || '',
+          fotoProfil: u['Foto Profil URL'] || u.fotoProfil || (isAdminRole ? ((typeof localStorage !== 'undefined' && localStorage.getItem('portal_admin_photo')) || REAL_SCHOOL_SNAPSHOT.SettingsMap.admin_photo || 'cloud-media/teachers/admin-avatar.jpg') : ''),
           nip: u['NIP'] || u.nip || '',
           telepon: u['Telepon'] || u.telepon || '',
-          alamat: u['Alamat'] || u.alamat || ''
+          alamat: u['Alamat'] || u.alamat || (isAdminRole ? ((typeof localStorage !== 'undefined' && localStorage.getItem('portal_admin_address')) || REAL_SCHOOL_SNAPSHOT.SettingsMap.admin_address || 'Desa Lagadi, Kec. Lawa, Kab. Muna Barat') : '')
         };
       };
 
@@ -6708,6 +6724,20 @@
         if (updateData.password) updateFields['Password'] = updateData.password;
         if (updateData.newPassword) updateFields['Password'] = updateData.newPassword;
 
+        if (updateData.alamat && (userId === 'USRMVOW3VFZ8LCZ' || updateData.username === 'DZULKIFLI' || updateData.role === 'admin')) {
+          try {
+            localStorage.setItem('portal_admin_address', updateData.alamat);
+            REAL_SCHOOL_SNAPSHOT.SettingsMap.admin_address = updateData.alamat;
+          } catch (e) { }
+        }
+        if ((updateData.fotoProfilUrl || updateData.fotoProfil) && (userId === 'USRMVOW3VFZ8LCZ' || updateData.username === 'DZULKIFLI' || updateData.role === 'admin')) {
+          try {
+            const photoVal = updateData.fotoProfilUrl || updateData.fotoProfil;
+            localStorage.setItem('portal_admin_photo', photoVal);
+            REAL_SCHOOL_SNAPSHOT.SettingsMap.admin_photo = photoVal;
+          } catch (e) { }
+        }
+
         // Extra metadata (Jenis Kelamin & Jenis PTK)
         const extraMeta = {};
         const jk = updateData.jenisKelamin !== undefined ? updateData.jenisKelamin : updateData['Jenis Kelamin'];
@@ -6864,6 +6894,23 @@
           }
           if (settingsObj.principal_photo) {
             localStorage.setItem('portal_principal_photo', settingsObj.principal_photo);
+          }
+          if (settingsObj.admin_address) {
+            localStorage.setItem('portal_admin_address', settingsObj.admin_address);
+            REAL_SCHOOL_SNAPSHOT.SettingsMap.admin_address = settingsObj.admin_address;
+            try {
+              const allCached = _getTableCache('Users');
+              const adm = allCached.find(x => (x.ID || x.id) === 'USRMVOW3VFZ8LCZ' || (x.Username || '').toUpperCase() === 'DZULKIFLI');
+              if (adm) {
+                adm['Alamat'] = settingsObj.admin_address;
+                adm.alamat = settingsObj.admin_address;
+                _setTableCache('Users', allCached);
+              }
+            } catch (e) { }
+          }
+          if (settingsObj.admin_photo) {
+            localStorage.setItem('portal_admin_photo', settingsObj.admin_photo);
+            REAL_SCHOOL_SNAPSHOT.SettingsMap.admin_photo = settingsObj.admin_photo;
           }
         } catch (e) { }
 
