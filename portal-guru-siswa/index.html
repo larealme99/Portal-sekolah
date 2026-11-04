@@ -22,6 +22,7 @@
       SUPABASE_ANON_KEY: 'sb_publishable_GjKXAsbZi1HP2kkBGMvMzg_cmyIFcu6'
     };
   </script>
+  <script src="supabase-bridge.js"></script>
   <script src="../supabase-bridge.js"></script>
 
   <style>
@@ -3779,6 +3780,112 @@
     let isSyncingData = false;
     let autoSyncTimer = null;
 
+    // ── PETA FOTO RESMI DEWAN GURU SMAN 12 MUNA BARAT ──
+    const KNOWN_TEACHER_PHOTO_MAP = {
+      'USRMVL3A5K7HB02': 'cloud-media/teachers/USRMVL3A5K7HB02.jpg', // LA ODE HARNADO
+      'USRMVL3KPCGXBVZ': 'cloud-media/teachers/USRMVL3KPCGXBVZ.jpg', // RAHMAN RAJAB
+      'USRMVLS1SJ33FOG': 'cloud-media/teachers/USRMVLS1SJ33FOG.jpg', // DESTI ASRIYAH
+      'USRMVLZ3DDLIH3T': 'cloud-media/teachers/USRMVLZ3DDLIH3T.jpg', // LIA ARIANTI
+      'USRMVM21Z6SHJZ6': 'cloud-media/teachers/USRMVM21Z6SHJZ6.jpg', // HASRANI
+      'USRMVNUMVEGZ2GE': 'cloud-media/teachers/USRMVNUMVEGZ2GE.jpg', // MARTHA
+      'USRMVNV3EY0Z0Q3': 'cloud-media/teachers/USRMVNV3EY0Z0Q3.jpg', // ASBIA
+      'USRMVNV7HLF8OWP': 'cloud-media/teachers/USRMVNV7HLF8OWP.jpg', // YANTI FIRDARATIH
+      'USRMVNVCZN3F8R4': 'cloud-media/teachers/USRMVNVCZN3F8R4.jpg', // SITTI HAJRAH
+      'USRMVNVFO9PWZ0V': 'cloud-media/teachers/USRMVNVFO9PWZ0V.jpg', // MARLIANTI
+      'USRMVNVP3CZIRSB': 'cloud-media/teachers/USRMVNVP3CZIRSB.jpg', // SITI MURNI
+      'USRMVNVSCESNYR7': 'cloud-media/teachers/USRMVNVSCESNYR7.jpg', // EFRIA
+      'USRMVNVVHPWXA14': 'cloud-media/teachers/USRMVNVVHPWXA14.jpg', // HASNIAR
+      'USRMVNVYN602X02': 'cloud-media/teachers/USRMVNVYN602X02.jpg', // SITI SARINA
+      'USRMVNW1D0B50GO': 'cloud-media/teachers/USRMVNW1D0B50GO.jpg', // ABDUL MAMAN SAPUTRA
+      'USRMVNW49WI05H2': 'cloud-media/teachers/USRMVNW49WI05H2.jpg', // SYAWALUDIN TAGALI
+      'USRMVNW8O3OOQO5': 'cloud-media/teachers/USRMVNW8O3OOQO5.jpg', // WA ODE ISMAWATI
+      'USRMVNWB9YX4NR2': 'cloud-media/teachers/USRMVNWB9YX4NR2.jpg', // LILIS URMAYANI
+      'USRMVNWEUE9L58E': 'cloud-media/teachers/USRMVNWEUE9L58E.jpg', // SAMARUDIN
+      'USRMVNWGZ579WL1': 'cloud-media/teachers/USRMVNWGZ579WL1.jpg', // MEGAWATI
+      'USRMVNWJ01WHJYI': 'cloud-media/teachers/USRMVNWJ01WHJYI.jpg', // WA ODE AFRIANI
+      'USRMVNWNM4N3REE': 'cloud-media/teachers/USRMVNWNM4N3REE.jpg', // NUR HIKMA
+      'USRMVNWPN4BGC91': 'cloud-media/teachers/USRMVNWPN4BGC91.jpg', // NURZA
+      'USRMVOW3VFZ8LCZ': 'cloud-media/teachers/admin-avatar.jpg',    // DZULKIFLI
+      'DZULKIFLI': 'cloud-media/teachers/admin-avatar.jpg'
+    };
+
+    function isPhotoPath(val) {
+      if (!val || typeof val !== 'string') return false;
+      const s = val.trim();
+      if (!s) return false;
+      if (s.startsWith('data:image/') || s.startsWith('http://') || s.startsWith('https://') || s.startsWith('blob:')) return true;
+      if (/\.(jpg|jpeg|png|webp|gif|svg)$/i.test(s)) return true;
+      if (s.includes('cloud-media') || s.includes('teachers') || s.includes('/') || s.includes('\\')) return true;
+      return false;
+    }
+
+    function getTeacherPhoto(id, username, name) {
+      if (id && KNOWN_TEACHER_PHOTO_MAP[id]) return KNOWN_TEACHER_PHOTO_MAP[id];
+      const uClean = String(username || '').trim().toUpperCase();
+      if (uClean && KNOWN_TEACHER_PHOTO_MAP[uClean]) return KNOWN_TEACHER_PHOTO_MAP[uClean];
+      if (uClean === 'DZULKIFLI') return 'cloud-media/teachers/admin-avatar.jpg';
+
+      const nClean = String(name || '').toLowerCase();
+      if (nClean) {
+        if (nClean.includes('dzulkifli')) return 'cloud-media/teachers/admin-avatar.jpg';
+        if (nClean.includes('hasniar')) return 'cloud-media/teachers/USRMVNVVHPWXA14.jpg';
+        if (nClean.includes('hasrani')) return 'cloud-media/teachers/USRMVM21Z6SHJZ6.jpg';
+        if (nClean.includes('rahman rajab')) return 'cloud-media/teachers/USRMVL3KPCGXBVZ.jpg';
+        if (nClean.includes('lia arianti')) return 'cloud-media/teachers/USRMVLZ3DDLIH3T.jpg';
+        if (nClean.includes('ismawati')) return 'cloud-media/teachers/USRMVNW8O3OOQO5.jpg';
+        if (nClean.includes('martha')) return 'cloud-media/teachers/USRMVNUMVEGZ2GE.jpg';
+        if (nClean.includes('lilis')) return 'cloud-media/teachers/USRMVNWB9YX4NR2.jpg';
+        if (nClean.includes('yanti')) return 'cloud-media/teachers/USRMVNV7HLF8OWP.jpg';
+        if (nClean.includes('harnado')) return 'cloud-media/teachers/USRMVL3A5K7HB02.jpg';
+        if (nClean.includes('megawati')) return 'cloud-media/teachers/USRMVNWGZ579WL1.jpg';
+        if (nClean.includes('maman')) return 'cloud-media/teachers/USRMVNW1D0B50GO.jpg';
+        if (nClean.includes('marlianti')) return 'cloud-media/teachers/USRMVNVFO9PWZ0V.jpg';
+        if (nClean.includes('nurza')) return 'cloud-media/teachers/USRMVNWPN4BGC91.jpg';
+        if (nClean.includes('afriani')) return 'cloud-media/teachers/USRMVNWJ01WHJYI.jpg';
+        if (nClean.includes('asbia')) return 'cloud-media/teachers/USRMVNV3EY0Z0Q3.jpg';
+        if (nClean.includes('desti')) return 'cloud-media/teachers/USRMVLS1SJ33FOG.jpg';
+        if (nClean.includes('efria')) return 'cloud-media/teachers/USRMVNVSCESNYR7.jpg';
+        if (nClean.includes('nur hikma')) return 'cloud-media/teachers/USRMVNWNM4N3REE.jpg';
+        if (nClean.includes('samarudin')) return 'cloud-media/teachers/USRMVNWEUE9L58E.jpg';
+        if (nClean.includes('siti murni')) return 'cloud-media/teachers/USRMVNVP3CZIRSB.jpg';
+        if (nClean.includes('siti sarina')) return 'cloud-media/teachers/USRMVNVYN602X02.jpg';
+        if (nClean.includes('hajrah')) return 'cloud-media/teachers/USRMVNVCZN3F8R4.jpg';
+        if (nClean.includes('syawaludin')) return 'cloud-media/teachers/USRMVNW49WI05H2.jpg';
+      }
+      return '';
+    }
+
+    // Penanganan multi-tier error gambar avatar untuk Aplikasi Android & Web
+    window.handleAvatarImgError = function(img, fallbackEmoji) {
+      if (!img) return;
+      const raw = img.getAttribute('data-original-src') || img.getAttribute('src') || '';
+      const clean = raw.replace(/^(\.\.\/)+/, '').replace(/^\/+/, '');
+
+      // 1. Coba ../cloud-media/... jika diakses sebagai subdirektori browser
+      if (!img.dataset.triedParent) {
+        img.dataset.triedParent = '1';
+        img.src = '../' + clean;
+        return;
+      }
+      // 2. Coba path lokal langsung (portal-guru-siswa/cloud-media/...)
+      if (!img.dataset.triedLocal) {
+        img.dataset.triedLocal = '1';
+        img.src = clean;
+        return;
+      }
+      // 3. Coba GitHub Raw CDN publik (selalu live dan dapat diakses dari Android)
+      if (!img.dataset.triedCdn && clean.startsWith('cloud-media/')) {
+        img.dataset.triedCdn = '1';
+        img.src = 'https://raw.githubusercontent.com/larealme99/Portal-sekolah/main/' + clean;
+        return;
+      }
+      // 4. Jika seluruhnya gagal, gantikan dengan emoji fallback
+      img.onerror = null;
+      if (img.parentElement) {
+        img.parentElement.innerHTML = fallbackEmoji || '👨‍🏫';
+      }
+    };
+
     // Hashing password konsisten dengan supabase-bridge.js
     async function hashPassword(str) {
       try {
@@ -4189,14 +4296,22 @@
           }
 
           if (isMatched) {
+            const teacherId = u.ID || u.id || '';
+            const teacherUname = u.Username || u.username || usernameVal;
+            const teacherName = u['Nama Lengkap'] || u.namaLengkap || teacherUname;
+            let teacherPhoto = u['Foto Profil URL'] || u.fotoProfil || '';
+            if (!teacherPhoto || !isPhotoPath(teacherPhoto)) {
+              teacherPhoto = getTeacherPhoto(teacherId, teacherUname, teacherName);
+            }
+
             currentUser = {
               role: finalRole,
-              id: u.ID || u.id || '',
-              username: u.Username || u.username || usernameVal,
-              name: u['Nama Lengkap'] || u.namaLengkap || u.Username || usernameVal,
+              id: teacherId,
+              username: teacherUname,
+              name: teacherName,
               nip: u.NIP || u.nip || '-',
               phone: u.Telepon || u.telepon || '',
-              photo: u['Foto Profil URL'] || u.fotoProfil || ''
+              photo: teacherPhoto
             };
             localStorage.setItem('smandum_active_user', JSON.stringify(currentUser));
             loginSuccess();
@@ -7773,7 +7888,26 @@
         // 4. Process Teachers
         if (teachRes.status === 'fulfilled' && Array.isArray(teachRes.value?.data)) {
           dbTeachers = teachRes.value.data.filter(u => (u.Role || u.role) !== 'siswa');
+          dbTeachers.forEach(t => {
+            const tId = t.ID || t.id;
+            if ((!t['Foto Profil URL'] || !t['Foto Profil URL'].trim()) && KNOWN_TEACHER_PHOTO_MAP[tId]) {
+              t['Foto Profil URL'] = KNOWN_TEACHER_PHOTO_MAP[tId];
+            }
+          });
           try { localStorage.setItem('portal_teachers_data', JSON.stringify(dbTeachers)); } catch (e) {}
+
+          // Sinkronkan foto profil sesi pengguna guru yang sedang aktif
+          if (currentUser && currentUser.role !== 'siswa') {
+            const matchMe = dbTeachers.find(t => (t.ID || t.id) === currentUser.id || String(t.Username || t.username).toLowerCase() === String(currentUser.username).toLowerCase());
+            if (matchMe) {
+              const freshPhoto = matchMe['Foto Profil URL'] || matchMe.fotoProfil || getTeacherPhoto(currentUser.id, currentUser.username, currentUser.name);
+              if (freshPhoto && freshPhoto !== currentUser.photo) {
+                currentUser.photo = freshPhoto;
+                try { localStorage.setItem('smandum_active_user', JSON.stringify(currentUser)); } catch (e) {}
+                updateAvatarDisplay(currentUser.photo);
+              }
+            }
+          }
         }
 
         // 5. Process Subjects
@@ -12657,11 +12791,19 @@
         }
       }
 
-      const photo = currentUser.photo;
-      if (photo && (photo.startsWith('data:image') || photo.startsWith('http'))) {
-        container.innerHTML = `<img src="${photo}" class="preview-photo-img" alt="${currentUser.name}">`;
+      let photo = currentUser.photo;
+      if (!photo && currentUser.role !== 'siswa') {
+        photo = getTeacherPhoto(currentUser.id, currentUser.username, currentUser.name);
+      }
+
+      const isSiswa = currentUser.role === 'siswa';
+      const defEmoji = isSiswa ? '👨‍🎓' : (currentUser.role === 'admin' ? '🛡️' : '👨‍🏫');
+
+      if (photo && isPhotoPath(photo)) {
+        const cleanPath = String(photo).trim().replace(/\\/g, '/');
+        container.innerHTML = `<img src="${cleanPath}" data-original-src="${cleanPath}" class="preview-photo-img" alt="${escapeHtml(currentUser.name)}" onerror="handleAvatarImgError(this, '${defEmoji}')" style="max-height:280px;max-width:100%;border-radius:12px;object-fit:contain;box-shadow:0 8px 24px rgba(0,0,0,0.4);">`;
       } else {
-        const emoji = photo || (currentUser.role === 'siswa' ? '👨‍🎓' : '👨‍🏫');
+        const emoji = photo || defEmoji;
         container.innerHTML = `<div style="font-size:96px; text-shadow:0 10px 25px rgba(0,0,0,0.5);">${emoji}</div>`;
       }
 
@@ -12747,22 +12889,33 @@
     function updateAvatarDisplay(photoVal) {
       const navAvatar = document.getElementById('home-user-avatar');
       const profAvatar = document.getElementById('profile-avatar-img');
+      const isSiswa = currentUser && currentUser.role === 'siswa';
+      const defEmoji = isSiswa ? '👨‍🎓' : (currentUser && currentUser.role === 'admin' ? '🛡️' : '👨‍🏫');
 
-      if (!photoVal) {
-        const defEmoji = currentUser && currentUser.role === 'siswa' ? '👨‍🎓' : '👨‍🏫';
+      let finalPhoto = photoVal;
+      if (!finalPhoto && currentUser && !isSiswa) {
+        finalPhoto = getTeacherPhoto(currentUser.id, currentUser.username, currentUser.name);
+        if (finalPhoto) {
+          currentUser.photo = finalPhoto;
+          try { localStorage.setItem('smandum_active_user', JSON.stringify(currentUser)); } catch (e) {}
+        }
+      }
+
+      if (!finalPhoto) {
         if (navAvatar) navAvatar.innerHTML = defEmoji;
         if (profAvatar) profAvatar.innerHTML = defEmoji;
         return;
       }
 
-      if (photoVal.startsWith('data:image') || photoVal.startsWith('http')) {
-        const imgHtml = `<img src="${photoVal}" alt="Avatar">`;
+      if (isPhotoPath(finalPhoto)) {
+        const cleanPath = String(finalPhoto).trim().replace(/\\/g, '/');
+        const imgHtml = `<img src="${cleanPath}" data-original-src="${cleanPath}" alt="Avatar" onerror="handleAvatarImgError(this, '${defEmoji}')" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block;">`;
         if (navAvatar) navAvatar.innerHTML = imgHtml;
         if (profAvatar) profAvatar.innerHTML = imgHtml;
       } else {
         // Emoji preset
-        if (navAvatar) navAvatar.innerHTML = photoVal;
-        if (profAvatar) profAvatar.innerHTML = photoVal;
+        if (navAvatar) navAvatar.innerHTML = finalPhoto;
+        if (profAvatar) profAvatar.innerHTML = finalPhoto;
       }
     }
 
@@ -14623,6 +14776,9 @@
           const parsed = JSON.parse(savedUser);
           if (parsed && parsed.role) {
             currentUser = parsed;
+            if (currentUser.role !== 'siswa' && (!currentUser.photo || !isPhotoPath(currentUser.photo))) {
+              currentUser.photo = getTeacherPhoto(currentUser.id, currentUser.username, currentUser.name);
+            }
             currentRole = currentUser.role === 'siswa' ? 'siswa' : 'guru';
             loginSuccess();
           } else {
