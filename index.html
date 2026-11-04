@@ -6638,10 +6638,10 @@
                 <!-- ALAMAT SEKOLAH DENGAN TULISAN MIRING -->
                 <p class="lp-hero-school-meta" id="lpHeroSchoolMeta">
                     <span><i class="fas fa-map-marker-alt" style="color:#38bdf8;margin-right:5px"></i><span
-                            id="lpHeroAddress">Jl. Poros Lagadi-Tondasi, Muna Barat</span></span>
+                            id="lpHeroAddress">Pulau Maginti, Desa Kangkunawe, Kecamatan Maginti</span></span>
                     <span style="opacity:0.6">&bull;</span>
                     <span><i class="fas fa-id-card" style="color:#38bdf8;margin-right:5px"></i>NPSN: <span
-                            id="lpHeroNpsn">69989028</span></span>
+                            id="lpHeroNpsn">70011748</span></span>
                 </p>
                 <div class="simpul-headline-box">
                     <h1 class="simpul-headline-1">Satu Aplikasi,</h1>
@@ -8734,10 +8734,19 @@
                     if (parsedSet.principal_name === 'Drs. H. Kepala Sekolah, M.Pd') {
                         parsedSet.principal_name = 'La Ode Mursaban Indi, S.Pd., M.Pd';
                     }
-                    if (parsedSet.school_npsn === '69989028') {
+                    if (!parsedSet.school_npsn || parsedSet.school_npsn === '69989028') {
                         parsedSet.school_npsn = '70011748';
                     }
+                    if (!parsedSet.school_address || parsedSet.school_address.includes('Lagadi') || parsedSet.school_address.includes('_')) {
+                        parsedSet.school_address = 'Pulau Maginti, Desa Kangkunawe, Kecamatan Maginti';
+                    }
                     APP.settings = parsedSet;
+                } else {
+                    APP.settings = {
+                        school_name: 'SMA Negeri 12 Muna Barat',
+                        school_address: 'Pulau Maginti, Desa Kangkunawe, Kecamatan Maginti',
+                        school_npsn: '70011748'
+                    };
                 }
             } catch (e) { }
 
@@ -8838,8 +8847,14 @@
         function applySettings() {
             var s = APP.settings || {};
             var sn = s.school_name || 'SMA Negeri 12 Muna Barat';
-            var sAddr = s.school_address || 'Pulau Maginti_Desa Kangkunawe_Kecamatan Maginti';
+            var sAddr = s.school_address || 'Pulau Maginti, Desa Kangkunawe, Kecamatan Maginti';
             var sNpsn = s.school_npsn || '70011748';
+            if (!sAddr || sAddr.includes('Lagadi') || sAddr.includes('_')) {
+                sAddr = 'Pulau Maginti, Desa Kangkunawe, Kecamatan Maginti';
+            }
+            if (!sNpsn || sNpsn === '69989028') {
+                sNpsn = '70011748';
+            }
             function setText(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
             setText('lpSchoolName', sn);
             setText('lpHeroSchoolTitle', sn);
@@ -11437,7 +11452,7 @@
             var s = APP.settings || {};
             var notice = s.spmb_disabled_notice || 'Pendaftaran Penerimaan Murid Baru (SPMB) SMAN 12 Muna Barat saat ini belum dibuka atau sedang dalam masa persiapan tahun ajaran baru. Silakan pantau pengumuman resmi berkala dari pihak sekolah atau hubungi panitia melalui kontak berikut.';
             var sn = s.school_name || 'SMAN 12 Muna Barat';
-            var addr = s.school_address || 'Jl. Poros Lagadi-Tondasi, Muna Barat';
+            var addr = s.school_address || 'Pulau Maginti, Desa Kangkunawe, Kecamatan Maginti';
             var telp = s.school_phone || '0821-xxxx-xxxx';
             var email = s.school_email || 'sman12munabarat@gmail.com';
 
@@ -11867,7 +11882,7 @@
             SPMB_CURRENT_RECEIPT_ITEM = item;
             var s = APP.settings || {};
             var schoolName = s.school_name || 'SMA NEGERI 12 MUNA BARAT';
-            var schoolAddr = s.school_address || 'Pulau Maginti_Desa Kangkunawe_Kecamatan Maginti';
+            var schoolAddr = s.school_address || 'Pulau Maginti, Desa Kangkunawe, Kecamatan Maginti';
             var schoolNpsn = s.school_npsn || '70011748';
             var regNo = item.nomorPendaftaran || item.id;
             var tglStr = new Date(item.tanggalDaftar || Date.now()).toLocaleDateString('id-ID', {
@@ -15442,8 +15457,14 @@
                     '<small style="color:var(--text2);display:block;margin-top:4px">Upload foto resmi Kepala Sekolah (format potret/avatar, dapat disesuaikan crop &amp; framing wajah secara presisi).</small>' +
                     '</div></div></div>' +
                     '<div class="settings-section"><div class="settings-section-title"><i class="fas fa-school"></i> Identitas Sekolah</div>' +
-                    '<div class="form-row"><div class="form-group"><label>Nama Sekolah</label><input class="form-control" id="stNama" value="' + esc(s.school_name || '') + '"/></div><div class="form-group"><label>NPSN</label><input class="form-control" id="stNPSN" value="' + esc(s.school_npsn || '') + '"/></div></div>' +
-                    '<div class="form-group"><label>Alamat</label><textarea class="form-control" id="stAlamat">' + esc(s.school_address || '') + '</textarea></div>' +
+                    (function() {
+                        var sNpsnInput = s.school_npsn || '70011748';
+                        if (sNpsnInput === '69989028') sNpsnInput = '70011748';
+                        var sAlamatInput = s.school_address || 'Pulau Maginti, Desa Kangkunawe, Kecamatan Maginti';
+                        if (!sAlamatInput || sAlamatInput.includes('Lagadi') || sAlamatInput.includes('_')) sAlamatInput = 'Pulau Maginti, Desa Kangkunawe, Kecamatan Maginti';
+                        return '<div class="form-row"><div class="form-group"><label>Nama Sekolah</label><input class="form-control" id="stNama" value="' + esc(s.school_name || 'SMAN 12 Muna Barat') + '"/></div><div class="form-group"><label>NPSN</label><input class="form-control" id="stNPSN" value="' + esc(sNpsnInput) + '"/></div></div>' +
+                               '<div class="form-group"><label>Alamat</label><textarea class="form-control" id="stAlamat">' + esc(sAlamatInput) + '</textarea></div>';
+                    })() +
                     '<div class="form-row"><div class="form-group"><label>Telepon</label><input class="form-control" id="stTelp" value="' + esc(s.school_phone || '') + '"/></div><div class="form-group"><label>Email</label><input class="form-control" id="stEmail" value="' + esc(s.school_email || '') + '"/></div></div>' +
                     '<div class="form-row"><div class="form-group"><label>Akreditasi</label><select class="form-control" id="stAkred"><option>A</option><option>B</option><option>C</option><option>Belum Terakreditasi</option></select></div><div class="form-group"><label>Tahun Ajaran</label><input class="form-control" id="stTahun" value="' + esc(s.academic_year || '') + '"/></div></div>' +
                     '<div class="form-row"><div class="form-group"><label>Semester</label><select class="form-control" id="stSemester"><option value="Ganjil">Ganjil</option><option value="Genap">Genap</option></select></div><div class="form-group"><label>Nama Kepala Sekolah</label><input class="form-control" id="stKepsek" value="' + esc(s.principal_name || '') + '"/></div></div>' +
@@ -15982,6 +16003,14 @@
                 cloud_drive_folder_url: cloudDriveFolder,
                 gallery_images: JSON.stringify(getActiveGalleryPhotos())
             };
+
+            // Langsung sinkronkan ke memori lokal & perbarui halaman depan tanpa menunggu callback
+            APP.settings = Object.assign({}, APP.settings, data);
+            try {
+                localStorage.setItem('portal_app_settings', JSON.stringify(APP.settings));
+                localStorage.setItem('portal_settings_cache', JSON.stringify(APP.settings));
+            } catch (e) { }
+            applySettings();
             if (bgVal) {
                 try { localStorage.setItem('portal_school_background_url', bgVal); } catch (e) { }
             }
@@ -16696,7 +16725,7 @@
                     '</div>' +
                     '<p><i class="fas fa-id-badge" style="width:20px;color:#10b981"></i> <strong>NIP:</strong> ' + esc(u.nip || '-') + ' &bull; <strong>Username:</strong> ' + esc(u.username || 'admin') + ' &bull; <strong>No. HP:</strong> ' + esc(u.telepon || '-') + '</p>' +
                     '<p style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:4px 0"><i class="fas fa-map-marker-alt" style="width:20px;color:#10b981"></i> <strong>Alamat Domisili:</strong> ' + alamatBadge + '</p>' +
-                    '<p><i class="fas fa-school" style="width:20px;color:#10b981"></i> <strong>Institusi:</strong> SMAN 12 MUNA BARAT &bull; ' + esc((APP.settings && APP.settings.school_address) || 'Jl. Poros Lagadi - Tondasi, Tiworo Tengah, Muna Barat') + '</p>' +
+                    '<p><i class="fas fa-school" style="width:20px;color:#10b981"></i> <strong>Institusi:</strong> SMAN 12 MUNA BARAT &bull; ' + esc((APP.settings && APP.settings.school_address) || 'Pulau Maginti, Desa Kangkunawe, Kecamatan Maginti') + '</p>' +
                     '<p><i class="fas fa-clock" style="width:20px;color:#10b981"></i> Sesi Aktif: <strong>' + esc(todayDateStr) + '</strong></p>' +
                     '</div>' +
                     '<div style="display:flex;flex-direction:column;gap:8px;min-width:180px">' +

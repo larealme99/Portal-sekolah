@@ -429,8 +429,8 @@
   const REAL_SCHOOL_SNAPSHOT = {
     "SettingsMap": {
         "school_name": "SMAN 12 Muna Barat",
-        "school_address": "Jl. Poros Lagadi-Tondasi, Muna Barat",
-        "school_npsn": "69989028",
+        "school_address": "Pulau Maginti, Desa Kangkunawe, Kecamatan Maginti",
+        "school_npsn": "70011748",
         "school_phone": "081234567890",
         "school_email": "info@sman12munabarat.sch.id",
         "school_accreditation": "A",
@@ -6101,7 +6101,7 @@
     try {
       if (typeof localStorage === 'undefined') return;
 
-      const SNAPSHOT_VERSION = '2026-11-04-v7';
+      const SNAPSHOT_VERSION = '2026-11-04-v8';
       const currentVer = localStorage.getItem('portal_snapshot_version');
 
       // 1. Hapus sesi login apabila yang tersimpan adalah akun dummy (USR001 / admin / Administrator)
@@ -6837,10 +6837,22 @@
 
     // --- SETTINGS (PENGATURAN SEKOLAH) ---
     getDefaultSettings() {
-      return {
+      let localSaved = {};
+      try {
+        localSaved = JSON.parse(localStorage.getItem('portal_settings_cache') || localStorage.getItem('portal_app_settings') || '{}');
+      } catch (e) { }
+      const res = {
         ...REAL_SCHOOL_SNAPSHOT.SettingsMap,
+        ...localSaved,
         gallery_images: JSON.stringify(REAL_SCHOOL_SNAPSHOT.GalleryImages || [])
       };
+      if (!res.school_address || res.school_address.includes('Lagadi') || res.school_address.includes('_')) {
+        res.school_address = 'Pulau Maginti, Desa Kangkunawe, Kecamatan Maginti';
+      }
+      if (!res.school_npsn || res.school_npsn === '69989028') {
+        res.school_npsn = '70011748';
+      }
+      return res;
     },
 
     async getSettings() {
@@ -6862,8 +6874,15 @@
             settings[row.Key] = row.Value;
           }
         });
+        if (!settings.school_address || settings.school_address.includes('Lagadi') || settings.school_address.includes('_')) {
+          settings.school_address = 'Pulau Maginti, Desa Kangkunawe, Kecamatan Maginti';
+        }
+        if (!settings.school_npsn || settings.school_npsn === '69989028') {
+          settings.school_npsn = '70011748';
+        }
         try {
           localStorage.setItem('portal_settings_cache', JSON.stringify(settings));
+          localStorage.setItem('portal_app_settings', JSON.stringify(settings));
         } catch (e) { }
         return { success: true, data: settings };
       } catch (e) {
@@ -6889,11 +6908,23 @@
           const merged = { ...cached, ...settingsObj };
           localStorage.setItem('portal_settings_cache', JSON.stringify(merged));
           localStorage.setItem('portal_app_settings', JSON.stringify(merged));
+          
+          if (settingsObj.school_address) {
+            REAL_SCHOOL_SNAPSHOT.SettingsMap.school_address = settingsObj.school_address;
+          }
+          if (settingsObj.school_npsn) {
+            REAL_SCHOOL_SNAPSHOT.SettingsMap.school_npsn = settingsObj.school_npsn;
+          }
+          if (settingsObj.school_name) {
+            REAL_SCHOOL_SNAPSHOT.SettingsMap.school_name = settingsObj.school_name;
+          }
           if (settingsObj.school_background_url) {
             localStorage.setItem('portal_school_background_url', settingsObj.school_background_url);
+            REAL_SCHOOL_SNAPSHOT.SettingsMap.school_background_url = settingsObj.school_background_url;
           }
           if (settingsObj.principal_photo) {
             localStorage.setItem('portal_principal_photo', settingsObj.principal_photo);
+            REAL_SCHOOL_SNAPSHOT.SettingsMap.principal_photo = settingsObj.principal_photo;
           }
           if (settingsObj.admin_address) {
             localStorage.setItem('portal_admin_address', settingsObj.admin_address);
